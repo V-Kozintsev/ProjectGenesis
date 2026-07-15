@@ -42,7 +42,8 @@ Add basic third-person movement.
 
 Acceptance criteria:
 
-- player can move with keyboard;
+- player can move by left-clicking the ground;
+- keyboard movement remains available as an optional fallback;
 - movement is smooth enough for prototype;
 - camera follows player;
 - code is separated from future combat logic.
@@ -65,4 +66,3 @@ Acceptance criteria:
 - skill trees;
 - crafting;
 - boss systems.
-

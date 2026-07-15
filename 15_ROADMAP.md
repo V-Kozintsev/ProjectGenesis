@@ -2,6 +2,8 @@
 
 ## Version 0.1 - First Breath
 
+Status: Sprint 001 foundation implemented on 2026-07-15.
+
 Goal: the player exists in the world.
 
 Features:
@@ -85,4 +87,3 @@ Features:
 - audio pass;
 - save/load stable;
 - performance acceptable.
-

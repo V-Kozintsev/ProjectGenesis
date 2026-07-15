@@ -8,11 +8,12 @@ Fantasy RPG prototype with long-term online RPG direction.
 
 Initial control target:
 
-- third-person character movement;
+- third-person click-to-move character movement;
 - orbit camera;
-- mouse and keyboard first;
+- mouse-first controls inspired by classic point-and-click MMORPGs;
+- WASD and arrow keys as optional fallback movement;
 - controller support later;
-- click-to-target or soft targeting can be evaluated after basic combat works.
+- click-to-target or soft targeting for combat can be evaluated after basic combat works.
 
 ## Main Gameplay Loop
 
@@ -83,4 +84,3 @@ Version 0.1 is successful when the player can:
 - receive loot;
 - equip one item;
 - save and reload core progress.
-

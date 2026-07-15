@@ -4,15 +4,16 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-The project is at documentation and pre-production stage.
+Sprint 001 foundation is implemented: the Unity project has a starter scene, a prototype player, a following camera, and basic movement.
 
-The first goal is to prepare a clear foundation for Codex-assisted development:
+## Prototype Controls
 
-- what kind of game we are building;
-- what must be built first;
-- what should be postponed;
-- how Unity code should be structured;
-- how tasks should be split so the project does not turn into chaos.
+- Open `Assets/ProjectGenesis/Scenes/StarterVillage.unity` before entering Play mode.
+- Left-click the ground to move the character. This is the primary control style, inspired by classic point-and-click MMORPGs such as Lineage 2.
+- Hold the right mouse button and move the mouse to rotate the camera horizontally and vertically.
+- Use the mouse wheel to zoom the camera in and out.
+- WASD or arrow keys are optional fallback controls and cancel the current click destination.
+- The current prototype walks directly toward the clicked point. Obstacle-aware navigation will be added when the world has obstacles that require it.
 
 ## Documentation Map
 
@@ -40,4 +41,3 @@ The first goal is to prepare a clear foundation for Codex-assisted development:
 ## Development Principle
 
 Every task should be small enough to finish, test, and understand. Large ideas must be split into clear implementation steps before code is written.
-
