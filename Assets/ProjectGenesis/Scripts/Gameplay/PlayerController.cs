@@ -1,29 +1,39 @@
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.InputSystem;
 
 namespace ProjectGenesis.Gameplay
 {
-    [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(typeof(NavMeshAgent))]
     public sealed class PlayerController : MonoBehaviour
     {
         [Header("Movement")]
         [SerializeField] private float moveSpeed = 5f;
         [SerializeField] private float rotationSpeed = 12f;
-        [SerializeField] private float gravity = -20f;
-        [SerializeField] private float stoppingDistance = 0.15f;
+        [SerializeField] private float stoppingDistance = 0.25f;
+        [SerializeField] private float manualMoveSampleDistance = 1.25f;
 
         [Header("References")]
         [SerializeField] private Transform cameraTransform;
         [SerializeField] private GameObject destinationMarker;
 
-        private CharacterController characterController;
-        private Vector3 verticalVelocity;
-        private Vector3 destination;
-        private bool hasDestination;
+        private NavMeshAgent agent;
+        private NavMeshPath clickPath;
 
         private void Awake()
         {
-            characterController = GetComponent<CharacterController>();
+            agent = GetComponent<NavMeshAgent>();
+            if (agent == null)
+            {
+                agent = gameObject.AddComponent<NavMeshAgent>();
+            }
+
+            agent.speed = moveSpeed;
+            agent.angularSpeed = 720f;
+            agent.acceleration = 24f;
+            agent.stoppingDistance = stoppingDistance;
+            agent.updateRotation = false;
+            clickPath = new NavMeshPath();
 
             if (cameraTransform == null && Camera.main != null)
             {
@@ -36,33 +46,25 @@ namespace ProjectGenesis.Gameplay
             TrySetClickDestination();
 
             Vector2 moveInput = ReadMoveInput();
-            Vector3 moveDirection;
 
             if (moveInput.sqrMagnitude > 0.001f)
             {
                 CancelClickMovement();
-                moveDirection = GetCameraRelativeMoveDirection(moveInput);
+                MoveManually(GetCameraRelativeMoveDirection(moveInput));
             }
-            else
+            else if (agent.isOnNavMesh && agent.hasPath && agent.remainingDistance <= agent.stoppingDistance)
             {
-                moveDirection = GetClickMoveDirection();
+                CancelClickMovement();
             }
 
-            if (moveDirection.sqrMagnitude > 0.001f)
+            Vector3 planarVelocity = agent.velocity;
+            planarVelocity.y = 0f;
+
+            if (planarVelocity.sqrMagnitude > 0.001f)
             {
-                Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+                Quaternion targetRotation = Quaternion.LookRotation(planarVelocity.normalized, Vector3.up);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
             }
-
-            if (characterController.isGrounded && verticalVelocity.y < 0f)
-            {
-                verticalVelocity.y = -2f;
-            }
-
-            verticalVelocity.y += gravity * Time.deltaTime;
-
-            Vector3 velocity = moveDirection * moveSpeed + verticalVelocity;
-            characterController.Move(velocity * Time.deltaTime);
         }
 
         public void SetCameraTransform(Transform followCamera)
@@ -122,42 +124,64 @@ namespace ProjectGenesis.Gameplay
                 return;
             }
 
-            destination = closestHit.point;
-            hasDestination = true;
+            if (!TrySetReachableDestination(closestHit.point))
+            {
+                CancelClickMovement();
+                return;
+            }
 
             if (destinationMarker != null)
             {
-                destinationMarker.transform.position = closestHit.point + Vector3.up * 0.03f;
+                destinationMarker.transform.position = agent.destination + Vector3.up * 0.03f;
                 destinationMarker.SetActive(true);
             }
         }
 
-        private Vector3 GetClickMoveDirection()
+        private bool TrySetReachableDestination(Vector3 requestedPoint)
         {
-            if (!hasDestination)
+            if (!NavMesh.SamplePosition(requestedPoint, out NavMeshHit navMeshHit, 1.5f, NavMesh.AllAreas))
             {
-                return Vector3.zero;
+                return false;
             }
 
-            Vector3 toDestination = destination - transform.position;
-            toDestination.y = 0f;
-
-            if (toDestination.magnitude <= stoppingDistance)
+            if (!agent.isOnNavMesh)
             {
-                CancelClickMovement();
-                return Vector3.zero;
+                return false;
             }
 
-            return toDestination.normalized;
+            if (!agent.CalculatePath(navMeshHit.position, clickPath) || clickPath.status != NavMeshPathStatus.PathComplete)
+            {
+                return false;
+            }
+
+            agent.SetPath(clickPath);
+            return true;
         }
 
         private void CancelClickMovement()
         {
-            hasDestination = false;
+            if (agent != null && agent.enabled && agent.isOnNavMesh)
+            {
+                agent.ResetPath();
+            }
 
             if (destinationMarker != null)
             {
                 destinationMarker.SetActive(false);
+            }
+        }
+
+        private void MoveManually(Vector3 moveDirection)
+        {
+            if (moveDirection.sqrMagnitude <= 0.001f || !agent.isOnNavMesh)
+            {
+                return;
+            }
+
+            Vector3 desiredPosition = transform.position + moveDirection * moveSpeed * Time.deltaTime;
+            if (NavMesh.SamplePosition(desiredPosition, out NavMeshHit navMeshHit, manualMoveSampleDistance, NavMesh.AllAreas))
+            {
+                agent.Move(navMeshHit.position - transform.position);
             }
         }
 

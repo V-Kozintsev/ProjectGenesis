@@ -22,6 +22,11 @@ namespace ProjectGenesis.Gameplay
         [SerializeField] private float maximumDistance = 10f;
         [SerializeField, Range(0.25f, 3f)] private float zoomStep = 1.25f;
 
+        [Header("Collision")]
+        [SerializeField] private float collisionRadius = 0.25f;
+        [SerializeField] private float collisionOffset = 0.2f;
+        [SerializeField] private LayerMask collisionMask = ~0;
+
         private float yaw;
         private float pitch;
         private bool isOrbitInitialized;
@@ -43,6 +48,7 @@ namespace ProjectGenesis.Gameplay
             Vector3 focusPoint = target.position + Vector3.up * lookHeight;
             Quaternion orbitRotation = Quaternion.Euler(pitch, yaw, 0f);
             Vector3 desiredPosition = focusPoint - orbitRotation * Vector3.forward * distance;
+            desiredPosition = ResolveCameraCollision(focusPoint, desiredPosition);
             float followBlend = 1f - Mathf.Exp(-followSharpness * Time.deltaTime);
 
             transform.position = Vector3.Lerp(transform.position, desiredPosition, followBlend);
@@ -100,6 +106,33 @@ namespace ProjectGenesis.Gameplay
             yaw = currentLookRotation.eulerAngles.y;
             pitch = Mathf.Clamp(NormalizeAngle(currentLookRotation.eulerAngles.x), minimumPitch, maximumPitch);
             isOrbitInitialized = true;
+        }
+
+        private Vector3 ResolveCameraCollision(Vector3 focusPoint, Vector3 desiredPosition)
+        {
+            Vector3 focusToCamera = desiredPosition - focusPoint;
+            float targetDistance = focusToCamera.magnitude;
+
+            if (targetDistance <= 0.01f)
+            {
+                return desiredPosition;
+            }
+
+            Vector3 direction = focusToCamera / targetDistance;
+            if (Physics.SphereCast(
+                    focusPoint,
+                    collisionRadius,
+                    direction,
+                    out RaycastHit hit,
+                    targetDistance,
+                    collisionMask,
+                    QueryTriggerInteraction.Ignore))
+            {
+                float safeDistance = Mathf.Max(hit.distance - collisionOffset, minimumDistance * 0.35f);
+                return focusPoint + direction * safeDistance;
+            }
+
+            return desiredPosition;
         }
 
         private static float NormalizeAngle(float angle)

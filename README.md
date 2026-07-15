@@ -4,16 +4,17 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 001 foundation is implemented: the Unity project has a starter scene, a prototype player, a following camera, and basic movement.
+Sprint 002 starter village blockout is implemented: the Unity project has a small greybox village, obstacle-aware NavMesh movement, playable-area boundaries, camera obstacle protection, and a minimal UI placeholder.
 
 ## Prototype Controls
 
 - Open `Assets/ProjectGenesis/Scenes/StarterVillage.unity` before entering Play mode.
 - Left-click the ground to move the character. This is the primary control style, inspired by classic point-and-click MMORPGs such as Lineage 2.
+- Click movement uses NavMesh navigation, so the character routes around simple obstacles and ignores unreachable points.
 - Hold the right mouse button and move the mouse to rotate the camera horizontally and vertically.
 - Use the mouse wheel to zoom the camera in and out.
 - WASD or arrow keys are optional fallback controls and cancel the current click destination.
-- The current prototype walks directly toward the clicked point. Obstacle-aware navigation will be added when the world has obstacles that require it.
+- The camera shortens its distance when a wall or prop blocks the view, then returns to the requested zoom when clear.
 
 ## Documentation Map
 
@@ -36,6 +37,7 @@ Sprint 001 foundation is implemented: the Unity project has a starter scene, a p
 - [16_SPRINT_001.md](16_SPRINT_001.md) - first actionable development sprint.
 - [17_BACKLOG.md](17_BACKLOG.md) - ideas that are useful but not current.
 - [18_CODEX_FIRST_MESSAGE.md](18_CODEX_FIRST_MESSAGE.md) - first message to give Codex when starting a new task.
+- [19_SPRINT_002.md](19_SPRINT_002.md) - starter village blockout sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

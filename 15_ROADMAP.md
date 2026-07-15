@@ -2,7 +2,7 @@
 
 ## Version 0.1 - First Breath
 
-Status: Sprint 001 foundation implemented on 2026-07-15.
+Status: Sprint 002 starter village blockout implemented on 2026-07-15.
 
 Goal: the player exists in the world.
 
@@ -14,6 +14,13 @@ Features:
 - third-person camera;
 - basic environment;
 - simple UI placeholder.
+
+Sprint 002 additions:
+
+- starter village blockout;
+- obstacle-aware NavMesh movement;
+- playable-area boundaries;
+- camera obstacle protection.
 
 ## Version 0.2 - First Contact
 
