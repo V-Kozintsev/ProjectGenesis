@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 namespace ProjectGenesis.Gameplay
@@ -19,10 +20,12 @@ namespace ProjectGenesis.Gameplay
 
         private NavMeshAgent agent;
         private NavMeshPath clickPath;
+        private PlayerInteractionController interactionController;
 
         private void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
+            interactionController = GetComponent<PlayerInteractionController>();
             if (agent == null)
             {
                 agent = gameObject.AddComponent<NavMeshAgent>();
@@ -43,6 +46,11 @@ namespace ProjectGenesis.Gameplay
 
         private void Update()
         {
+            if (agent == null || !agent.enabled)
+            {
+                return;
+            }
+
             TrySetClickDestination();
 
             Vector2 moveInput = ReadMoveInput();
@@ -52,9 +60,9 @@ namespace ProjectGenesis.Gameplay
                 CancelClickMovement();
                 MoveManually(GetCameraRelativeMoveDirection(moveInput));
             }
-            else if (agent.isOnNavMesh && agent.hasPath && agent.remainingDistance <= agent.stoppingDistance)
+            else if (agent.enabled && agent.isOnNavMesh && agent.hasPath && agent.remainingDistance <= agent.stoppingDistance)
             {
-                CancelClickMovement();
+                HideDestinationMarker();
             }
 
             Vector3 planarVelocity = agent.velocity;
@@ -90,6 +98,11 @@ namespace ProjectGenesis.Gameplay
                 return;
             }
 
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            {
+                return;
+            }
+
             Camera gameplayCamera = cameraTransform.GetComponent<Camera>();
             if (gameplayCamera == null)
             {
@@ -98,6 +111,14 @@ namespace ProjectGenesis.Gameplay
 
             Ray ray = gameplayCamera.ScreenPointToRay(mouse.position.ReadValue());
             RaycastHit[] hits = Physics.RaycastAll(ray, gameplayCamera.farClipPlane, ~0, QueryTriggerInteraction.Ignore);
+
+            InteractableNpc clickedNpc = FindClickedInteractable(hits);
+            if (clickedNpc != null)
+            {
+                HideDestinationMarker();
+                interactionController?.HandleNpcClick(clickedNpc);
+                return;
+            }
 
             bool foundWalkableSurface = false;
             RaycastHit closestHit = default;
@@ -137,6 +158,20 @@ namespace ProjectGenesis.Gameplay
             }
         }
 
+        private static InteractableNpc FindClickedInteractable(RaycastHit[] hits)
+        {
+            foreach (RaycastHit hit in hits)
+            {
+                InteractableNpc npc = hit.transform.GetComponentInParent<InteractableNpc>();
+                if (npc != null)
+                {
+                    return npc;
+                }
+            }
+
+            return null;
+        }
+
         private bool TrySetReachableDestination(Vector3 requestedPoint)
         {
             if (!NavMesh.SamplePosition(requestedPoint, out NavMeshHit navMeshHit, 1.5f, NavMesh.AllAreas))
@@ -144,7 +179,7 @@ namespace ProjectGenesis.Gameplay
                 return false;
             }
 
-            if (!agent.isOnNavMesh)
+            if (!agent.enabled || !agent.isOnNavMesh)
             {
                 return false;
             }
@@ -165,6 +200,11 @@ namespace ProjectGenesis.Gameplay
                 agent.ResetPath();
             }
 
+            HideDestinationMarker();
+        }
+
+        private void HideDestinationMarker()
+        {
             if (destinationMarker != null)
             {
                 destinationMarker.SetActive(false);
@@ -173,7 +213,7 @@ namespace ProjectGenesis.Gameplay
 
         private void MoveManually(Vector3 moveDirection)
         {
-            if (moveDirection.sqrMagnitude <= 0.001f || !agent.isOnNavMesh)
+            if (moveDirection.sqrMagnitude <= 0.001f || !agent.enabled || !agent.isOnNavMesh)
             {
                 return;
             }

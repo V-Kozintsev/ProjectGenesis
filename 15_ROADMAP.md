@@ -24,6 +24,8 @@ Sprint 002 additions:
 
 ## Version 0.2 - First Contact
 
+Status: Sprint 003 first contact implemented on 2026-07-15.
+
 Goal: the player can interact.
 
 Features:
@@ -32,6 +34,13 @@ Features:
 - dialogue window;
 - first quest accepted;
 - quest log state.
+
+Sprint 003 exclusions:
+
+- no enemies;
+- no combat objective progress;
+- no rewards;
+- no inventory.
 
 ## Version 0.3 - First Fight
 

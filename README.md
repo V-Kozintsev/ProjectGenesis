@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 002 starter village blockout is implemented: the Unity project has a small greybox village, obstacle-aware NavMesh movement, playable-area boundaries, camera obstacle protection, and a minimal UI placeholder.
+Sprint 003 first contact is implemented: the Unity project has a small greybox village, obstacle-aware NavMesh movement, playable-area boundaries, camera obstacle protection, a first NPC, simple dialogue UI, and first quest state.
 
 ## Prototype Controls
 
@@ -15,6 +15,15 @@ Sprint 002 starter village blockout is implemented: the Unity project has a smal
 - Use the mouse wheel to zoom the camera in and out.
 - WASD or arrow keys are optional fallback controls and cancel the current click destination.
 - The camera shortens its distance when a wall or prop blocks the view, then returns to the requested zoom when clear.
+- Click the Village Elder once to run closer.
+- Double-click the Village Elder to talk: if the player is far away, the character runs closer and opens dialogue only when almost touching the NPC.
+- NPC interaction can be tuned on the player object in the `PlayerInteractionController` component:
+  - `Interaction Radius` controls how close the player must be for dialogue to open and stay open;
+  - `Approach Distance` controls how close the player tries to stand after clicking an NPC;
+  - `Click Approach Max Distance` controls how far away an NPC can be clicked for auto-approach.
+  - `Double Click Window` controls how quickly two clicks must happen to count as a talk command.
+- `E` is still available as a temporary fallback while standing near an NPC.
+- Accepting the first quest changes it from `NotStarted` to `Active`; combat and quest completion are intentionally not implemented yet.
 
 ## Documentation Map
 
@@ -38,6 +47,7 @@ Sprint 002 starter village blockout is implemented: the Unity project has a smal
 - [17_BACKLOG.md](17_BACKLOG.md) - ideas that are useful but not current.
 - [18_CODEX_FIRST_MESSAGE.md](18_CODEX_FIRST_MESSAGE.md) - first message to give Codex when starting a new task.
 - [19_SPRINT_002.md](19_SPRINT_002.md) - starter village blockout sprint.
+- [20_SPRINT_003.md](20_SPRINT_003.md) - first NPC, dialogue, and quest state sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle
