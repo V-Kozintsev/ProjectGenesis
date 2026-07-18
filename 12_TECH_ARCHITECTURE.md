@@ -94,7 +94,10 @@ Save only stable runtime state:
 
 Do not serialize entire scene objects.
 
+The current prototype saves automatically through `IPlayerPersistence`. `LocalJsonPlayerPersistence` is an offline development implementation, not the final ownership model. It writes a small versioned profile containing only stable ids and values, while `PlayerPersistenceController` captures and restores Unity runtime components.
+
+There is no player-facing save/load button. The intended online flow is automatic, server-authoritative persistence: the server stores character progress and a validated last position, then restores that state after the player logs in again. Replacing local JSON with a server adapter should not require gameplay systems to know where the profile is stored.
+
 ## Multiplayer Later
 
-Do not build the first prototype around multiplayer assumptions. Keep systems deterministic and data-oriented enough that multiplayer can be evaluated later.
-
+Do not build networking before the local gameplay loop is stable. Keep systems deterministic and data-oriented, use stable ids for persisted content, and keep persistence behind an interface so server authority can replace the local prototype implementation later.

@@ -1,6 +1,7 @@
 using ProjectGenesis.Core;
 using ProjectGenesis.Data;
 using ProjectGenesis.Gameplay;
+using ProjectGenesis.Saving;
 using ProjectGenesis.UI;
 using Unity.AI.Navigation;
 using UnityEditor;
@@ -57,6 +58,12 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 006/Rebuild Starter Village First Loop")]
+        public static void RebuildStarterVillageFirstLoop()
+        {
+            RebuildStarterVillage();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -75,7 +82,7 @@ namespace ProjectGenesis.Tools.Editor
             Material lootMaterial = CreateMaterial(LootMaterialPath, new Color(0.92f, 0.62f, 0.16f));
             ItemDefinition rustySword = CreateRustySword();
 
-            GameObject playerPrefab = CreatePlayerPrefab(playerMaterial);
+            GameObject playerPrefab = CreatePlayerPrefab(playerMaterial, rustySword);
             GameObject wolfPrefab = CreateWolfPrefab(wolfMaterial, targetRingMaterial, rustySword, lootMaterial);
 
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -188,7 +195,7 @@ namespace ProjectGenesis.Tools.Editor
             return item;
         }
 
-        private static GameObject CreatePlayerPrefab(Material playerMaterial)
+        private static GameObject CreatePlayerPrefab(Material playerMaterial, ItemDefinition rustySword)
         {
             GameObject player = new("PF_Player_Prototype");
             player.transform.position = Vector3.zero;
@@ -212,6 +219,8 @@ namespace ProjectGenesis.Tools.Editor
             player.AddComponent<PlayerInventory>();
             player.AddComponent<PlayerEquipment>();
             player.AddComponent<PlayerLootController>();
+            PlayerPersistenceController persistence = player.AddComponent<PlayerPersistenceController>();
+            persistence.Configure(new[] { rustySword });
             PlayerCombatController combatController = player.AddComponent<PlayerCombatController>();
 
             GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Capsule);
@@ -255,7 +264,7 @@ namespace ProjectGenesis.Tools.Editor
             CombatStats stats = wolf.AddComponent<CombatStats>();
             stats.Configure(8, 1, 1.05f, 1.1f);
             EnemyBrain brain = wolf.AddComponent<EnemyBrain>();
-            brain.Configure(4f, 4.5f, 20, 6f);
+            brain.Configure(4f, 4.5f, 20, 6f, "wolf");
             EnemyLootDrop lootDrop = wolf.AddComponent<EnemyLootDrop>();
             lootDrop.Configure(lootItem, lootMaterial);
 
@@ -466,7 +475,7 @@ namespace ProjectGenesis.Tools.Editor
             GameObject textObject = new("Text_Status");
             textObject.transform.SetParent(canvasObject.transform, false);
             Text text = textObject.AddComponent<Text>();
-            text.text = "First Reward Prototype";
+            text.text = "First Loop Prototype";
             text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = 24;
             text.color = new Color(1f, 0.95f, 0.82f);
@@ -761,7 +770,7 @@ namespace ProjectGenesis.Tools.Editor
             Text questText = CreateText("Text_Quest", root.transform, "", 20, TextAnchor.UpperLeft);
             questText.color = new Color(0.77f, 0.91f, 1f);
             questText.lineSpacing = 1.08f;
-            SetRect(questText.GetComponent<RectTransform>(), new Vector2(28f, -210f), new Vector2(664f, 86f), new Vector2(0f, 1f));
+            SetRect(questText.GetComponent<RectTransform>(), new Vector2(28f, -202f), new Vector2(664f, 122f), new Vector2(0f, 1f));
 
             Button acceptButton = CreateButton("Button_AcceptQuest", root.transform, "Принять поручение");
             SetRect(acceptButton.GetComponent<RectTransform>(), new Vector2(28f, 28f), new Vector2(300f, 58f), new Vector2(0f, 0f));

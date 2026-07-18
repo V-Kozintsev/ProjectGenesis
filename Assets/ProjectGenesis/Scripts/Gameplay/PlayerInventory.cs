@@ -33,5 +33,23 @@ namespace ProjectGenesis.Gameplay
         {
             return item != null && items.Contains(item);
         }
+
+        public void RestoreItems(IEnumerable<ItemDefinition> restoredItems)
+        {
+            items.Clear();
+
+            if (restoredItems != null)
+            {
+                foreach (ItemDefinition item in restoredItems)
+                {
+                    if (item != null && items.Count < capacity)
+                    {
+                        items.Add(item);
+                    }
+                }
+            }
+
+            Changed?.Invoke(this);
+        }
     }
 }

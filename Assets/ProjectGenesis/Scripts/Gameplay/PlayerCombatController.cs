@@ -20,6 +20,7 @@ namespace ProjectGenesis.Gameplay
         private Health health;
         private CombatStats stats;
         private PlayerProgression progression;
+        private QuestLog questLog;
         private Collider playerCollider;
         private EnemyBrain target;
         private float nextAttackTime;
@@ -37,6 +38,7 @@ namespace ProjectGenesis.Gameplay
             health = GetComponent<Health>();
             stats = GetComponent<CombatStats>();
             progression = GetComponent<PlayerProgression>();
+            questLog = GetComponent<QuestLog>();
             playerCollider = GetComponent<Collider>();
             health.Died += HandlePlayerDied;
 
@@ -166,6 +168,7 @@ namespace ProjectGenesis.Gameplay
             }
 
             progression.AddExperience(defeatedEnemy.ExperienceReward);
+            questLog?.ReportEnemyDefeated(defeatedEnemy.QuestTargetId);
             ClearTargetInternal(false);
         }
 

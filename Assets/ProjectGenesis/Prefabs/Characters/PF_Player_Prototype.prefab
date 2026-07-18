@@ -103,6 +103,7 @@ GameObject:
   - component: {fileID: 743857187644922264}
   - component: {fileID: 7566425608953301210}
   - component: {fileID: 3380113414659367393}
+  - component: {fileID: 1151744357416748806}
   - component: {fileID: 4857155830772707276}
   m_Layer: 0
   m_Name: PF_Player_Prototype
@@ -198,6 +199,7 @@ MonoBehaviour:
   attackRange: 1.35
   attackInterval: 0.8
   equipmentAttackBonus: 0
+  progressionAttackBonus: 0
 --- !u!114 &779681520609666833
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -212,6 +214,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   level: 1
   currentExperience: 0
+  maximumLevel: 5
+  baseExperienceRequirement: 100
+  requirementGrowthPerLevel: 50
+  healthPerLevel: 10
+  attackPowerPerLevel: 2
 --- !u!114 &743857187644922264
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -253,6 +260,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pickupDistance: 0.85
   maximumClickDistance: 30
+--- !u!114 &1151744357416748806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5875306266831850917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d76c4187a1b8654c8fc14d53d1f9f73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  saveInterval: 2
+  itemCatalog:
+  - {fileID: 11400000, guid: af70d6da1d148ba4c84d128117b61d47, type: 2}
 --- !u!114 &4857155830772707276
 MonoBehaviour:
   m_ObjectHideFlags: 0

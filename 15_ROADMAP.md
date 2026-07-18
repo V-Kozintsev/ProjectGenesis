@@ -105,6 +105,8 @@ Sprint 005 exclusions:
 
 ## Version 0.5 - First Loop
 
+Status: Sprint 006 first loop implemented on 2026-07-18.
+
 Goal: the first complete RPG loop works.
 
 Features:
@@ -113,7 +115,23 @@ Features:
 - quest completion;
 - reward;
 - level up;
-- save/load.
+- automatic persistence.
+
+Sprint 006 additions:
+
+- one complete accept, kill, return, and turn-in quest flow;
+- tracked wolf objective progress and one-time quest reward;
+- experience thresholds, level up, and health and attack growth;
+- automatic persistence for position, progression, quest state, inventory, and equipment;
+- replaceable persistence interface with local JSON as a temporary offline stand-in for the future authoritative server;
+- development-only command for clearing the local prototype profile.
+
+Sprint 006 exclusions:
+
+- no player-facing save/load button or save slots;
+- no authentication, account service, database, or real multiplayer backend;
+- no enemy respawn, world-state persistence, multiple quests, or dialogue trees;
+- no additional items, equipment slots, skills, or character creation.
 
 ## Version 0.6 - First Zone
 

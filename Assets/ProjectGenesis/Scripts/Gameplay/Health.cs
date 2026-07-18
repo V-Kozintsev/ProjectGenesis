@@ -50,5 +50,14 @@ namespace ProjectGenesis.Gameplay
             currentHealth = maximumHealth;
             Changed?.Invoke(this);
         }
+
+        public void SetMaximumHealth(int maximum, bool restoreFull)
+        {
+            maximumHealth = Mathf.Max(1, maximum);
+            currentHealth = restoreFull
+                ? maximumHealth
+                : Mathf.Clamp(currentHealth, 0, maximumHealth);
+            Changed?.Invoke(this);
+        }
     }
 }

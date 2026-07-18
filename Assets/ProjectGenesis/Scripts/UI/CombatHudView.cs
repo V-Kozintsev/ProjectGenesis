@@ -190,7 +190,9 @@ namespace ProjectGenesis.UI
         {
             if (experienceText != null && progression != null)
             {
-                experienceText.text = $"Уровень {progression.Level}   Опыт: {progression.CurrentExperience}";
+                experienceText.text = progression.Level >= progression.MaximumLevel
+                    ? $"Уровень {progression.Level}   Опыт: MAX"
+                    : $"Уровень {progression.Level}   Опыт: {progression.CurrentExperience} / {progression.ExperienceToNextLevel}";
             }
         }
 

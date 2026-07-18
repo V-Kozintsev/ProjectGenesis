@@ -26,6 +26,16 @@
 - Added a compact inventory window opened by `I` or its on-screen button.
 - Made the equipped sword increase attack power from 14 to 18, with immediate equip and unequip feedback.
 - Kept Sprint 005 scoped away from general zone rules, armor, trading, crafting, quest rewards, enemy respawn, and save/load.
+- Documented Sprint 006 scope and acceptance criteria.
+- Completed the first quest loop: accept the Village Elder's task, defeat the wolf, return, and turn it in once.
+- Added serializable quest objective progress, ready-to-turn-in and completed states, and an 80 experience quest reward.
+- Added level thresholds and level-up stat growth; the first full loop raises the player to level 2 with 110 maximum health and higher attack power.
+- Extended the HUD and dialogue window with experience thresholds, objective progress, reward details, and completed-state feedback.
+- Added automatic persistence for the player's last valid position, level, experience, quest state, inventory, and equipped weapon.
+- Kept persistence behind `IPlayerPersistence`; local JSON is only a temporary offline substitute for a future authoritative online service.
+- Added `Project Genesis > Development > Clear Local Prototype Profile` for clean development playthroughs.
+- Verified the full loop and restored state across two Play mode sessions, then cleared the local test profile.
+- Kept Sprint 006 scoped away from a manual save UI, authentication, databases, a real multiplayer backend, enemy respawn, world flags, multiple quests, and additional equipment systems.
 
 ## 2026-07-15
 

@@ -49,6 +49,15 @@ namespace ProjectGenesis.Gameplay
             Changed?.Invoke(this);
         }
 
+        public void RestoreMainHand(ItemDefinition item)
+        {
+            mainHand = item != null && item.ItemType == ItemType.Weapon && inventory.Contains(item)
+                ? item
+                : null;
+            ApplyMainHandBonus();
+            Changed?.Invoke(this);
+        }
+
         private void ApplyMainHandBonus()
         {
             int bonus = mainHand != null ? mainHand.AttackBonus : 0;

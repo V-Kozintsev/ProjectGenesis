@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 005 first reward is implemented: the prototype now includes a peaceful village gate, a separate northern combat area, one hostile wolf, a visible weapon drop, an eight-slot inventory, and a main-hand equipment bonus.
+Sprint 006 first loop is implemented: the player can accept the Village Elder's task, defeat the wolf, collect and equip its sword, return for the quest reward, reach level 2, and continue from the same state after restarting Play mode.
 
 ## Prototype Controls
 
@@ -31,8 +31,12 @@ Sprint 005 first reward is implemented: the prototype now includes a peaceful vi
   - `Approach Distance` controls how close the player tries to stand after clicking an NPC;
   - `Click Approach Max Distance` controls how far away an NPC can be clicked for auto-approach.
 - `E` is still available as a temporary fallback while standing near an NPC.
-- Accepting the first quest changes it from `NotStarted` to `Active`; defeating the wolf does not complete that quest yet.
-- Armor, additional equipment slots, enemy respawn, trading, saving, combat skills, and quest completion are intentionally outside Sprint 005.
+- Accept the Village Elder's quest, defeat the young wolf beyond the north gate, then return to the elder and choose `Завершить поручение`.
+- Defeating the wolf grants 20 experience. Turning in the quest grants another 80 experience, raises the player to level 2, increases maximum health to 110, and increases base attack power by 2.
+- Player position, level, experience, quest state, inventory, and equipped weapon are saved automatically. There is intentionally no save button.
+- For the current offline prototype, persistence uses a local JSON file behind a replaceable interface. In the future online version, the authoritative server will store this state and return the character near the last valid position after login.
+- To start a fresh development playthrough, use `Project Genesis > Development > Clear Local Prototype Profile` while outside Play mode.
+- Armor, additional equipment slots, enemy respawn, trading, combat skills, multiple quests, authentication, and a real server backend are intentionally outside Sprint 006.
 
 ## Documentation Map
 
@@ -59,6 +63,7 @@ Sprint 005 first reward is implemented: the prototype now includes a peaceful vi
 - [20_SPRINT_003.md](20_SPRINT_003.md) - first NPC, dialogue, and quest state sprint.
 - [21_SPRINT_004.md](21_SPRINT_004.md) - first enemy, combat, health, death, and experience sprint.
 - [22_SPRINT_005.md](22_SPRINT_005.md) - first loot, inventory, and equipment reward sprint.
+- [23_SPRINT_006.md](23_SPRINT_006.md) - first complete quest, progression, and automatic persistence loop sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

@@ -37,7 +37,7 @@ namespace ProjectGenesis.UI
         {
             if (acceptQuestButton != null)
             {
-                acceptQuestButton.onClick.AddListener(AcceptCurrentQuest);
+                acceptQuestButton.onClick.AddListener(HandleQuestAction);
             }
 
             if (closeButton != null)
@@ -77,7 +77,7 @@ namespace ProjectGenesis.UI
             canInteract = null;
         }
 
-        private void AcceptCurrentQuest()
+        private void HandleQuestAction()
         {
             if (currentNpc == null || currentQuestLog == null || !CanStillInteract())
             {
@@ -85,7 +85,20 @@ namespace ProjectGenesis.UI
                 return;
             }
 
-            currentQuestLog.TryAcceptQuest(currentNpc.QuestId);
+            QuestState state = currentQuestLog.GetQuestState(currentNpc.QuestId);
+            if (state == QuestState.NotStarted)
+            {
+                currentQuestLog.TryAcceptQuest(
+                    currentNpc.QuestId,
+                    currentNpc.QuestTargetId,
+                    currentNpc.RequiredKillCount,
+                    currentNpc.RewardExperience);
+            }
+            else if (state == QuestState.ReadyToTurnIn)
+            {
+                currentQuestLog.TryTurnInQuest(currentNpc.QuestId);
+            }
+
             Refresh();
         }
 
@@ -102,6 +115,9 @@ namespace ProjectGenesis.UI
             }
 
             QuestState state = currentQuestLog != null ? currentQuestLog.GetQuestState(currentNpc.QuestId) : QuestState.NotStarted;
+            QuestProgressData progress = currentQuestLog != null
+                ? currentQuestLog.GetQuestProgress(currentNpc.QuestId)
+                : null;
 
             if (speakerText != null)
             {
@@ -110,17 +126,40 @@ namespace ProjectGenesis.UI
 
             if (bodyText != null)
             {
-                bodyText.text = state == QuestState.NotStarted ? currentNpc.GreetingText : currentNpc.ActiveQuestText;
+                bodyText.text = state switch
+                {
+                    QuestState.NotStarted => currentNpc.GreetingText,
+                    QuestState.Active => currentNpc.ActiveQuestText,
+                    QuestState.ReadyToTurnIn => currentNpc.ReadyQuestText,
+                    QuestState.Completed => currentNpc.CompletedQuestText,
+                    _ => currentNpc.GreetingText
+                };
             }
 
             if (questText != null)
             {
-                questText.text = $"{currentNpc.QuestTitle}\n{currentNpc.QuestObjectiveText}\nСостояние: {GetStateLabel(state)}";
+                int currentCount = progress != null ? progress.CurrentCount : 0;
+                int requiredCount = progress != null ? progress.RequiredCount : currentNpc.RequiredKillCount;
+                questText.text =
+                    $"{currentNpc.QuestTitle}\n" +
+                    $"{currentNpc.QuestObjectiveText} ({currentCount} / {requiredCount})\n" +
+                    $"Награда: {currentNpc.RewardExperience} опыта\n" +
+                    $"Состояние: {GetStateLabel(state)}";
             }
 
             if (acceptQuestButton != null)
             {
-                acceptQuestButton.gameObject.SetActive(state == QuestState.NotStarted);
+                bool showAction = state == QuestState.NotStarted || state == QuestState.ReadyToTurnIn;
+                acceptQuestButton.gameObject.SetActive(showAction);
+
+                if (showAction)
+                {
+                    Text label = acceptQuestButton.GetComponentInChildren<Text>();
+                    if (label != null)
+                    {
+                        label.text = state == QuestState.NotStarted ? "Принять поручение" : "Завершить поручение";
+                    }
+                }
             }
         }
 

@@ -21,6 +21,7 @@ namespace ProjectGenesis.Gameplay
         [SerializeField, Min(1f)] private float leashRadius = 6f;
         [SerializeField, Min(1)] private int experienceReward = 20;
         [SerializeField, Min(0f)] private float corpseLifetime = 6f;
+        [SerializeField] private string questTargetId = "wolf";
 
         [Header("References")]
         [SerializeField] private Transform player;
@@ -44,6 +45,7 @@ namespace ProjectGenesis.Gameplay
         public EnemyState State { get; private set; } = EnemyState.Idle;
         public bool IsDead => health == null || health.IsDead;
         public int ExperienceReward => experienceReward;
+        public string QuestTargetId => questTargetId;
         public Health Health => health;
         public CombatStats CombatStats => stats;
         public Collider TargetCollider => targetCollider;
@@ -136,12 +138,18 @@ namespace ProjectGenesis.Gameplay
             }
         }
 
-        public void Configure(float detection, float leash, int reward, float despawnDelay = 6f)
+        public void Configure(
+            float detection,
+            float leash,
+            int reward,
+            float despawnDelay = 6f,
+            string objectiveTargetId = "wolf")
         {
             detectionRadius = Mathf.Max(0.5f, detection);
             leashRadius = Mathf.Max(1f, leash);
             experienceReward = Mathf.Max(1, reward);
             corpseLifetime = Mathf.Max(0f, despawnDelay);
+            questTargetId = string.IsNullOrWhiteSpace(objectiveTargetId) ? "wolf" : objectiveTargetId;
         }
 
         public void SetPlayer(Transform playerTransform)
