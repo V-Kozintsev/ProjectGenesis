@@ -17,6 +17,7 @@ namespace ProjectGenesis.Tools.Editor
     {
         private const string ScenePath = "Assets/ProjectGenesis/Scenes/StarterVillage.unity";
         private const string PlayerPrefabPath = "Assets/ProjectGenesis/Prefabs/Characters/PF_Player_Prototype.prefab";
+        private const string WolfPrefabPath = "Assets/ProjectGenesis/Prefabs/Enemies/PF_Enemy_Wolf.prefab";
         private const string GroundMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Starter_Ground.mat";
         private const string PlayerMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Player_Prototype.mat";
         private const string MarkerMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Move_Target.mat";
@@ -25,6 +26,8 @@ namespace ProjectGenesis.Tools.Editor
         private const string BoundaryMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Village_Boundary.mat";
         private const string PropMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Village_Prop.mat";
         private const string NpcMaterialPath = "Assets/ProjectGenesis/Materials/MAT_NPC_Village_Elder.mat";
+        private const string WolfMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Enemy_Wolf.mat";
+        private const string TargetRingMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Combat_TargetRing.mat";
 
         [MenuItem("Project Genesis/Sprint 002/Rebuild Starter Village Blockout")]
         public static void RebuildStarterVillageBlockout()
@@ -34,6 +37,12 @@ namespace ProjectGenesis.Tools.Editor
 
         [MenuItem("Project Genesis/Sprint 003/Rebuild Starter Village First Contact")]
         public static void RebuildStarterVillageFirstContact()
+        {
+            RebuildStarterVillage();
+        }
+
+        [MenuItem("Project Genesis/Sprint 004/Rebuild Starter Village First Fight")]
+        public static void RebuildStarterVillageFirstFight()
         {
             RebuildStarterVillage();
         }
@@ -50,8 +59,11 @@ namespace ProjectGenesis.Tools.Editor
             Material boundaryMaterial = CreateMaterial(BoundaryMaterialPath, new Color(0.36f, 0.28f, 0.18f));
             Material propMaterial = CreateMaterial(PropMaterialPath, new Color(0.48f, 0.32f, 0.18f));
             Material npcMaterial = CreateMaterial(NpcMaterialPath, new Color(0.72f, 0.64f, 0.42f));
+            Material wolfMaterial = CreateMaterial(WolfMaterialPath, new Color(0.28f, 0.3f, 0.34f));
+            Material targetRingMaterial = CreateMaterial(TargetRingMaterialPath, new Color(0.85f, 0.16f, 0.12f));
 
             GameObject playerPrefab = CreatePlayerPrefab(playerMaterial);
+            GameObject wolfPrefab = CreateWolfPrefab(wolfMaterial, targetRingMaterial);
 
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             scene.name = "StarterVillage";
@@ -69,6 +81,8 @@ namespace ProjectGenesis.Tools.Editor
             player.transform.SetPositionAndRotation(spawnPoint.transform.position, spawnPoint.transform.rotation);
             player.AddComponent<QuestLog>();
             PlayerInteractionController interactionController = player.AddComponent<PlayerInteractionController>();
+            PlayerCombatController combatController = player.GetComponent<PlayerCombatController>();
+            combatController.SetRespawnPoint(spawnPoint.transform);
 
             GameObject destinationMarker = CreateDestinationMarker(markerMaterial);
             PlayerController playerController = player.GetComponent<PlayerController>();
@@ -78,8 +92,9 @@ namespace ProjectGenesis.Tools.Editor
             playerController.SetCameraTransform(camera.transform);
             interactionController.SetGameplayCamera(camera);
 
-            CreateVillageElder(npcMaterial);
-            FirstContactUi ui = CreateFirstContactUi();
+            CreateVillageElder(npcMaterial, targetRingMaterial);
+            CreateWolf(wolfPrefab, player.transform);
+            FirstContactUi ui = CreateFirstContactUi(player, combatController);
             interactionController.SetDialogueWindow(ui.DialogueWindow);
             interactionController.SetPromptView(ui.PromptView);
 
@@ -101,6 +116,7 @@ namespace ProjectGenesis.Tools.Editor
             {
                 "Assets/ProjectGenesis/Materials",
                 "Assets/ProjectGenesis/Prefabs/Characters",
+                "Assets/ProjectGenesis/Prefabs/Enemies",
                 "Assets/ProjectGenesis/Prefabs/UI",
                 "Assets/ProjectGenesis/Prefabs/World",
                 "Assets/ProjectGenesis/Scenes"
@@ -159,6 +175,12 @@ namespace ProjectGenesis.Tools.Editor
             agent.enabled = false;
 
             player.AddComponent<PlayerController>();
+            Health health = player.AddComponent<Health>();
+            health.Configure(100);
+            CombatStats stats = player.AddComponent<CombatStats>();
+            stats.Configure(14, 3, 1.35f, 0.8f);
+            player.AddComponent<PlayerProgression>();
+            PlayerCombatController combatController = player.AddComponent<PlayerCombatController>();
 
             GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             visual.name = "Visual";
@@ -166,11 +188,97 @@ namespace ProjectGenesis.Tools.Editor
             visual.transform.localPosition = new Vector3(0f, 1f, 0f);
             Object.DestroyImmediate(visual.GetComponent<Collider>());
             visual.GetComponent<Renderer>().sharedMaterial = playerMaterial;
+            combatController.SetVisualRoot(visual);
 
             GameObject savedPrefab = PrefabUtility.SaveAsPrefabAsset(player, PlayerPrefabPath);
             Object.DestroyImmediate(player);
 
             return savedPrefab;
+        }
+
+        private static GameObject CreateWolfPrefab(Material wolfMaterial, Material targetRingMaterial)
+        {
+            GameObject wolf = new("PF_Enemy_Wolf");
+
+            NavMeshAgent agent = wolf.AddComponent<NavMeshAgent>();
+            agent.height = 1.4f;
+            agent.radius = 0.4f;
+            agent.baseOffset = 0f;
+            agent.speed = 3.8f;
+            agent.angularSpeed = 540f;
+            agent.acceleration = 18f;
+            agent.stoppingDistance = 0.8f;
+            agent.enabled = false;
+
+            BoxCollider targetCollider = wolf.AddComponent<BoxCollider>();
+            targetCollider.center = new Vector3(0f, 0.68f, 0.25f);
+            targetCollider.size = new Vector3(1f, 1.4f, 2.1f);
+
+            Health health = wolf.AddComponent<Health>();
+            health.Configure(45);
+            CombatStats stats = wolf.AddComponent<CombatStats>();
+            stats.Configure(8, 1, 1.05f, 1.1f);
+            EnemyBrain brain = wolf.AddComponent<EnemyBrain>();
+            brain.Configure(4f, 6f, 20);
+
+            GameObject visualRoot = new("Visual");
+            visualRoot.transform.SetParent(wolf.transform, false);
+
+            CreateWolfPart(
+                "Body",
+                visualRoot.transform,
+                new Vector3(0f, 0.65f, 0f),
+                new Vector3(0.85f, 0.7f, 1.4f),
+                wolfMaterial);
+            CreateWolfPart(
+                "Head",
+                visualRoot.transform,
+                new Vector3(0f, 0.82f, 0.86f),
+                new Vector3(0.68f, 0.62f, 0.62f),
+                wolfMaterial);
+            CreateWolfPart(
+                "Ear_Left",
+                visualRoot.transform,
+                new Vector3(-0.2f, 1.2f, 0.96f),
+                new Vector3(0.16f, 0.34f, 0.16f),
+                wolfMaterial);
+            CreateWolfPart(
+                "Ear_Right",
+                visualRoot.transform,
+                new Vector3(0.2f, 1.2f, 0.96f),
+                new Vector3(0.16f, 0.34f, 0.16f),
+                wolfMaterial);
+
+            GameObject selectionRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            selectionRing.name = "SelectionRing";
+            selectionRing.transform.SetParent(wolf.transform, false);
+            selectionRing.transform.localPosition = new Vector3(0f, 0.025f, 0f);
+            selectionRing.transform.localScale = new Vector3(0.78f, 0.025f, 0.78f);
+            Object.DestroyImmediate(selectionRing.GetComponent<Collider>());
+            selectionRing.GetComponent<Renderer>().sharedMaterial = targetRingMaterial;
+            selectionRing.SetActive(false);
+
+            brain.SetVisuals(visualRoot, selectionRing);
+
+            GameObject savedPrefab = PrefabUtility.SaveAsPrefabAsset(wolf, WolfPrefabPath);
+            Object.DestroyImmediate(wolf);
+            return savedPrefab;
+        }
+
+        private static void CreateWolfPart(
+            string name,
+            Transform parent,
+            Vector3 localPosition,
+            Vector3 localScale,
+            Material material)
+        {
+            GameObject part = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            part.name = name;
+            part.transform.SetParent(parent, false);
+            part.transform.localPosition = localPosition;
+            part.transform.localScale = localScale;
+            Object.DestroyImmediate(part.GetComponent<Collider>());
+            part.GetComponent<Renderer>().sharedMaterial = material;
         }
 
         private static void CreateGround(Transform parent, Material groundMaterial)
@@ -260,17 +368,34 @@ namespace ProjectGenesis.Tools.Editor
             return camera;
         }
 
-        private static void CreateVillageElder(Material npcMaterial)
+        private static void CreateVillageElder(Material npcMaterial, Material targetRingMaterial)
         {
             GameObject elder = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             elder.name = "NPC_VillageElder";
             elder.transform.SetPositionAndRotation(new Vector3(-1.9f, 1f, -1.9f), Quaternion.Euler(0f, 35f, 0f));
             elder.transform.localScale = new Vector3(0.9f, 1f, 0.9f);
             elder.GetComponent<Renderer>().sharedMaterial = npcMaterial;
-            elder.AddComponent<InteractableNpc>();
+            InteractableNpc npc = elder.AddComponent<InteractableNpc>();
+
+            GameObject selectionRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            selectionRing.name = "SelectionRing";
+            selectionRing.transform.SetParent(elder.transform, false);
+            selectionRing.transform.localPosition = new Vector3(0f, -0.98f, 0f);
+            selectionRing.transform.localScale = new Vector3(0.78f, 0.025f, 0.78f);
+            Object.DestroyImmediate(selectionRing.GetComponent<Collider>());
+            selectionRing.GetComponent<Renderer>().sharedMaterial = targetRingMaterial;
+            npc.SetSelectionRing(selectionRing);
         }
 
-        private static FirstContactUi CreateFirstContactUi()
+        private static void CreateWolf(GameObject wolfPrefab, Transform player)
+        {
+            GameObject wolf = (GameObject)PrefabUtility.InstantiatePrefab(wolfPrefab);
+            wolf.name = "Enemy_YoungWolf";
+            wolf.transform.SetPositionAndRotation(new Vector3(0f, 0.05f, 6.2f), Quaternion.Euler(0f, 180f, 0f));
+            wolf.GetComponent<EnemyBrain>().SetPlayer(player);
+        }
+
+        private static FirstContactUi CreateFirstContactUi(GameObject player, PlayerCombatController combatController)
         {
             GameObject canvasObject = new("UI_FirstContact");
             Canvas canvas = canvasObject.AddComponent<Canvas>();
@@ -283,7 +408,7 @@ namespace ProjectGenesis.Tools.Editor
             GameObject textObject = new("Text_Status");
             textObject.transform.SetParent(canvasObject.transform, false);
             Text text = textObject.AddComponent<Text>();
-            text.text = "First Contact Prototype";
+            text.text = "First Fight Prototype";
             text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = 24;
             text.color = new Color(1f, 0.95f, 0.82f);
@@ -298,8 +423,153 @@ namespace ProjectGenesis.Tools.Editor
 
             InteractionPromptView promptView = CreateInteractionPrompt(canvasObject.transform);
             DialogueWindow dialogueWindow = CreateDialogueWindow(canvasObject.transform);
+            CreateCombatHud(canvasObject, player, combatController);
 
             return new FirstContactUi(dialogueWindow, promptView);
+        }
+
+        private static void CreateCombatHud(
+            GameObject canvasObject,
+            GameObject player,
+            PlayerCombatController combatController)
+        {
+            GameObject playerPanel = CreatePanel(
+                "CombatHud_Player",
+                canvasObject.transform,
+                new Color(0.045f, 0.055f, 0.065f, 0.9f));
+            playerPanel.GetComponent<Image>().raycastTarget = false;
+            SetRect(
+                playerPanel.GetComponent<RectTransform>(),
+                new Vector2(24f, -76f),
+                new Vector2(360f, 116f),
+                new Vector2(0f, 1f));
+
+            Text playerHealthText = CreateText(
+                "Text_PlayerHealth",
+                playerPanel.transform,
+                "Здоровье: 100 / 100",
+                21,
+                TextAnchor.UpperLeft);
+            playerHealthText.color = Color.white;
+            SetRect(
+                playerHealthText.GetComponent<RectTransform>(),
+                new Vector2(16f, -12f),
+                new Vector2(328f, 28f),
+                new Vector2(0f, 1f));
+
+            Image playerHealthFill = CreateHealthBar(
+                "PlayerHealthBar",
+                playerPanel.transform,
+                new Vector2(16f, -46f),
+                new Vector2(328f, 20f),
+                new Color(0.22f, 0.72f, 0.32f));
+
+            Text experienceText = CreateText(
+                "Text_Experience",
+                playerPanel.transform,
+                "Уровень 1   Опыт: 0",
+                19,
+                TextAnchor.UpperLeft);
+            experienceText.color = new Color(0.8f, 0.88f, 1f);
+            SetRect(
+                experienceText.GetComponent<RectTransform>(),
+                new Vector2(16f, -76f),
+                new Vector2(328f, 26f),
+                new Vector2(0f, 1f));
+
+            GameObject targetPanel = CreatePanel(
+                "CombatHud_Target",
+                canvasObject.transform,
+                new Color(0.07f, 0.045f, 0.045f, 0.92f));
+            targetPanel.GetComponent<Image>().raycastTarget = false;
+            SetRect(
+                targetPanel.GetComponent<RectTransform>(),
+                new Vector2(0f, -24f),
+                new Vector2(430f, 104f),
+                new Vector2(0.5f, 1f));
+
+            Text targetNameText = CreateText(
+                "Text_TargetName",
+                targetPanel.transform,
+                "Молодой волк",
+                22,
+                TextAnchor.UpperLeft);
+            targetNameText.color = new Color(1f, 0.78f, 0.58f);
+            SetRect(
+                targetNameText.GetComponent<RectTransform>(),
+                new Vector2(16f, -10f),
+                new Vector2(344f, 28f),
+                new Vector2(0f, 1f));
+
+            Button clearTargetButton = CreateButton("Button_ClearTarget", targetPanel.transform, "X");
+            clearTargetButton.GetComponent<Image>().color = new Color(0.3f, 0.11f, 0.1f, 1f);
+            SetRect(
+                clearTargetButton.GetComponent<RectTransform>(),
+                new Vector2(382f, -8f),
+                new Vector2(32f, 30f),
+                new Vector2(0f, 1f));
+
+            Text targetHealthText = CreateText(
+                "Text_TargetHealth",
+                targetPanel.transform,
+                "Здоровье: 45 / 45",
+                18,
+                TextAnchor.UpperLeft);
+            targetHealthText.color = Color.white;
+            SetRect(
+                targetHealthText.GetComponent<RectTransform>(),
+                new Vector2(16f, -42f),
+                new Vector2(398f, 24f),
+                new Vector2(0f, 1f));
+
+            Image targetHealthFill = CreateHealthBar(
+                "TargetHealthBar",
+                targetPanel.transform,
+                new Vector2(16f, -70f),
+                new Vector2(398f, 18f),
+                new Color(0.82f, 0.18f, 0.14f));
+
+            CombatHudView hud = canvasObject.AddComponent<CombatHudView>();
+            hud.Initialize(
+                playerHealthText,
+                playerHealthFill,
+                targetNameText,
+                targetHealthText,
+                targetHealthFill,
+                experienceText,
+                targetPanel,
+                clearTargetButton,
+                player.GetComponent<Health>(),
+                player.GetComponent<PlayerProgression>(),
+                combatController,
+                player.GetComponent<PlayerInteractionController>());
+            targetPanel.SetActive(false);
+        }
+
+        private static Image CreateHealthBar(
+            string name,
+            Transform parent,
+            Vector2 anchoredPosition,
+            Vector2 size,
+            Color fillColor)
+        {
+            GameObject background = CreatePanel(name, parent, new Color(0.02f, 0.025f, 0.03f, 1f));
+            background.GetComponent<Image>().raycastTarget = false;
+            SetRect(
+                background.GetComponent<RectTransform>(),
+                anchoredPosition,
+                size,
+                new Vector2(0f, 1f));
+
+            GameObject fillObject = CreatePanel("Fill", background.transform, fillColor);
+            Image fill = fillObject.GetComponent<Image>();
+            fill.raycastTarget = false;
+            fill.type = Image.Type.Filled;
+            fill.fillMethod = Image.FillMethod.Horizontal;
+            fill.fillOrigin = 0;
+            fill.fillAmount = 1f;
+            Stretch(fillObject.GetComponent<RectTransform>(), 2f, 2f, 2f, 2f);
+            return fill;
         }
 
         private static InteractionPromptView CreateInteractionPrompt(Transform canvasTransform)

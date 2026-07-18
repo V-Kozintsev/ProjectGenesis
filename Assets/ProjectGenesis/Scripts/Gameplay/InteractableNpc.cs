@@ -11,6 +11,7 @@ namespace ProjectGenesis.Gameplay
         [SerializeField] private string questId = "wolves-near-the-road";
         [SerializeField] private string questTitle = "Волки у дороги";
         [SerializeField] private string questObjectiveText = "Будущая цель: победить 3 волков у старой северной дороги.";
+        [SerializeField] private GameObject selectionRing;
 
         public string DisplayName => displayName;
         public string GreetingText => greetingText;
@@ -18,6 +19,20 @@ namespace ProjectGenesis.Gameplay
         public string QuestId => questId;
         public string QuestTitle => questTitle;
         public string QuestObjectiveText => questObjectiveText;
+
+        public void SetSelectionRing(GameObject ring)
+        {
+            selectionRing = ring;
+            SetSelected(false);
+        }
+
+        public void SetSelected(bool selected)
+        {
+            if (selectionRing != null)
+            {
+                selectionRing.SetActive(selected);
+            }
+        }
 
         public void Interact(QuestLog questLog, DialogueWindow dialogueWindow, System.Func<InteractableNpc, bool> canInteract = null)
         {

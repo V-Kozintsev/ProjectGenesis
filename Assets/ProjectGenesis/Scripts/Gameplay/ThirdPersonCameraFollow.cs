@@ -14,6 +14,8 @@ namespace ProjectGenesis.Gameplay
         [SerializeField] private float rotationSensitivity = 0.18f;
         [SerializeField] private float minimumPitch = 8f;
         [SerializeField] private float maximumPitch = 70f;
+        [SerializeField] private float defaultPitch = 28f;
+        [SerializeField] private float rightClickDragThreshold = 6f;
         [SerializeField] private bool invertVertical;
 
         [Header("Zoom")]
@@ -30,6 +32,9 @@ namespace ProjectGenesis.Gameplay
         private float yaw;
         private float pitch;
         private bool isOrbitInitialized;
+        private float rightDragDistance;
+        private bool isRightDragging;
+        private bool isFrontView;
 
         private void LateUpdate()
         {
@@ -69,14 +74,34 @@ namespace ProjectGenesis.Gameplay
                 return;
             }
 
-            if (mouse.rightButton.isPressed)
+            if (mouse.middleButton.wasPressedThisFrame)
+            {
+                ToggleFrontView();
+            }
+
+            if (mouse.rightButton.wasPressedThisFrame)
+            {
+                rightDragDistance = 0f;
+                isRightDragging = false;
+            }
+
+            if (mouse.rightButton.isPressed && !mouse.rightButton.wasPressedThisFrame)
             {
                 Vector2 lookDelta = mouse.delta.ReadValue();
+                rightDragDistance += lookDelta.magnitude;
+                isRightDragging |= rightDragDistance >= rightClickDragThreshold;
+
                 yaw += lookDelta.x * rotationSensitivity;
 
                 float verticalDirection = invertVertical ? 1f : -1f;
                 pitch += lookDelta.y * rotationSensitivity * verticalDirection;
                 pitch = Mathf.Clamp(pitch, minimumPitch, maximumPitch);
+                isFrontView = false;
+            }
+
+            if (mouse.rightButton.wasReleasedThisFrame && !isRightDragging)
+            {
+                ResetBehindTarget();
             }
 
             float scrollDelta = mouse.scroll.ReadValue().y;
@@ -106,6 +131,20 @@ namespace ProjectGenesis.Gameplay
             yaw = currentLookRotation.eulerAngles.y;
             pitch = Mathf.Clamp(NormalizeAngle(currentLookRotation.eulerAngles.x), minimumPitch, maximumPitch);
             isOrbitInitialized = true;
+        }
+
+        private void ToggleFrontView()
+        {
+            isFrontView = !isFrontView;
+            yaw = target.eulerAngles.y + (isFrontView ? 180f : 0f);
+            pitch = Mathf.Clamp(defaultPitch, minimumPitch, maximumPitch);
+        }
+
+        private void ResetBehindTarget()
+        {
+            isFrontView = false;
+            yaw = target.eulerAngles.y;
+            pitch = Mathf.Clamp(defaultPitch, minimumPitch, maximumPitch);
         }
 
         private Vector3 ResolveCameraCollision(Vector3 focusPoint, Vector3 desiredPosition)

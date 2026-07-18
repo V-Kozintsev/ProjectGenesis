@@ -44,6 +44,8 @@ Sprint 003 exclusions:
 
 ## Version 0.3 - First Fight
 
+Status: Sprint 004 first fight implemented on 2026-07-18.
+
 Goal: the player can fight and win.
 
 Features:
@@ -53,6 +55,21 @@ Features:
 - basic attack;
 - enemy death;
 - experience reward.
+
+Sprint 004 additions:
+
+- one hostile wolf on the north road;
+- click selection, automatic approach, and basic attacks;
+- enemy idle, chase, attack, return, and death states;
+- player death and village respawn;
+- combat HUD for health, target health, level, and experience.
+
+Sprint 004 exclusions:
+
+- no loot, inventory, or equipment;
+- no quest objective progress or completion;
+- no combat skills or multiple enemies;
+- no enemy respawn or save/load.
 
 ## Version 0.4 - First Reward
 

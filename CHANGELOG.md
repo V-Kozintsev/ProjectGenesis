@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-07-18
+
+- Documented Sprint 004 scope and acceptance criteria.
+- Added reusable health, combat stats, distance checks, and player progression components.
+- Added click-to-target combat: the player approaches a selected enemy and performs timed basic attacks automatically.
+- Unified mouse interaction: one click selects an NPC or enemy, while a double-click starts dialogue or combat with that selected target.
+- Kept selected targets while moving away, separated stopping an action from clearing a target, and added `Esc` plus a target-panel close button for explicit deselection.
+- Removed click-timing dependence: clicking an already selected NPC or enemy performs its action regardless of how long ago it was selected.
+- Reused the top target panel for selected NPCs as well as enemies.
+- Expanded the classic MMORPG camera controls: mouse-wheel click toggles the front/rear view, while a short right-click returns the camera behind the character.
+- Added a first wolf enemy with idle, chase, attack, return, and death states.
+- Added player death, delayed respawn at the village spawn point, and full-health restoration.
+- Added a combat HUD for player health, selected-enemy health, level, and experience.
+- Added 20 experience as the first combat reward.
+- Added a blockout wolf and combat target marker to the starter village scene.
+- Kept Sprint 004 scoped away from loot, inventory, equipment, quest completion, skills, and save/load.
+
 ## 2026-07-15
 
 - Added initial project documentation foundation.

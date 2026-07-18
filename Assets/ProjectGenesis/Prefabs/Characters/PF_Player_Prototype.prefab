@@ -97,6 +97,10 @@ GameObject:
   - component: {fileID: 5024015913259744772}
   - component: {fileID: 1847188174384912691}
   - component: {fileID: 6891834445730343274}
+  - component: {fileID: 8010310046048321749}
+  - component: {fileID: 4704407190682888797}
+  - component: {fileID: 779681520609666833}
+  - component: {fileID: 4857155830772707276}
   m_Layer: 0
   m_Name: PF_Player_Prototype
   m_TagString: Untagged
@@ -160,3 +164,64 @@ MonoBehaviour:
   manualMoveSampleDistance: 1.25
   cameraTransform: {fileID: 0}
   destinationMarker: {fileID: 0}
+--- !u!114 &8010310046048321749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5875306266831850917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65065efd6bdb706478ad6671d4d5a695, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maximumHealth: 100
+  currentHealth: 100
+--- !u!114 &4704407190682888797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5875306266831850917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70b8f5a104298804f90f7686f71e730c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackPower: 14
+  defense: 3
+  attackRange: 1.35
+  attackInterval: 0.8
+--- !u!114 &779681520609666833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5875306266831850917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e8aa567218201246bffb1cb07742c1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  level: 1
+  currentExperience: 0
+--- !u!114 &4857155830772707276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5875306266831850917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d340e4cce8e1c64faf8c3e0b5e5de1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  approachPadding: 0.35
+  respawnDelay: 1.25
+  maximumTargetDistance: 30
+  respawnPoint: {fileID: 0}
+  visualRoot: {fileID: 1313147602143778910}

@@ -21,11 +21,13 @@ namespace ProjectGenesis.Gameplay
         private NavMeshAgent agent;
         private NavMeshPath clickPath;
         private PlayerInteractionController interactionController;
+        private PlayerCombatController combatController;
 
         private void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
             interactionController = GetComponent<PlayerInteractionController>();
+            combatController = GetComponent<PlayerCombatController>();
             if (agent == null)
             {
                 agent = gameObject.AddComponent<NavMeshAgent>();
@@ -46,7 +48,9 @@ namespace ProjectGenesis.Gameplay
 
         private void Update()
         {
-            if (agent == null || !agent.enabled)
+            TryClearSelection();
+
+            if (agent == null || !agent.enabled || (combatController != null && combatController.IsInputLocked))
             {
                 return;
             }
@@ -57,6 +61,8 @@ namespace ProjectGenesis.Gameplay
 
             if (moveInput.sqrMagnitude > 0.001f)
             {
+                combatController?.StopCombatAction();
+                interactionController?.CancelForMovement();
                 CancelClickMovement();
                 MoveManually(GetCameraRelativeMoveDirection(moveInput));
             }
@@ -112,10 +118,20 @@ namespace ProjectGenesis.Gameplay
             Ray ray = gameplayCamera.ScreenPointToRay(mouse.position.ReadValue());
             RaycastHit[] hits = Physics.RaycastAll(ray, gameplayCamera.farClipPlane, ~0, QueryTriggerInteraction.Ignore);
 
+            EnemyBrain clickedEnemy = FindClickedEnemy(hits);
+            if (clickedEnemy != null)
+            {
+                HideDestinationMarker();
+                interactionController?.CancelForCombat();
+                combatController?.HandleEnemyClick(clickedEnemy);
+                return;
+            }
+
             InteractableNpc clickedNpc = FindClickedInteractable(hits);
             if (clickedNpc != null)
             {
                 HideDestinationMarker();
+                combatController?.ClearTarget();
                 interactionController?.HandleNpcClick(clickedNpc);
                 return;
             }
@@ -145,6 +161,9 @@ namespace ProjectGenesis.Gameplay
                 return;
             }
 
+            combatController?.StopCombatAction();
+            interactionController?.CancelForMovement();
+
             if (!TrySetReachableDestination(closestHit.point))
             {
                 CancelClickMovement();
@@ -156,6 +175,19 @@ namespace ProjectGenesis.Gameplay
                 destinationMarker.transform.position = agent.destination + Vector3.up * 0.03f;
                 destinationMarker.SetActive(true);
             }
+        }
+
+        private void TryClearSelection()
+        {
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard == null || !keyboard.escapeKey.wasPressedThisFrame)
+            {
+                return;
+            }
+
+            combatController?.ClearTarget();
+            interactionController?.ClearSelection();
+            HideDestinationMarker();
         }
 
         private static InteractableNpc FindClickedInteractable(RaycastHit[] hits)
@@ -170,6 +202,26 @@ namespace ProjectGenesis.Gameplay
             }
 
             return null;
+        }
+
+        private static EnemyBrain FindClickedEnemy(RaycastHit[] hits)
+        {
+            EnemyBrain closestEnemy = null;
+            float closestDistance = float.MaxValue;
+
+            foreach (RaycastHit hit in hits)
+            {
+                EnemyBrain enemy = hit.transform.GetComponentInParent<EnemyBrain>();
+                if (enemy == null || enemy.IsDead || hit.distance >= closestDistance)
+                {
+                    continue;
+                }
+
+                closestEnemy = enemy;
+                closestDistance = hit.distance;
+            }
+
+            return closestEnemy;
         }
 
         private bool TrySetReachableDestination(Vector3 requestedPoint)

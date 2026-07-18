@@ -1,3 +1,4 @@
+using System;
 using ProjectGenesis.UI;
 using UnityEngine;
 using UnityEngine.AI;
@@ -13,7 +14,6 @@ namespace ProjectGenesis.Gameplay
         [SerializeField, Min(0.1f)] private float interactionRadius = 1.25f;
         [SerializeField, Min(0.25f)] private float approachDistance = 0.5f;
         [SerializeField, Min(1f)] private float clickApproachMaxDistance = 20f;
-        [SerializeField, Range(0.15f, 1f)] private float doubleClickWindow = 0.6f;
 
         [Header("References")]
         [SerializeField] private DialogueWindow dialogueWindow;
@@ -25,10 +25,13 @@ namespace ProjectGenesis.Gameplay
         private Collider playerCollider;
         private NavMeshPath approachPath;
         private InteractableNpc nearestNpc;
+        private InteractableNpc selectedNpc;
         private InteractableNpc pendingInteractionNpc;
-        private InteractableNpc lastClickedNpc;
-        private float lastNpcClickTime = -999f;
         private bool shouldOpenDialogueAfterApproach;
+
+        public event Action<InteractableNpc> SelectionChanged;
+
+        public InteractableNpc SelectedNpc => selectedNpc;
 
         private void Awake()
         {
@@ -52,6 +55,7 @@ namespace ProjectGenesis.Gameplay
         {
             CancelPendingInteractionOnManualMove();
             nearestNpc = FindNearestNpc();
+            ClearSelectionWhenTooFar();
             CloseDialogueWhenTooFar();
             TryOpenPendingInteraction();
 
@@ -87,6 +91,25 @@ namespace ProjectGenesis.Gameplay
             gameplayCamera = camera;
         }
 
+        public void CancelForMovement()
+        {
+            CancelPendingInteraction(false);
+        }
+
+        public void CancelForCombat()
+        {
+            CancelPendingInteraction(true);
+            ClearNpcSelection();
+            dialogueWindow?.Hide();
+        }
+
+        public void ClearSelection()
+        {
+            CancelPendingInteraction(true);
+            ClearNpcSelection();
+            dialogueWindow?.Hide();
+        }
+
         public void HandleNpcClick(InteractableNpc clickedNpc)
         {
             if (clickedNpc == null)
@@ -94,11 +117,14 @@ namespace ProjectGenesis.Gameplay
                 return;
             }
 
-            bool isRepeatedNpcClick =
-                clickedNpc == pendingInteractionNpc ||
-                (clickedNpc == lastClickedNpc && Time.unscaledTime - lastNpcClickTime <= doubleClickWindow);
-            lastClickedNpc = clickedNpc;
-            lastNpcClickTime = Time.unscaledTime;
+            if (clickedNpc != selectedNpc)
+            {
+                CancelPendingInteraction(true);
+                SetSelectedNpc(clickedNpc);
+                dialogueWindow?.Hide();
+                promptView?.ShowMessage($"Выбран NPC: {clickedNpc.DisplayName}");
+                return;
+            }
 
             float distance = GetPlanarDistance(clickedNpc);
             if (distance <= interactionRadius)
@@ -108,7 +134,7 @@ namespace ProjectGenesis.Gameplay
             }
             else if (distance <= clickApproachMaxDistance)
             {
-                StartApproachInteraction(clickedNpc, isRepeatedNpcClick);
+                StartApproachInteraction(clickedNpc, true);
             }
             else
             {
@@ -177,6 +203,35 @@ namespace ProjectGenesis.Gameplay
             }
         }
 
+        private void SetSelectedNpc(InteractableNpc npc)
+        {
+            if (selectedNpc != null)
+            {
+                selectedNpc.SetSelected(false);
+            }
+
+            selectedNpc = npc;
+            selectedNpc?.SetSelected(true);
+            SelectionChanged?.Invoke(selectedNpc);
+        }
+
+        private void ClearNpcSelection()
+        {
+            bool hadSelection = selectedNpc != null;
+
+            if (selectedNpc != null)
+            {
+                selectedNpc.SetSelected(false);
+            }
+
+            selectedNpc = null;
+
+            if (hadSelection)
+            {
+                SelectionChanged?.Invoke(null);
+            }
+        }
+
         private void CancelPendingInteractionOnManualMove()
         {
             Keyboard keyboard = Keyboard.current;
@@ -212,6 +267,18 @@ namespace ProjectGenesis.Gameplay
             {
                 dialogueWindow.Hide();
             }
+        }
+
+        private void ClearSelectionWhenTooFar()
+        {
+            if (selectedNpc == null || GetPlanarDistance(selectedNpc) <= clickApproachMaxDistance)
+            {
+                return;
+            }
+
+            CancelPendingInteraction(true);
+            ClearNpcSelection();
+            dialogueWindow?.Hide();
         }
 
         private bool CanInteractWith(InteractableNpc npc)

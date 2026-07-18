@@ -46,6 +46,8 @@ Acceptance criteria:
 
 - right mouse button still rotates the camera;
 - mouse wheel still zooms in and out;
+- clicking the mouse wheel switches between rear and front views;
+- a short right-click returns the camera behind the character;
 - camera distance shortens when an obstacle blocks the view;
 - camera returns to the requested distance when the path is clear.
 

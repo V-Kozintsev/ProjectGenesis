@@ -4,26 +4,31 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 003 first contact is implemented: the Unity project has a small greybox village, obstacle-aware NavMesh movement, playable-area boundaries, camera obstacle protection, a first NPC, simple dialogue UI, and first quest state.
+Sprint 004 first fight is implemented: the Unity project now has a small greybox village, obstacle-aware movement, a first NPC and quest state, one hostile wolf, basic combat, health, death, respawn, and an experience reward.
 
 ## Prototype Controls
 
 - Open `Assets/ProjectGenesis/Scenes/StarterVillage.unity` before entering Play mode.
 - Left-click the ground to move the character. This is the primary control style, inspired by classic point-and-click MMORPGs such as Lineage 2.
 - Click movement uses NavMesh navigation, so the character routes around simple obstacles and ignores unreachable points.
-- Hold the right mouse button and move the mouse to rotate the camera horizontally and vertically.
-- Use the mouse wheel to zoom the camera in and out.
+- Hold the right mouse button and move the mouse to rotate the camera horizontally and vertically. A short right-click returns it behind the character.
+- Use the mouse wheel to zoom the camera in and out. Click the wheel to switch between the rear and front views.
 - WASD or arrow keys are optional fallback controls and cancel the current click destination.
+- Click the grey wolf on the north road once to select it. Click the selected wolf again at any time to run into range and attack automatically; a quick double-click performs both steps.
+- Clicking the ground or using WASD stops the current approach or attack but keeps the selected target.
+- Press `Esc`, click the `X` in the target panel, or select another creature to clear or switch the current target.
+- The combat HUD shows player health, selected-enemy health, level, and experience.
+- Defeating the wolf awards 20 experience. If the player dies, the character briefly disappears and returns at the village spawn point with full health.
 - The camera shortens its distance when a wall or prop blocks the view, then returns to the requested zoom when clear.
-- Click the Village Elder once to run closer.
-- Double-click the Village Elder to talk: if the player is far away, the character runs closer and opens dialogue only when almost touching the NPC.
+- Click the Village Elder once to select him and show his target panel.
+- Click the selected Village Elder again at any time to talk; a quick double-click performs both steps. If the player is far away, the character runs closer and opens dialogue only when almost touching the NPC.
 - NPC interaction can be tuned on the player object in the `PlayerInteractionController` component:
   - `Interaction Radius` controls how close the player must be for dialogue to open and stay open;
   - `Approach Distance` controls how close the player tries to stand after clicking an NPC;
   - `Click Approach Max Distance` controls how far away an NPC can be clicked for auto-approach.
-  - `Double Click Window` controls how quickly two clicks must happen to count as a talk command.
 - `E` is still available as a temporary fallback while standing near an NPC.
-- Accepting the first quest changes it from `NotStarted` to `Active`; combat and quest completion are intentionally not implemented yet.
+- Accepting the first quest changes it from `NotStarted` to `Active`; defeating the wolf does not complete that quest yet.
+- Loot, inventory, equipment, combat skills, and quest completion are intentionally outside Sprint 004.
 
 ## Documentation Map
 
@@ -48,6 +53,7 @@ Sprint 003 first contact is implemented: the Unity project has a small greybox v
 - [18_CODEX_FIRST_MESSAGE.md](18_CODEX_FIRST_MESSAGE.md) - first message to give Codex when starting a new task.
 - [19_SPRINT_002.md](19_SPRINT_002.md) - starter village blockout sprint.
 - [20_SPRINT_003.md](20_SPRINT_003.md) - first NPC, dialogue, and quest state sprint.
+- [21_SPRINT_004.md](21_SPRINT_004.md) - first enemy, combat, health, death, and experience sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle
