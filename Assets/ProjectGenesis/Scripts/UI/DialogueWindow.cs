@@ -91,7 +91,7 @@ namespace ProjectGenesis.UI
                 currentQuestLog.TryAcceptQuest(
                     currentNpc.QuestId,
                     currentNpc.QuestTargetId,
-                    currentNpc.RequiredKillCount,
+                    currentNpc.RequiredObjectiveCount,
                     currentNpc.RewardExperience);
             }
             else if (state == QuestState.ReadyToTurnIn)
@@ -139,7 +139,7 @@ namespace ProjectGenesis.UI
             if (questText != null)
             {
                 int currentCount = progress != null ? progress.CurrentCount : 0;
-                int requiredCount = progress != null ? progress.RequiredCount : currentNpc.RequiredKillCount;
+                int requiredCount = progress != null ? progress.RequiredCount : currentNpc.RequiredObjectiveCount;
                 questText.text =
                     $"{currentNpc.QuestTitle}\n" +
                     $"{currentNpc.QuestObjectiveText} ({currentCount} / {requiredCount})\n" +

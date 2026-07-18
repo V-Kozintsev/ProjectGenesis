@@ -48,7 +48,7 @@ namespace ProjectGenesis.Gameplay
 
         public void HandleLootClick(WorldLootPickup pickup)
         {
-            if (pickup == null || pickup.Item == null)
+            if (pickup == null || !pickup.IsCollectible)
             {
                 return;
             }

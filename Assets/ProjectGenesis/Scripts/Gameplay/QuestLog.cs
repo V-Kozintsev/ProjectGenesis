@@ -80,11 +80,34 @@ namespace ProjectGenesis.Gameplay
             return true;
         }
 
-        public void ReportEnemyDefeated(string targetId)
+        public bool HasActiveObjective(string targetId)
         {
             if (string.IsNullOrWhiteSpace(targetId))
             {
-                return;
+                return false;
+            }
+
+            foreach (QuestProgressData progress in quests.Values)
+            {
+                if (progress.State == QuestState.Active && progress.TargetId == targetId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void ReportEnemyDefeated(string targetId)
+        {
+            ReportObjectiveProgress(targetId);
+        }
+
+        public bool ReportObjectiveProgress(string targetId)
+        {
+            if (string.IsNullOrWhiteSpace(targetId))
+            {
+                return false;
             }
 
             bool changed = false;
@@ -108,6 +131,8 @@ namespace ProjectGenesis.Gameplay
             {
                 Changed?.Invoke(this);
             }
+
+            return changed;
         }
 
         public bool TryTurnInQuest(string questId)

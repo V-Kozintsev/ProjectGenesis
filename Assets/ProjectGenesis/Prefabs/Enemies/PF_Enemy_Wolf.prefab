@@ -247,8 +247,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfb5513a12597e848bf7a58273fe3b72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRadius: 4
-  leashRadius: 4.5
+  detectionRadius: 2.2
+  leashRadius: 3.5
   experienceReward: 20
   corpseLifetime: 6
   questTargetId: wolf
@@ -269,6 +269,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   item: {fileID: 11400000, guid: af70d6da1d148ba4c84d128117b61d47, type: 2}
   pickupMaterial: {fileID: 2100000, guid: 38cf18dcf7f68d241917c7df2b035395, type: 2}
+  itemDropChance: 0.35
+  questObjectiveTargetId: wolf_tail
+  questItemDropChance: 0.7
 --- !u!1 &3439214415301255750
 GameObject:
   m_ObjectHideFlags: 0

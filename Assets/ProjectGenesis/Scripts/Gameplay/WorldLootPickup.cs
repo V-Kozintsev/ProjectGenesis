@@ -15,6 +15,7 @@ namespace ProjectGenesis.Gameplay
         private bool isCollected;
 
         public ItemDefinition Item => item;
+        public bool IsCollectible => item != null;
 
         private void Awake()
         {

@@ -135,6 +135,8 @@ Sprint 006 exclusions:
 
 ## Version 0.6 - First Zone
 
+Status: Sprint 007 first-zone gameplay loop implemented on 2026-07-18.
+
 Goal: the starter area feels like a small world.
 
 Features:
@@ -144,6 +146,22 @@ Features:
 - cave entrance;
 - more items;
 - more NPCs.
+
+Sprint 007 additions:
+
+- three wolf spawners distributed across the northern combat area;
+- six-second corpse cleanup and twelve-second enemy respawn;
+- independent 35% sword drop and 70% active-quest trophy progress chances;
+- five-tail collection quest with progress saved through the existing profile;
+- compact quest tracker for active and ready-to-turn-in states;
+- quest trophies applied directly to capped objective progress instead of becoming world or inventory items.
+
+Sprint 007 exclusions:
+
+- no general-purpose loot tables, rarity tiers, or shared world-spawn service;
+- no additional enemy species, caves, bosses, NPCs, or quests;
+- no polished models, animation, audio, or final UI art;
+- no server-authoritative spawning, loot, or quest validation.
 
 ## Version 1.0 - Vertical Slice
 

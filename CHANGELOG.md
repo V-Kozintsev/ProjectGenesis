@@ -2,6 +2,17 @@
 
 ## 2026-07-18
 
+- Documented Sprint 007 scope and acceptance criteria.
+- Replaced the single fixed wolf encounter with three distributed wolf spawners in the northern combat area.
+- Added six-second corpse cleanup and twelve-second enemy respawn.
+- Added independent chances: 35% for a world `Rusty Sword` drop and 70% for direct wolf-tail objective progress while the collection quest is active and incomplete.
+- Changed the Village Elder's objective from one guaranteed kill to collecting five chance-based wolf tails.
+- Kept quest trophies out of the world and normal inventory, stored them as serializable objective progress, and capped them at the required amount.
+- Added a compact upper-right quest tracker for active progress and return-to-NPC readiness.
+- Tuned wolf detection, leash distance, and spawn positions so encounters can be approached individually.
+- Verified quest acceptance and tracker display, wolf defeat and experience, random non-quest loot, corpse cleanup, and enemy respawn in Play mode.
+- Kept Sprint 007 scoped away from additional enemy types, multiple quests, generalized loot tables, polished presentation, and server authority.
+
 - Documented Sprint 004 scope and acceptance criteria.
 - Added reusable health, combat stats, distance checks, and player progression components.
 - Added click-to-target combat: the player approaches a selected enemy and performs timed basic attacks automatically.

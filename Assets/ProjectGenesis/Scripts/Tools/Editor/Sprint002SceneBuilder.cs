@@ -64,6 +64,12 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 007/Rebuild Starter Village First Zone Loop")]
+        public static void RebuildStarterVillageFirstZoneLoop()
+        {
+            RebuildStarterVillage();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -83,7 +89,11 @@ namespace ProjectGenesis.Tools.Editor
             ItemDefinition rustySword = CreateRustySword();
 
             GameObject playerPrefab = CreatePlayerPrefab(playerMaterial, rustySword);
-            GameObject wolfPrefab = CreateWolfPrefab(wolfMaterial, targetRingMaterial, rustySword, lootMaterial);
+            GameObject wolfPrefab = CreateWolfPrefab(
+                wolfMaterial,
+                targetRingMaterial,
+                rustySword,
+                lootMaterial);
 
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             scene.name = "StarterVillage";
@@ -113,9 +123,9 @@ namespace ProjectGenesis.Tools.Editor
             playerController.SetCameraTransform(camera.transform);
             interactionController.SetGameplayCamera(camera);
 
-            CreateVillageElder(npcMaterial, targetRingMaterial);
-            CreateWolf(wolfPrefab, player.transform);
-            FirstContactUi ui = CreateFirstContactUi(player, combatController);
+            InteractableNpc villageElder = CreateVillageElder(npcMaterial, targetRingMaterial);
+            CreateWolfSpawners(wolfPrefab, player.transform);
+            FirstContactUi ui = CreateFirstContactUi(player, combatController, villageElder);
             interactionController.SetDialogueWindow(ui.DialogueWindow);
             interactionController.SetPromptView(ui.PromptView);
 
@@ -264,9 +274,14 @@ namespace ProjectGenesis.Tools.Editor
             CombatStats stats = wolf.AddComponent<CombatStats>();
             stats.Configure(8, 1, 1.05f, 1.1f);
             EnemyBrain brain = wolf.AddComponent<EnemyBrain>();
-            brain.Configure(4f, 4.5f, 20, 6f, "wolf");
+            brain.Configure(2.2f, 3.5f, 20, 6f, "wolf");
             EnemyLootDrop lootDrop = wolf.AddComponent<EnemyLootDrop>();
-            lootDrop.Configure(lootItem, lootMaterial);
+            lootDrop.Configure(
+                lootItem,
+                lootMaterial,
+                0.35f,
+                "wolf_tail",
+                0.7f);
 
             GameObject visualRoot = new("Visual");
             visualRoot.transform.SetParent(wolf.transform, false);
@@ -435,7 +450,7 @@ namespace ProjectGenesis.Tools.Editor
             return camera;
         }
 
-        private static void CreateVillageElder(Material npcMaterial, Material targetRingMaterial)
+        private static InteractableNpc CreateVillageElder(Material npcMaterial, Material targetRingMaterial)
         {
             GameObject elder = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             elder.name = "NPC_VillageElder";
@@ -443,6 +458,13 @@ namespace ProjectGenesis.Tools.Editor
             elder.transform.localScale = new Vector3(0.9f, 1f, 0.9f);
             elder.GetComponent<Renderer>().sharedMaterial = npcMaterial;
             InteractableNpc npc = elder.AddComponent<InteractableNpc>();
+            npc.ConfigureQuest(
+                "wolves-near-the-road",
+                "Волчьи трофеи",
+                "Собрать волчьи хвосты.",
+                "wolf_tail",
+                5,
+                80);
 
             GameObject selectionRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             selectionRing.name = "SelectionRing";
@@ -452,17 +474,32 @@ namespace ProjectGenesis.Tools.Editor
             Object.DestroyImmediate(selectionRing.GetComponent<Collider>());
             selectionRing.GetComponent<Renderer>().sharedMaterial = targetRingMaterial;
             npc.SetSelectionRing(selectionRing);
+            return npc;
         }
 
-        private static void CreateWolf(GameObject wolfPrefab, Transform player)
+        private static void CreateWolfSpawners(GameObject wolfPrefab, Transform player)
         {
-            GameObject wolf = (GameObject)PrefabUtility.InstantiatePrefab(wolfPrefab);
-            wolf.name = "Enemy_YoungWolf";
-            wolf.transform.SetPositionAndRotation(new Vector3(0f, 0.05f, 13.6f), Quaternion.Euler(0f, 180f, 0f));
-            wolf.GetComponent<EnemyBrain>().SetPlayer(player);
+            CreateWolfSpawner("WolfSpawn_West", new Vector3(-6.2f, 0.05f, 11.3f), wolfPrefab, player);
+            CreateWolfSpawner("WolfSpawn_North", new Vector3(0f, 0.05f, 16.3f), wolfPrefab, player);
+            CreateWolfSpawner("WolfSpawn_East", new Vector3(6.2f, 0.05f, 14.8f), wolfPrefab, player);
         }
 
-        private static FirstContactUi CreateFirstContactUi(GameObject player, PlayerCombatController combatController)
+        private static void CreateWolfSpawner(
+            string name,
+            Vector3 position,
+            GameObject wolfPrefab,
+            Transform player)
+        {
+            GameObject spawn = new(name);
+            spawn.transform.SetPositionAndRotation(position, Quaternion.Euler(0f, 180f, 0f));
+            EnemySpawner spawner = spawn.AddComponent<EnemySpawner>();
+            spawner.Configure(wolfPrefab, player, 12f);
+        }
+
+        private static FirstContactUi CreateFirstContactUi(
+            GameObject player,
+            PlayerCombatController combatController,
+            InteractableNpc villageElder)
         {
             GameObject canvasObject = new("UI_FirstContact");
             Canvas canvas = canvasObject.AddComponent<Canvas>();
@@ -475,7 +512,7 @@ namespace ProjectGenesis.Tools.Editor
             GameObject textObject = new("Text_Status");
             textObject.transform.SetParent(canvasObject.transform, false);
             Text text = textObject.AddComponent<Text>();
-            text.text = "First Loop Prototype";
+            text.text = "First Zone Prototype";
             text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = 24;
             text.color = new Color(1f, 0.95f, 0.82f);
@@ -491,9 +528,57 @@ namespace ProjectGenesis.Tools.Editor
             InteractionPromptView promptView = CreateInteractionPrompt(canvasObject.transform);
             DialogueWindow dialogueWindow = CreateDialogueWindow(canvasObject.transform);
             CreateCombatHud(canvasObject, player, combatController);
+            CreateQuestTracker(canvasObject, player.GetComponent<QuestLog>(), villageElder);
             CreateInventoryUi(canvasObject, player);
 
             return new FirstContactUi(dialogueWindow, promptView);
+        }
+
+        private static void CreateQuestTracker(
+            GameObject canvasObject,
+            QuestLog questLog,
+            InteractableNpc questOwner)
+        {
+            GameObject root = CreatePanel(
+                "QuestTracker",
+                canvasObject.transform,
+                new Color(0.045f, 0.055f, 0.06f, 0.92f));
+            root.GetComponent<Image>().raycastTarget = false;
+            SetRect(
+                root.GetComponent<RectTransform>(),
+                new Vector2(-24f, -24f),
+                new Vector2(380f, 116f),
+                new Vector2(1f, 1f));
+
+            Text title = CreateText(
+                "Text_QuestTrackerTitle",
+                root.transform,
+                "Волчьи трофеи",
+                22,
+                TextAnchor.UpperLeft);
+            title.color = new Color(1f, 0.84f, 0.48f);
+            SetRect(
+                title.GetComponent<RectTransform>(),
+                new Vector2(16f, -14f),
+                new Vector2(348f, 30f),
+                new Vector2(0f, 1f));
+
+            Text objective = CreateText(
+                "Text_QuestTrackerObjective",
+                root.transform,
+                "Волчьи хвосты: 0 / 5",
+                19,
+                TextAnchor.UpperLeft);
+            objective.color = new Color(0.77f, 0.91f, 1f);
+            SetRect(
+                objective.GetComponent<RectTransform>(),
+                new Vector2(16f, -56f),
+                new Vector2(348f, 42f),
+                new Vector2(0f, 1f));
+
+            QuestTrackerView tracker = canvasObject.AddComponent<QuestTrackerView>();
+            tracker.Initialize(root, title, objective, questLog, questOwner);
+            root.SetActive(false);
         }
 
         private static void CreateInventoryUi(GameObject canvasObject, GameObject player)

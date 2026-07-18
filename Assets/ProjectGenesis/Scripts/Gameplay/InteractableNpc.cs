@@ -6,15 +6,15 @@ namespace ProjectGenesis.Gameplay
     public sealed class InteractableNpc : MonoBehaviour
     {
         [SerializeField] private string displayName = "Староста деревни";
-        [SerializeField] private string greetingText = "Путник, северная дорога стала опасной. Волки подходят всё ближе к деревне. Сможешь помочь нам?";
-        [SerializeField] private string activeQuestText = "Волк всё ещё бродит за северными воротами. Возвращайся, когда справишься с ним.";
-        [SerializeField] private string readyQuestText = "Ты справился. Деревня снова может дышать спокойнее.";
+        [SerializeField] private string greetingText = "Путник, волков за северными воротами стало слишком много. Принеси мне пять волчьих хвостов.";
+        [SerializeField] private string activeQuestText = "Хвост выпадает не с каждого волка. Продолжай охоту за северными воротами.";
+        [SerializeField] private string readyQuestText = "Пяти хвостов достаточно. Теперь мы знаем, насколько велика стая.";
         [SerializeField] private string completedQuestText = "Спасибо за помощь. Северная дорога теперь безопаснее.";
         [SerializeField] private string questId = "wolves-near-the-road";
-        [SerializeField] private string questTitle = "Волки у дороги";
-        [SerializeField] private string questObjectiveText = "Победить молодого волка за северными воротами.";
-        [SerializeField] private string questTargetId = "wolf";
-        [SerializeField, Min(1)] private int requiredKillCount = 1;
+        [SerializeField] private string questTitle = "Волчьи трофеи";
+        [SerializeField] private string questObjectiveText = "Собрать волчьи хвосты.";
+        [SerializeField] private string questTargetId = "wolf_tail";
+        [SerializeField, Min(1)] private int requiredObjectiveCount = 5;
         [SerializeField, Min(0)] private int rewardExperience = 80;
         [SerializeField] private GameObject selectionRing;
 
@@ -27,8 +27,24 @@ namespace ProjectGenesis.Gameplay
         public string QuestTitle => questTitle;
         public string QuestObjectiveText => questObjectiveText;
         public string QuestTargetId => questTargetId;
-        public int RequiredKillCount => requiredKillCount;
+        public int RequiredObjectiveCount => requiredObjectiveCount;
         public int RewardExperience => rewardExperience;
+
+        public void ConfigureQuest(
+            string id,
+            string title,
+            string objectiveText,
+            string targetId,
+            int requiredCount,
+            int experienceReward)
+        {
+            questId = id;
+            questTitle = title;
+            questObjectiveText = objectiveText;
+            questTargetId = targetId;
+            requiredObjectiveCount = Mathf.Max(1, requiredCount);
+            rewardExperience = Mathf.Max(0, experienceReward);
+        }
 
         public void SetSelectionRing(GameObject ring)
         {

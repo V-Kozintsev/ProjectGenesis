@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 006 first loop is implemented: the player can accept the Village Elder's task, defeat the wolf, collect and equip its sword, return for the quest reward, reach level 2, and continue from the same state after restarting Play mode.
+Sprint 007 first-zone loop is implemented: the player can accept the Village Elder's task, hunt respawning wolves, collect chance-based quest trophies and equipment, track objective progress, turn in the quest, and continue from the same state after restarting Play mode.
 
 ## Prototype Controls
 
@@ -14,13 +14,14 @@ Sprint 006 first loop is implemented: the player can accept the Village Elder's 
 - Hold the right mouse button and move the mouse to rotate the camera horizontally and vertically. A short right-click returns it behind the character.
 - Use the mouse wheel to zoom the camera in and out. Click the wheel to switch between the rear and front views.
 - WASD or arrow keys are optional fallback controls and cancel the current click destination.
-- Leave the village through the north gate to reach the first combat area. The wolf returns home before it can chase the player back into the village.
-- Click the grey wolf in the northern combat area once to select it. Click the selected wolf again at any time to run into range and attack automatically; a quick double-click performs both steps.
+- Leave the village through the north gate to reach the first combat area. Its three wolves are spread across the zone and return home before they can chase the player back into the village.
+- Click a grey wolf once to select it. Click the selected wolf again at any time to run into range and attack automatically; a quick double-click performs both steps.
 - Clicking the ground or using WASD stops the current approach or attack but keeps the selected target.
 - Press `Esc`, click the `X` in the target panel, or select another creature to clear or switch the current target.
 - The combat HUD shows player health, selected-enemy health, level, and experience.
-- Defeating the wolf awards 20 experience. If the player dies, the character briefly disappears and returns at the village spawn point with full health.
-- Defeating the wolf also drops a visible `Rusty Sword`. The wolf body disappears after six seconds, while the loot remains available; click the drop to approach it and collect it.
+- Defeating a wolf awards 20 experience. Its body disappears after six seconds and its spawner creates a new wolf after twelve seconds. If the player dies, the character briefly disappears and returns at the village spawn point with full health.
+- Each wolf has an independent 35% chance to drop a visible `Rusty Sword`. Click the drop to approach it and collect it.
+- While the Village Elder's quest is active and incomplete, each wolf also has a 70% chance to add a `Wolf Tail` directly to objective progress. Quest trophies do not appear on the ground or occupy normal inventory slots, and progress stops at `5 / 5`.
 - Press `I` or click `Инвентарь [I]` to open the eight-slot inventory.
 - Click `Надеть` to equip the sword in the main-hand slot and increase attack power from 14 to 18. Click `Снять` to remove the bonus without deleting the item.
 - The camera shortens its distance when a wall or prop blocks the view, then returns to the requested zoom when clear.
@@ -31,12 +32,13 @@ Sprint 006 first loop is implemented: the player can accept the Village Elder's 
   - `Approach Distance` controls how close the player tries to stand after clicking an NPC;
   - `Click Approach Max Distance` controls how far away an NPC can be clicked for auto-approach.
 - `E` is still available as a temporary fallback while standing near an NPC.
-- Accept the Village Elder's quest, defeat the young wolf beyond the north gate, then return to the elder and choose `Завершить поручение`.
+- Accept the Village Elder's quest, collect five wolf tails beyond the north gate, then return to the elder and choose `Завершить поручение`.
+- The compact tracker in the upper-right corner shows current tail progress and tells the player when it is time to return to the elder.
 - Defeating the wolf grants 20 experience. Turning in the quest grants another 80 experience, raises the player to level 2, increases maximum health to 110, and increases base attack power by 2.
 - Player position, level, experience, quest state, inventory, and equipped weapon are saved automatically. There is intentionally no save button.
 - For the current offline prototype, persistence uses a local JSON file behind a replaceable interface. In the future online version, the authoritative server will store this state and return the character near the last valid position after login.
 - To start a fresh development playthrough, use `Project Genesis > Development > Clear Local Prototype Profile` while outside Play mode.
-- Armor, additional equipment slots, enemy respawn, trading, combat skills, multiple quests, authentication, and a real server backend are intentionally outside Sprint 006.
+- Armor, additional equipment slots, trading, combat skills, multiple quests, authentication, and a real server backend are intentionally outside Sprint 007.
 
 ## Documentation Map
 
@@ -64,6 +66,7 @@ Sprint 006 first loop is implemented: the player can accept the Village Elder's 
 - [21_SPRINT_004.md](21_SPRINT_004.md) - first enemy, combat, health, death, and experience sprint.
 - [22_SPRINT_005.md](22_SPRINT_005.md) - first loot, inventory, and equipment reward sprint.
 - [23_SPRINT_006.md](23_SPRINT_006.md) - first complete quest, progression, and automatic persistence loop sprint.
+- [24_SPRINT_007.md](24_SPRINT_007.md) - first-zone enemy population, respawn, chance loot, trophy quest, and tracker sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle
