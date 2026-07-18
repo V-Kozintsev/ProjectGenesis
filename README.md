@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 004 first fight is implemented: the Unity project now has a small greybox village, obstacle-aware movement, a first NPC and quest state, one hostile wolf, basic combat, health, death, respawn, and an experience reward.
+Sprint 005 first reward is implemented: the prototype now includes a peaceful village gate, a separate northern combat area, one hostile wolf, a visible weapon drop, an eight-slot inventory, and a main-hand equipment bonus.
 
 ## Prototype Controls
 
@@ -14,11 +14,15 @@ Sprint 004 first fight is implemented: the Unity project now has a small greybox
 - Hold the right mouse button and move the mouse to rotate the camera horizontally and vertically. A short right-click returns it behind the character.
 - Use the mouse wheel to zoom the camera in and out. Click the wheel to switch between the rear and front views.
 - WASD or arrow keys are optional fallback controls and cancel the current click destination.
-- Click the grey wolf on the north road once to select it. Click the selected wolf again at any time to run into range and attack automatically; a quick double-click performs both steps.
+- Leave the village through the north gate to reach the first combat area. The wolf returns home before it can chase the player back into the village.
+- Click the grey wolf in the northern combat area once to select it. Click the selected wolf again at any time to run into range and attack automatically; a quick double-click performs both steps.
 - Clicking the ground or using WASD stops the current approach or attack but keeps the selected target.
 - Press `Esc`, click the `X` in the target panel, or select another creature to clear or switch the current target.
 - The combat HUD shows player health, selected-enemy health, level, and experience.
 - Defeating the wolf awards 20 experience. If the player dies, the character briefly disappears and returns at the village spawn point with full health.
+- Defeating the wolf also drops a visible `Rusty Sword`. The wolf body disappears after six seconds, while the loot remains available; click the drop to approach it and collect it.
+- Press `I` or click `Инвентарь [I]` to open the eight-slot inventory.
+- Click `Надеть` to equip the sword in the main-hand slot and increase attack power from 14 to 18. Click `Снять` to remove the bonus without deleting the item.
 - The camera shortens its distance when a wall or prop blocks the view, then returns to the requested zoom when clear.
 - Click the Village Elder once to select him and show his target panel.
 - Click the selected Village Elder again at any time to talk; a quick double-click performs both steps. If the player is far away, the character runs closer and opens dialogue only when almost touching the NPC.
@@ -28,7 +32,7 @@ Sprint 004 first fight is implemented: the Unity project now has a small greybox
   - `Click Approach Max Distance` controls how far away an NPC can be clicked for auto-approach.
 - `E` is still available as a temporary fallback while standing near an NPC.
 - Accepting the first quest changes it from `NotStarted` to `Active`; defeating the wolf does not complete that quest yet.
-- Loot, inventory, equipment, combat skills, and quest completion are intentionally outside Sprint 004.
+- Armor, additional equipment slots, enemy respawn, trading, saving, combat skills, and quest completion are intentionally outside Sprint 005.
 
 ## Documentation Map
 
@@ -54,6 +58,7 @@ Sprint 004 first fight is implemented: the Unity project now has a small greybox
 - [19_SPRINT_002.md](19_SPRINT_002.md) - starter village blockout sprint.
 - [20_SPRINT_003.md](20_SPRINT_003.md) - first NPC, dialogue, and quest state sprint.
 - [21_SPRINT_004.md](21_SPRINT_004.md) - first enemy, combat, health, death, and experience sprint.
+- [22_SPRINT_005.md](22_SPRINT_005.md) - first loot, inventory, and equipment reward sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

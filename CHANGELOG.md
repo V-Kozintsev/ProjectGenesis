@@ -16,6 +16,16 @@
 - Added 20 experience as the first combat reward.
 - Added a blockout wolf and combat target marker to the starter village scene.
 - Kept Sprint 004 scoped away from loot, inventory, equipment, quest completion, skills, and save/load.
+- Documented Sprint 005 scope and acceptance criteria.
+- Opened a north village gate and added a visually distinct combat area beyond it.
+- Moved the wolf outside the village and shortened its leash so it returns before entering the peaceful area.
+- Added an authored `Rusty Sword` item definition and a visible wolf loot drop.
+- Added an adjustable corpse lifetime so the defeated wolf disappears after six seconds without removing its loot.
+- Added click-to-approach loot collection using the existing NavMesh movement.
+- Added an eight-slot player inventory and one main-hand equipment slot.
+- Added a compact inventory window opened by `I` or its on-screen button.
+- Made the equipped sword increase attack power from 14 to 18, with immediate equip and unequip feedback.
+- Kept Sprint 005 scoped away from general zone rules, armor, trading, crafting, quest rewards, enemy respawn, and save/load.
 
 ## 2026-07-15
 

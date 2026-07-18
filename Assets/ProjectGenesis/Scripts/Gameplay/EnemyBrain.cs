@@ -20,6 +20,7 @@ namespace ProjectGenesis.Gameplay
         [SerializeField, Min(0.5f)] private float detectionRadius = 4f;
         [SerializeField, Min(1f)] private float leashRadius = 6f;
         [SerializeField, Min(1)] private int experienceReward = 20;
+        [SerializeField, Min(0f)] private float corpseLifetime = 6f;
 
         [Header("References")]
         [SerializeField] private Transform player;
@@ -135,11 +136,12 @@ namespace ProjectGenesis.Gameplay
             }
         }
 
-        public void Configure(float detection, float leash, int reward)
+        public void Configure(float detection, float leash, int reward, float despawnDelay = 6f)
         {
             detectionRadius = Mathf.Max(0.5f, detection);
             leashRadius = Mathf.Max(1f, leash);
             experienceReward = Mathf.Max(1, reward);
+            corpseLifetime = Mathf.Max(0f, despawnDelay);
         }
 
         public void SetPlayer(Transform playerTransform)
@@ -245,6 +247,11 @@ namespace ProjectGenesis.Gameplay
             }
 
             Died?.Invoke(this);
+
+            if (corpseLifetime > 0f)
+            {
+                Destroy(gameObject, corpseLifetime);
+            }
         }
 
         private void FacePlayer()

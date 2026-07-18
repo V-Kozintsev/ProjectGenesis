@@ -1,4 +1,5 @@
 using ProjectGenesis.Core;
+using ProjectGenesis.Data;
 using ProjectGenesis.Gameplay;
 using ProjectGenesis.UI;
 using Unity.AI.Navigation;
@@ -28,6 +29,9 @@ namespace ProjectGenesis.Tools.Editor
         private const string NpcMaterialPath = "Assets/ProjectGenesis/Materials/MAT_NPC_Village_Elder.mat";
         private const string WolfMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Enemy_Wolf.mat";
         private const string TargetRingMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Combat_TargetRing.mat";
+        private const string CombatAreaMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Combat_Area.mat";
+        private const string LootMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Loot_Weapon.mat";
+        private const string RustySwordPath = "Assets/ProjectGenesis/Data/Items/ITM_RustySword.asset";
 
         [MenuItem("Project Genesis/Sprint 002/Rebuild Starter Village Blockout")]
         public static void RebuildStarterVillageBlockout()
@@ -47,6 +51,12 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 005/Rebuild Starter Village First Reward")]
+        public static void RebuildStarterVillageFirstReward()
+        {
+            RebuildStarterVillage();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -61,19 +71,23 @@ namespace ProjectGenesis.Tools.Editor
             Material npcMaterial = CreateMaterial(NpcMaterialPath, new Color(0.72f, 0.64f, 0.42f));
             Material wolfMaterial = CreateMaterial(WolfMaterialPath, new Color(0.28f, 0.3f, 0.34f));
             Material targetRingMaterial = CreateMaterial(TargetRingMaterialPath, new Color(0.85f, 0.16f, 0.12f));
+            Material combatAreaMaterial = CreateMaterial(CombatAreaMaterialPath, new Color(0.22f, 0.32f, 0.24f));
+            Material lootMaterial = CreateMaterial(LootMaterialPath, new Color(0.92f, 0.62f, 0.16f));
+            ItemDefinition rustySword = CreateRustySword();
 
             GameObject playerPrefab = CreatePlayerPrefab(playerMaterial);
-            GameObject wolfPrefab = CreateWolfPrefab(wolfMaterial, targetRingMaterial);
+            GameObject wolfPrefab = CreateWolfPrefab(wolfMaterial, targetRingMaterial, rustySword, lootMaterial);
 
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             scene.name = "StarterVillage";
 
             GameObject navigationRoot = new("Navigation");
             CreateGround(navigationRoot.transform, groundMaterial);
-            CreateRoad("Road_Main_NorthSouth", new Vector3(0f, 0.015f, 0f), new Vector3(1.4f, 0.03f, 14f), roadMaterial);
+            CreateRoad("Road_Main_NorthSouth", new Vector3(0f, 0.015f, 4.5f), new Vector3(1.4f, 0.03f, 25f), roadMaterial);
             CreateRoad("Road_Main_EastWest", new Vector3(0f, 0.02f, 0f), new Vector3(14f, 0.03f, 1.4f), roadMaterial);
 
             CreateVillageBlockout(buildingMaterial, boundaryMaterial, propMaterial);
+            CreateNorthCombatArea(combatAreaMaterial, boundaryMaterial, propMaterial);
 
             GameObject spawnPoint = CreateSpawnPoint();
             GameObject player = (GameObject)PrefabUtility.InstantiatePrefab(playerPrefab);
@@ -119,7 +133,8 @@ namespace ProjectGenesis.Tools.Editor
                 "Assets/ProjectGenesis/Prefabs/Enemies",
                 "Assets/ProjectGenesis/Prefabs/UI",
                 "Assets/ProjectGenesis/Prefabs/World",
-                "Assets/ProjectGenesis/Scenes"
+                "Assets/ProjectGenesis/Scenes",
+                "Assets/ProjectGenesis/Data/Items"
             };
 
             foreach (string folder in folders)
@@ -159,6 +174,20 @@ namespace ProjectGenesis.Tools.Editor
             return material;
         }
 
+        private static ItemDefinition CreateRustySword()
+        {
+            ItemDefinition item = AssetDatabase.LoadAssetAtPath<ItemDefinition>(RustySwordPath);
+            if (item == null)
+            {
+                item = ScriptableObject.CreateInstance<ItemDefinition>();
+                AssetDatabase.CreateAsset(item, RustySwordPath);
+            }
+
+            item.Configure("weapon.rusty_sword", "Ржавый меч", ItemType.Weapon, 4);
+            EditorUtility.SetDirty(item);
+            return item;
+        }
+
         private static GameObject CreatePlayerPrefab(Material playerMaterial)
         {
             GameObject player = new("PF_Player_Prototype");
@@ -180,6 +209,9 @@ namespace ProjectGenesis.Tools.Editor
             CombatStats stats = player.AddComponent<CombatStats>();
             stats.Configure(14, 3, 1.35f, 0.8f);
             player.AddComponent<PlayerProgression>();
+            player.AddComponent<PlayerInventory>();
+            player.AddComponent<PlayerEquipment>();
+            player.AddComponent<PlayerLootController>();
             PlayerCombatController combatController = player.AddComponent<PlayerCombatController>();
 
             GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Capsule);
@@ -196,7 +228,11 @@ namespace ProjectGenesis.Tools.Editor
             return savedPrefab;
         }
 
-        private static GameObject CreateWolfPrefab(Material wolfMaterial, Material targetRingMaterial)
+        private static GameObject CreateWolfPrefab(
+            Material wolfMaterial,
+            Material targetRingMaterial,
+            ItemDefinition lootItem,
+            Material lootMaterial)
         {
             GameObject wolf = new("PF_Enemy_Wolf");
 
@@ -219,7 +255,9 @@ namespace ProjectGenesis.Tools.Editor
             CombatStats stats = wolf.AddComponent<CombatStats>();
             stats.Configure(8, 1, 1.05f, 1.1f);
             EnemyBrain brain = wolf.AddComponent<EnemyBrain>();
-            brain.Configure(4f, 6f, 20);
+            brain.Configure(4f, 4.5f, 20, 6f);
+            EnemyLootDrop lootDrop = wolf.AddComponent<EnemyLootDrop>();
+            lootDrop.Configure(lootItem, lootMaterial);
 
             GameObject visualRoot = new("Visual");
             visualRoot.transform.SetParent(wolf.transform, false);
@@ -311,10 +349,30 @@ namespace ProjectGenesis.Tools.Editor
             CreateBuilding("Blockout_Crates_WestRoad", new Vector3(-2.7f, 0.45f, 1.1f), new Vector3(1.1f, 0.9f, 1.1f), propMaterial);
             CreateBuilding("Blockout_Cart_EastRoad", new Vector3(3.1f, 0.45f, -1.2f), new Vector3(1.5f, 0.9f, 0.8f), propMaterial);
 
-            CreateBoundary("Boundary_North", new Vector3(0f, 0.65f, 8.2f), new Vector3(17f, 1.3f, 0.4f), boundaryMaterial);
+            CreateBoundary("Boundary_NorthWest", new Vector3(-5.1f, 0.65f, 8.2f), new Vector3(6.8f, 1.3f, 0.4f), boundaryMaterial);
+            CreateBoundary("Boundary_NorthEast", new Vector3(5.1f, 0.65f, 8.2f), new Vector3(6.8f, 1.3f, 0.4f), boundaryMaterial);
             CreateBoundary("Boundary_South", new Vector3(0f, 0.65f, -8.2f), new Vector3(17f, 1.3f, 0.4f), boundaryMaterial);
             CreateBoundary("Boundary_East", new Vector3(8.2f, 0.65f, 0f), new Vector3(0.4f, 1.3f, 17f), boundaryMaterial);
             CreateBoundary("Boundary_West", new Vector3(-8.2f, 0.65f, 0f), new Vector3(0.4f, 1.3f, 17f), boundaryMaterial);
+        }
+
+        private static void CreateNorthCombatArea(
+            Material combatAreaMaterial,
+            Material boundaryMaterial,
+            Material propMaterial)
+        {
+            CreateRoad(
+                "Ground_NorthCombatArea",
+                new Vector3(0f, 0.008f, 13.2f),
+                new Vector3(16f, 0.015f, 9.6f),
+                combatAreaMaterial);
+
+            CreateBoundary("Boundary_CombatNorth", new Vector3(0f, 0.65f, 18.2f), new Vector3(17f, 1.3f, 0.4f), boundaryMaterial);
+            CreateBoundary("Boundary_CombatEast", new Vector3(8.2f, 0.65f, 13.2f), new Vector3(0.4f, 1.3f, 10f), boundaryMaterial);
+            CreateBoundary("Boundary_CombatWest", new Vector3(-8.2f, 0.65f, 13.2f), new Vector3(0.4f, 1.3f, 10f), boundaryMaterial);
+
+            CreateBuilding("CombatArea_Rock_West", new Vector3(-4.6f, 0.6f, 13.8f), new Vector3(1.4f, 1.2f, 1.1f), propMaterial);
+            CreateBuilding("CombatArea_Rock_East", new Vector3(4.7f, 0.45f, 15.4f), new Vector3(1.1f, 0.9f, 1.5f), propMaterial);
         }
 
         private static void CreateBuilding(string name, Vector3 position, Vector3 scale, Material material)
@@ -391,7 +449,7 @@ namespace ProjectGenesis.Tools.Editor
         {
             GameObject wolf = (GameObject)PrefabUtility.InstantiatePrefab(wolfPrefab);
             wolf.name = "Enemy_YoungWolf";
-            wolf.transform.SetPositionAndRotation(new Vector3(0f, 0.05f, 6.2f), Quaternion.Euler(0f, 180f, 0f));
+            wolf.transform.SetPositionAndRotation(new Vector3(0f, 0.05f, 13.6f), Quaternion.Euler(0f, 180f, 0f));
             wolf.GetComponent<EnemyBrain>().SetPlayer(player);
         }
 
@@ -408,7 +466,7 @@ namespace ProjectGenesis.Tools.Editor
             GameObject textObject = new("Text_Status");
             textObject.transform.SetParent(canvasObject.transform, false);
             Text text = textObject.AddComponent<Text>();
-            text.text = "First Fight Prototype";
+            text.text = "First Reward Prototype";
             text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = 24;
             text.color = new Color(1f, 0.95f, 0.82f);
@@ -424,8 +482,97 @@ namespace ProjectGenesis.Tools.Editor
             InteractionPromptView promptView = CreateInteractionPrompt(canvasObject.transform);
             DialogueWindow dialogueWindow = CreateDialogueWindow(canvasObject.transform);
             CreateCombatHud(canvasObject, player, combatController);
+            CreateInventoryUi(canvasObject, player);
 
             return new FirstContactUi(dialogueWindow, promptView);
+        }
+
+        private static void CreateInventoryUi(GameObject canvasObject, GameObject player)
+        {
+            Button openButton = CreateButton("Button_OpenInventory", canvasObject.transform, "Инвентарь [I]");
+            openButton.GetComponent<Image>().color = new Color(0.12f, 0.18f, 0.22f, 0.96f);
+            SetRect(
+                openButton.GetComponent<RectTransform>(),
+                new Vector2(-24f, 24f),
+                new Vector2(220f, 56f),
+                new Vector2(1f, 0f));
+
+            GameObject window = CreatePanel(
+                "InventoryWindow",
+                canvasObject.transform,
+                new Color(0.045f, 0.055f, 0.06f, 0.97f));
+            SetRect(
+                window.GetComponent<RectTransform>(),
+                new Vector2(-28f, 0f),
+                new Vector2(520f, 560f),
+                new Vector2(1f, 0.5f));
+
+            Text title = CreateText("Text_InventoryTitle", window.transform, "Инвентарь", 30, TextAnchor.UpperLeft);
+            title.color = new Color(1f, 0.84f, 0.48f);
+            SetRect(title.GetComponent<RectTransform>(), new Vector2(24f, -22f), new Vector2(390f, 42f), new Vector2(0f, 1f));
+
+            Button closeButton = CreateButton("Button_CloseInventory", window.transform, "X");
+            closeButton.GetComponent<Image>().color = new Color(0.28f, 0.1f, 0.09f, 1f);
+            SetRect(closeButton.GetComponent<RectTransform>(), new Vector2(-18f, -18f), new Vector2(38f, 36f), new Vector2(1f, 1f));
+
+            Text capacityText = CreateText("Text_InventoryCapacity", window.transform, "Ячейки: 0 / 8", 21, TextAnchor.UpperLeft);
+            capacityText.color = new Color(0.82f, 0.88f, 0.92f);
+            SetRect(capacityText.GetComponent<RectTransform>(), new Vector2(24f, -82f), new Vector2(220f, 30f), new Vector2(0f, 1f));
+
+            Text attackText = CreateText("Text_AttackPower", window.transform, "Сила атаки: 14", 21, TextAnchor.UpperLeft);
+            attackText.color = new Color(1f, 0.72f, 0.48f);
+            SetRect(attackText.GetComponent<RectTransform>(), new Vector2(272f, -82f), new Vector2(220f, 30f), new Vector2(0f, 1f));
+
+            Text mainHandText = CreateText("Text_MainHand", window.transform, "Оружие: не экипировано", 21, TextAnchor.UpperLeft);
+            mainHandText.color = new Color(0.72f, 0.9f, 1f);
+            SetRect(mainHandText.GetComponent<RectTransform>(), new Vector2(24f, -126f), new Vector2(468f, 34f), new Vector2(0f, 1f));
+
+            GameObject divider = CreatePanel("Divider", window.transform, new Color(0.28f, 0.32f, 0.34f, 1f));
+            divider.GetComponent<Image>().raycastTarget = false;
+            SetRect(divider.GetComponent<RectTransform>(), new Vector2(24f, -178f), new Vector2(468f, 2f), new Vector2(0f, 1f));
+
+            Text contentsTitle = CreateText("Text_ContentsTitle", window.transform, "Содержимое", 22, TextAnchor.UpperLeft);
+            contentsTitle.color = new Color(0.9f, 0.92f, 0.94f);
+            SetRect(contentsTitle.GetComponent<RectTransform>(), new Vector2(24f, -202f), new Vector2(468f, 32f), new Vector2(0f, 1f));
+
+            Text itemNameText = CreateText("Text_ItemName", window.transform, "Инвентарь пуст", 24, TextAnchor.UpperLeft);
+            itemNameText.color = new Color(1f, 0.82f, 0.42f);
+            SetRect(itemNameText.GetComponent<RectTransform>(), new Vector2(24f, -254f), new Vector2(468f, 36f), new Vector2(0f, 1f));
+
+            Text itemDetailsText = CreateText(
+                "Text_ItemDetails",
+                window.transform,
+                "Победите волка и подберите выпавший предмет.",
+                20,
+                TextAnchor.UpperLeft);
+            itemDetailsText.color = new Color(0.82f, 0.84f, 0.82f);
+            itemDetailsText.lineSpacing = 1.1f;
+            SetRect(itemDetailsText.GetComponent<RectTransform>(), new Vector2(24f, -302f), new Vector2(468f, 80f), new Vector2(0f, 1f));
+
+            Button actionButton = CreateButton("Button_ItemAction", window.transform, "Надеть");
+            SetRect(actionButton.GetComponent<RectTransform>(), new Vector2(24f, 28f), new Vector2(200f, 58f), new Vector2(0f, 0f));
+            Text actionText = actionButton.GetComponentInChildren<Text>();
+
+            Text hintText = CreateText("Text_InventoryHint", window.transform, "Нажмите I, чтобы закрыть", 18, TextAnchor.LowerRight);
+            hintText.color = new Color(0.62f, 0.68f, 0.7f);
+            SetRect(hintText.GetComponent<RectTransform>(), new Vector2(-24f, 42f), new Vector2(240f, 28f), new Vector2(1f, 0f));
+
+            InventoryView inventoryView = canvasObject.AddComponent<InventoryView>();
+            inventoryView.Initialize(
+                window,
+                openButton,
+                closeButton,
+                actionButton,
+                capacityText,
+                attackText,
+                mainHandText,
+                itemNameText,
+                itemDetailsText,
+                actionText,
+                player.GetComponent<PlayerInventory>(),
+                player.GetComponent<PlayerEquipment>(),
+                player.GetComponent<CombatStats>());
+            window.SetActive(false);
         }
 
         private static void CreateCombatHud(

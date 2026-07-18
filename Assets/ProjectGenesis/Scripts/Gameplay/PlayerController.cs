@@ -22,12 +22,14 @@ namespace ProjectGenesis.Gameplay
         private NavMeshPath clickPath;
         private PlayerInteractionController interactionController;
         private PlayerCombatController combatController;
+        private PlayerLootController lootController;
 
         private void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
             interactionController = GetComponent<PlayerInteractionController>();
             combatController = GetComponent<PlayerCombatController>();
+            lootController = GetComponent<PlayerLootController>();
             if (agent == null)
             {
                 agent = gameObject.AddComponent<NavMeshAgent>();
@@ -63,6 +65,7 @@ namespace ProjectGenesis.Gameplay
             {
                 combatController?.StopCombatAction();
                 interactionController?.CancelForMovement();
+                lootController?.CancelLootAction();
                 CancelClickMovement();
                 MoveManually(GetCameraRelativeMoveDirection(moveInput));
             }
@@ -123,6 +126,7 @@ namespace ProjectGenesis.Gameplay
             {
                 HideDestinationMarker();
                 interactionController?.CancelForCombat();
+                lootController?.CancelLootAction();
                 combatController?.HandleEnemyClick(clickedEnemy);
                 return;
             }
@@ -132,7 +136,18 @@ namespace ProjectGenesis.Gameplay
             {
                 HideDestinationMarker();
                 combatController?.ClearTarget();
+                lootController?.CancelLootAction();
                 interactionController?.HandleNpcClick(clickedNpc);
+                return;
+            }
+
+            WorldLootPickup clickedLoot = FindClickedLoot(hits);
+            if (clickedLoot != null)
+            {
+                HideDestinationMarker();
+                combatController?.StopCombatAction();
+                interactionController?.CancelForMovement();
+                lootController?.HandleLootClick(clickedLoot);
                 return;
             }
 
@@ -163,6 +178,7 @@ namespace ProjectGenesis.Gameplay
 
             combatController?.StopCombatAction();
             interactionController?.CancelForMovement();
+            lootController?.CancelLootAction();
 
             if (!TrySetReachableDestination(closestHit.point))
             {
@@ -187,6 +203,7 @@ namespace ProjectGenesis.Gameplay
 
             combatController?.ClearTarget();
             interactionController?.ClearSelection();
+            lootController?.CancelLootAction();
             HideDestinationMarker();
         }
 
@@ -222,6 +239,26 @@ namespace ProjectGenesis.Gameplay
             }
 
             return closestEnemy;
+        }
+
+        private static WorldLootPickup FindClickedLoot(RaycastHit[] hits)
+        {
+            WorldLootPickup closestPickup = null;
+            float closestDistance = float.MaxValue;
+
+            foreach (RaycastHit hit in hits)
+            {
+                WorldLootPickup pickup = hit.transform.GetComponentInParent<WorldLootPickup>();
+                if (pickup == null || hit.distance >= closestDistance)
+                {
+                    continue;
+                }
+
+                closestPickup = pickup;
+                closestDistance = hit.distance;
+            }
+
+            return closestPickup;
         }
 
         private bool TrySetReachableDestination(Vector3 requestedPoint)

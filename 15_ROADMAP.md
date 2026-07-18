@@ -73,6 +73,8 @@ Sprint 004 exclusions:
 
 ## Version 0.4 - First Reward
 
+Status: Sprint 005 first reward implemented on 2026-07-18.
+
 Goal: the player receives meaningful progress.
 
 Features:
@@ -81,6 +83,25 @@ Features:
 - loot drop;
 - equipment slot;
 - stat update from equipment.
+
+Sprint 005 additions:
+
+- north village gate and a separate prototype combat area;
+- wolf leash that prevents pursuit into the village;
+- authored `Rusty Sword` item definition;
+- visible click-to-collect wolf loot;
+- eight-slot player inventory;
+- one main-hand equipment slot;
+- attack power increase from equipped weapon;
+- compact inventory window opened with `I` or an on-screen button.
+
+Sprint 005 exclusions:
+
+- no general peace-zone or PvP-zone rules;
+- no armor or additional equipment slots;
+- no trading, currency, vendors, or crafting;
+- no enemy respawn or save/load;
+- no quest completion or quest rewards.
 
 ## Version 0.5 - First Loop
 

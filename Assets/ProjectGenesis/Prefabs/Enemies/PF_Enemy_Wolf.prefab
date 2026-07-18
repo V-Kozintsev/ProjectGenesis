@@ -135,6 +135,7 @@ GameObject:
   - component: {fileID: 7602654502361191128}
   - component: {fileID: 8727120540362918220}
   - component: {fileID: 5858290719935994172}
+  - component: {fileID: 7342429338186015730}
   m_Layer: 0
   m_Name: PF_Enemy_Wolf
   m_TagString: Untagged
@@ -232,6 +233,7 @@ MonoBehaviour:
   defense: 1
   attackRange: 1.05
   attackInterval: 1.1
+  equipmentAttackBonus: 0
 --- !u!114 &5858290719935994172
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -245,11 +247,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   detectionRadius: 4
-  leashRadius: 6
+  leashRadius: 4.5
   experienceReward: 20
+  corpseLifetime: 6
   player: {fileID: 0}
   visualRoot: {fileID: 1616227209458042685}
   selectionRing: {fileID: 3439214415301255750}
+--- !u!114 &7342429338186015730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1793943222149672334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbfb0aa41cae355448fdc7cf0d737827, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  item: {fileID: 11400000, guid: af70d6da1d148ba4c84d128117b61d47, type: 2}
+  pickupMaterial: {fileID: 2100000, guid: 38cf18dcf7f68d241917c7df2b035395, type: 2}
 --- !u!1 &3439214415301255750
 GameObject:
   m_ObjectHideFlags: 0
