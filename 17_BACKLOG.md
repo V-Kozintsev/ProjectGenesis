@@ -5,6 +5,7 @@
 - Character creation screen with race and class selection.
 - Campfire rest system.
 - Rare enemy variants.
+- Short random enemy roaming inside each spawn's home area.
 - First dungeon-like cave.
 - Reputation with village factions.
 - Simple crafting.
@@ -41,4 +42,3 @@
 - Add economy document.
 - Add save format specification.
 - Add technical risk register.
-

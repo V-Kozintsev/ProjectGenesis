@@ -135,7 +135,7 @@ Sprint 006 exclusions:
 
 ## Version 0.6 - First Zone
 
-Status: Sprint 009 loot-table foundation implemented on 2026-07-19.
+Status: Sprint 010 combat-recovery foundation implemented on 2026-07-19.
 
 Goal: the starter area feels like a small world.
 
@@ -198,6 +198,24 @@ Sprint 009 exclusions:
 - no centralized spawn authoring or final respawn/population balancing;
 - no server-authoritative loot rolls or multiplayer synchronization.
 
+Sprint 010 additions:
+
+- reusable delayed, interval-based health regeneration;
+- returning wolves that preserve damage instead of restoring full health immediately;
+- recovery that starts after reaching home, does not disable enemy reactions, and is delayed again by renewed damage;
+- leash distance measured from the wolf itself so pursuit is visible before return;
+- gradual out-of-combat player recovery with damage-delay resets;
+- Inspector-authored player and wolf recovery values;
+- deterministic validation of healing boundaries and prefab defaults.
+
+Sprint 010 exclusions:
+
+- no potions, food, healing skills, buffs, mana recovery, or status effects;
+- no combat log, floating numbers, recovery icons, animation, audio, or final effects;
+- no new enemies, attacks, difficulty scaling, or boss mechanics;
+- no death penalties, resurrection services, corpse running, or PvP rules;
+- no server-authoritative combat state or multiplayer synchronization.
+
 Post-Sprint 009 backlog decisions:
 
 - add explicit inventory-slot selection when different copies can have meaningfully different properties;
@@ -205,6 +223,7 @@ Post-Sprint 009 backlog decisions:
 - move enemy population and respawn timing into reusable spawn data instead of relying on scene-only tuning;
 - allow sub-10% and sub-1% loot rates, but balance them from expected kills per reward, time-to-kill, quest rewards, economy, and player frustration rather than treating 10% as a minimum;
 - consider guaranteed starter rewards or a pity rule separately from ordinary rare drops.
+- add short random idle roaming for wolves inside their home area without allowing them into the peaceful village.
 
 ## Version 1.0 - Vertical Slice
 

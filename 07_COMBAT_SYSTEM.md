@@ -88,3 +88,15 @@ Enemy death:
 - notify quest objectives;
 - play death feedback.
 
+## Combat Recovery
+
+Leaving combat and restoring health are separate phases.
+
+- enemies keep their current health while returning to their home point;
+- enemy recovery starts only after they reach home and wait through a configurable delay;
+- an enemy's leash is measured from its own position to its home point, allowing a visible pursuit before return;
+- a recovering enemy still detects, pursues, and attacks nearby players;
+- proximity alone does not pause enemy recovery, while each new hit restarts its recovery delay;
+- the player recovers only after active combat ends and a configurable no-damage delay passes;
+- recovery happens in small configurable ticks, never exceeds maximum health, and never revives a dead character;
+- death and respawn may still use an explicit full-health restoration independently of regeneration.

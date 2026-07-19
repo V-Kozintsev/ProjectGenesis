@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 009 loot-table foundation is implemented: regular enemy drops now come from reusable data assets, the wolf's sword chance is balanced to 10%, and deterministic simulation verifies the configured probability.
+Sprint 010 combat recovery is implemented: returning wolves retain damage and recover gradually after reaching home, while the player slowly regenerates after leaving active combat.
 
 ## Prototype Controls
 
@@ -20,6 +20,9 @@ Sprint 009 loot-table foundation is implemented: regular enemy drops now come fr
 - Press `Esc`, click the `X` in the target panel, or select another creature to clear or switch the current target.
 - The combat HUD shows player health, selected-enemy health, level, and experience.
 - Defeating a wolf awards 20 experience. Its body disappears after six seconds and its spawner creates a new wolf after twelve seconds. If the player dies, the character briefly disappears and returns at the village spawn point with full health.
+- A retreating wolf keeps its remaining health. Its leash measures how far the wolf itself has travelled from home, so it visibly pursues before returning. It can be re-engaged while returning by approaching inside its leash. At home it waits five seconds, then restores 3 health every second. It still attacks nearby players while recovering, and every new hit restarts the five-second healing delay.
+- After active combat ends, the player waits eight seconds and then restores 2 health every second. New damage restarts the delay, while death and village respawn still restore full health.
+- Recovery values are editable through `HealthRegeneration` on the player and wolf prefabs. Use `Project Genesis > Sprint 010 > Validate Combat Recovery` to verify saved defaults and health boundaries.
 - Each wolf has an independent 10% chance to drop a visible `Rusty Sword`. Click the drop to approach it and collect it.
 - Regular wolf loot is configured in `Assets/ProjectGenesis/Data/LootTables/LT_Wolf.asset`. Select that asset and edit an entry's `Drop Chance` value in the Inspector; `0.1` means 10%.
 - Rebuilding the starter village preserves edits to an existing loot-table asset. Use `Project Genesis > Sprint 009 > Validate Wolf Loot Table` to check the table and run a fixed-seed 100,000-roll simulation.
@@ -44,7 +47,7 @@ Sprint 009 loot-table foundation is implemented: regular enemy drops now come fr
 - Player position, level, experience, quest state, inventory, and equipped weapon are saved automatically. There is intentionally no save button.
 - For the current offline prototype, persistence uses a local JSON file behind a replaceable interface. In the future online version, the authoritative server will store this state and return the character near the last valid position after login.
 - To start a fresh development playthrough, use `Project Genesis > Development > Clear Local Prototype Profile` while outside Play mode.
-- Guaranteed first drops, pity counters, vendors, trading, randomized item stats, per-player loot ownership, and a real server backend are intentionally outside Sprint 009.
+- Healing items and skills, combat-status UI, death penalties, server-authoritative combat, and a real multiplayer backend are intentionally outside Sprint 010.
 
 ## Documentation Map
 
@@ -75,6 +78,7 @@ Sprint 009 loot-table foundation is implemented: regular enemy drops now come fr
 - [24_SPRINT_007.md](24_SPRINT_007.md) - first-zone enemy population, respawn, chance loot, trophy quest, and tracker sprint.
 - [25_SPRINT_008.md](25_SPRINT_008.md) - persistent quest journal, reusable quest metadata, abandon flow, notifications, and quest-state validation sprint.
 - [26_SPRINT_009.md](26_SPRINT_009.md) - data-driven loot tables, wolf drop rebalancing, Inspector tuning, and probability-validation sprint.
+- [27_SPRINT_010.md](27_SPRINT_010.md) - delayed player and enemy recovery, preserved retreat health, tunable settings, and validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

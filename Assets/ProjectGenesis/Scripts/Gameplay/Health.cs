@@ -10,6 +10,7 @@ namespace ProjectGenesis.Gameplay
         [SerializeField] private int currentHealth = 100;
 
         public event Action<Health> Changed;
+        public event Action<Health, int> Damaged;
         public event Action<Health> Died;
 
         public int MaximumHealth => maximumHealth;
@@ -34,14 +35,29 @@ namespace ProjectGenesis.Gameplay
                 return false;
             }
 
+            int previousHealth = currentHealth;
             currentHealth = Mathf.Max(0, currentHealth - amount);
+            int damageTaken = previousHealth - currentHealth;
             Changed?.Invoke(this);
+            Damaged?.Invoke(this, damageTaken);
 
             if (IsDead)
             {
                 Died?.Invoke(this);
             }
 
+            return true;
+        }
+
+        public bool Heal(int amount)
+        {
+            if (IsDead || amount <= 0 || currentHealth >= maximumHealth)
+            {
+                return false;
+            }
+
+            currentHealth = Mathf.Min(maximumHealth, currentHealth + amount);
+            Changed?.Invoke(this);
             return true;
         }
 

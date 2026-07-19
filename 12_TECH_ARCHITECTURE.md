@@ -71,6 +71,7 @@ Examples:
 - Inventory;
 - QuestLog;
 - CombatStats;
+- Health and HealthRegeneration;
 
 ### Unity Adapter Layer
 
@@ -82,6 +83,8 @@ Examples:
 - EnemyController;
 - InteractionTrigger;
 - InventoryView;
+
+`Health` owns health boundaries, damage, healing, and death events. `HealthRegeneration` is a reusable timing adapter that listens for damage and applies bounded healing ticks only while its owner allows recovery. Player and enemy controllers decide when combat state permits regeneration; they do not duplicate health arithmetic.
 
 ## Saving
 

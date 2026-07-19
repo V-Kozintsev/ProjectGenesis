@@ -2,6 +2,18 @@
 
 ## 2026-07-19
 
+- Documented Sprint 010 scope and acceptance criteria.
+- Added reusable delayed, interval-based `HealthRegeneration` with damage-delay resets and death safety.
+- Changed returning wolves to keep their current health instead of healing fully on reaching home.
+- Anchored each wolf's home point to its actual NavMesh placement and allowed close players to re-engage it during return.
+- Prevented an idle wolf from repeatedly restarting `Return` while the player remains far away, allowing its recovery delay to finish.
+- Measured leash distance from the wolf instead of the fleeing player, allowing a visible pursuit before returning home.
+- Kept recovering wolves responsive to nearby players; proximity does not pause healing, while each new hit restarts its delay.
+- Added five-second delayed wolf recovery at 3 health per second and interruption on renewed aggro.
+- Added eight-second delayed player recovery at 2 health per second after active combat ends.
+- Kept full restoration for player death and village respawn.
+- Exposed recovery values on player and wolf prefabs and added deterministic editor validation.
+- Rebuilt the starter village and kept leash, corpse cleanup, and respawn timing independently tunable.
 - Documented Sprint 009 scope and acceptance criteria.
 - Added reusable `LootTableDefinition` assets with item, rarity, direct chance, no-drop remainder, and one-result-per-roll behavior.
 - Created a shared `LT_Wolf` asset and reduced the `Rusty Sword` chance from 35% to 10%.

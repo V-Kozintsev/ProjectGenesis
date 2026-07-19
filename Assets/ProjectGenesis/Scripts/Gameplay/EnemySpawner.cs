@@ -54,7 +54,7 @@ namespace ProjectGenesis.Gameplay
 
             currentEnemy.SetPlayer(player);
             currentEnemy.Died += HandleEnemyDied;
-            StartCoroutine(EnableAgentAfterNavMeshReady(instance.GetComponent<NavMeshAgent>()));
+            StartCoroutine(EnableAgentAfterNavMeshReady(currentEnemy));
         }
 
         private void HandleEnemyDied(EnemyBrain enemy)
@@ -82,18 +82,31 @@ namespace ProjectGenesis.Gameplay
             SpawnEnemy();
         }
 
-        private static IEnumerator EnableAgentAfterNavMeshReady(NavMeshAgent agent)
+        private static IEnumerator EnableAgentAfterNavMeshReady(EnemyBrain enemy)
         {
             yield return null;
 
-            if (agent == null || agent.enabled)
+            if (enemy == null)
             {
+                yield break;
+            }
+
+            NavMeshAgent agent = enemy.GetComponent<NavMeshAgent>();
+            if (agent == null)
+            {
+                yield break;
+            }
+
+            if (agent.enabled)
+            {
+                enemy.SetHomePosition(agent.transform.position);
                 yield break;
             }
 
             if (NavMesh.SamplePosition(agent.transform.position, out NavMeshHit hit, 3f, NavMesh.AllAreas))
             {
                 agent.transform.position = hit.position;
+                enemy.SetHomePosition(hit.position);
                 agent.enabled = true;
             }
             else

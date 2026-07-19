@@ -8,6 +8,7 @@ namespace ProjectGenesis.Gameplay
 {
     [DefaultExecutionOrder(120)]
     [RequireComponent(typeof(Health), typeof(CombatStats), typeof(PlayerProgression))]
+    [RequireComponent(typeof(HealthRegeneration))]
     public sealed class PlayerCombatController : MonoBehaviour
     {
         [SerializeField, Min(0.1f)] private float approachPadding = 0.35f;
@@ -18,6 +19,7 @@ namespace ProjectGenesis.Gameplay
 
         private NavMeshAgent agent;
         private Health health;
+        private HealthRegeneration regeneration;
         private CombatStats stats;
         private PlayerProgression progression;
         private QuestLog questLog;
@@ -36,6 +38,7 @@ namespace ProjectGenesis.Gameplay
         {
             agent = GetComponent<NavMeshAgent>();
             health = GetComponent<Health>();
+            regeneration = GetComponent<HealthRegeneration>();
             stats = GetComponent<CombatStats>();
             progression = GetComponent<PlayerProgression>();
             questLog = GetComponent<QuestLog>();
@@ -129,12 +132,15 @@ namespace ProjectGenesis.Gameplay
             }
 
             isCombatActive = true;
+            regeneration.SetRegenerationAllowed(false);
             MoveTowardTarget();
         }
 
         public void StopCombatAction()
         {
+            bool wasCombatActive = isCombatActive;
             isCombatActive = false;
+            regeneration.SetRegenerationAllowed(true, wasCombatActive);
             StopAgent();
         }
 
@@ -145,6 +151,8 @@ namespace ProjectGenesis.Gameplay
 
         private void SetTarget(EnemyBrain enemy)
         {
+            bool wasCombatActive = isCombatActive;
+
             if (target != null)
             {
                 target.SetSelected(false);
@@ -157,6 +165,7 @@ namespace ProjectGenesis.Gameplay
             target.SetSelected(true);
             nextAttackTime = 0f;
             isCombatActive = false;
+            regeneration.SetRegenerationAllowed(true, wasCombatActive);
             TargetChanged?.Invoke(target);
         }
 
@@ -175,6 +184,7 @@ namespace ProjectGenesis.Gameplay
         private void ClearTargetInternal(bool stopMovement)
         {
             bool hadTarget = target != null;
+            bool wasCombatActive = isCombatActive;
 
             if (target != null)
             {
@@ -184,6 +194,7 @@ namespace ProjectGenesis.Gameplay
             UnsubscribeFromTarget();
             target = null;
             isCombatActive = false;
+            regeneration.SetRegenerationAllowed(true, wasCombatActive);
 
             if (stopMovement)
             {
@@ -254,6 +265,7 @@ namespace ProjectGenesis.Gameplay
         {
             isRespawning = true;
             ClearTargetInternal(true);
+            regeneration.SetRegenerationAllowed(false);
 
             if (visualRoot != null)
             {
@@ -279,6 +291,7 @@ namespace ProjectGenesis.Gameplay
             }
 
             health.RestoreFull();
+            regeneration.SetRegenerationAllowed(true, true);
 
             if (visualRoot != null)
             {

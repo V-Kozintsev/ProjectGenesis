@@ -83,6 +83,12 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 010/Rebuild Starter Village Combat Recovery")]
+        public static void RebuildStarterVillageCombatRecovery()
+        {
+            RebuildStarterVillage();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -252,6 +258,8 @@ namespace ProjectGenesis.Tools.Editor
             player.AddComponent<PlayerController>();
             Health health = player.AddComponent<Health>();
             health.Configure(100);
+            HealthRegeneration regeneration = player.AddComponent<HealthRegeneration>();
+            regeneration.Configure(8f, 2, 1f, true);
             CombatStats stats = player.AddComponent<CombatStats>();
             stats.Configure(14, 3, 1.35f, 0.8f);
             player.AddComponent<PlayerProgression>();
@@ -300,6 +308,8 @@ namespace ProjectGenesis.Tools.Editor
 
             Health health = wolf.AddComponent<Health>();
             health.Configure(45);
+            HealthRegeneration regeneration = wolf.AddComponent<HealthRegeneration>();
+            regeneration.Configure(5f, 3, 1f, false);
             CombatStats stats = wolf.AddComponent<CombatStats>();
             stats.Configure(8, 1, 1.05f, 1.1f);
             EnemyBrain brain = wolf.AddComponent<EnemyBrain>();

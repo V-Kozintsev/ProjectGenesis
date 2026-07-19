@@ -14,6 +14,7 @@ namespace ProjectGenesis.Gameplay
     }
 
     [RequireComponent(typeof(NavMeshAgent), typeof(Health), typeof(CombatStats))]
+    [RequireComponent(typeof(HealthRegeneration))]
     public sealed class EnemyBrain : MonoBehaviour
     {
         [Header("Behavior")]
@@ -30,6 +31,7 @@ namespace ProjectGenesis.Gameplay
 
         private NavMeshAgent agent;
         private Health health;
+        private HealthRegeneration regeneration;
         private CombatStats stats;
         private Health playerHealth;
         private CombatStats playerStats;
@@ -49,16 +51,22 @@ namespace ProjectGenesis.Gameplay
         public Health Health => health;
         public CombatStats CombatStats => stats;
         public Collider TargetCollider => targetCollider;
+        public float DetectionRadius => detectionRadius;
+        public float LeashRadius => leashRadius;
+        public float CorpseLifetime => corpseLifetime;
+        public Vector3 HomePosition => homePosition;
 
         private void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
             health = GetComponent<Health>();
+            regeneration = GetComponent<HealthRegeneration>();
             stats = GetComponent<CombatStats>();
             targetCollider = GetComponent<Collider>();
             homePosition = transform.position;
             livingVisualRotation = visualRoot != null ? visualRoot.transform.localRotation : Quaternion.identity;
             health.Died += HandleDeath;
+            regeneration.SetRegenerationAllowed(false);
 
             if (player != null)
             {
@@ -97,15 +105,24 @@ namespace ProjectGenesis.Gameplay
             }
 
             float playerFromHome = GetPlanarDistance(homePosition, player.position);
+            float distanceFromHome = GetPlanarDistance(homePosition, transform.position);
             float playerDistance = GetDistanceToPlayer();
 
             if (State == EnemyState.Return)
             {
-                UpdateReturn();
-                return;
+                if (playerFromHome <= leashRadius && playerDistance <= detectionRadius)
+                {
+                    hasAggro = true;
+                    regeneration.SetRegenerationAllowed(true);
+                }
+                else
+                {
+                    UpdateReturn();
+                    return;
+                }
             }
 
-            if (playerFromHome > leashRadius)
+            if (hasAggro && distanceFromHome > leashRadius)
             {
                 BeginReturn();
                 return;
@@ -119,6 +136,7 @@ namespace ProjectGenesis.Gameplay
             }
 
             hasAggro = true;
+            regeneration.SetRegenerationAllowed(true);
 
             if (playerDistance > stats.AttackRange)
             {
@@ -158,6 +176,11 @@ namespace ProjectGenesis.Gameplay
             CachePlayerReferences();
         }
 
+        public void SetHomePosition(Vector3 position)
+        {
+            homePosition = position;
+        }
+
         public void SetVisuals(GameObject bodyVisual, GameObject ring)
         {
             visualRoot = bodyVisual;
@@ -187,6 +210,7 @@ namespace ProjectGenesis.Gameplay
             }
 
             hasAggro = true;
+            regeneration.SetRegenerationAllowed(true);
             health.TakeDamage(damage);
         }
 
@@ -209,6 +233,7 @@ namespace ProjectGenesis.Gameplay
         private void BeginReturn()
         {
             hasAggro = false;
+            regeneration.SetRegenerationAllowed(false);
             SetState(EnemyState.Return);
 
             if (agent.enabled && agent.isOnNavMesh)
@@ -219,20 +244,24 @@ namespace ProjectGenesis.Gameplay
 
         private void UpdateReturn()
         {
-            if (GetPlanarDistance(transform.position, homePosition) > 0.25f)
+            float arrivalDistance = Mathf.Max(0.35f, agent.stoppingDistance + 0.1f);
+            bool reachedHome = GetPlanarDistance(transform.position, homePosition) <= arrivalDistance;
+
+            if (!reachedHome)
             {
                 agent.SetDestination(homePosition);
                 return;
             }
 
             StopAgent();
-            health.RestoreFull();
             SetState(EnemyState.Idle);
+            regeneration.SetRegenerationAllowed(true, true);
         }
 
         private void HandleDeath(Health _)
         {
             hasAggro = false;
+            regeneration.SetRegenerationAllowed(false);
             SetState(EnemyState.Dead);
             StopAgent();
 
