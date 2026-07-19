@@ -135,7 +135,7 @@ Sprint 006 exclusions:
 
 ## Version 0.6 - First Zone
 
-Status: Sprint 010 combat-recovery foundation implemented on 2026-07-19.
+Status: Sprint 011 enemy-territory foundation implemented on 2026-07-19.
 
 Goal: the starter area feels like a small world.
 
@@ -216,6 +216,24 @@ Sprint 010 exclusions:
 - no death penalties, resurrection services, corpse running, or PvP rules;
 - no server-authoritative combat state or multiplayer synchronization.
 
+Sprint 011 additions:
+
+- reusable rectangular enemy territory with Inspector tuning and Scene gizmo;
+- short random NavMesh roaming around each wolf's home point;
+- configurable roaming radius and idle-delay range on the wolf prefab;
+- territory-aware detection and return that keep wolves outside the peaceful village;
+- independently tunable detection, pursuit, roaming, idle-delay, and territory values;
+- territory assignment preserved through enemy respawn;
+- deterministic validation of territory dimensions, roaming defaults, and all three spawners.
+
+Sprint 011 exclusions:
+
+- no waypoint patrol routes, packs, formations, fleeing, or coordinated attacks;
+- no additional enemy types, animations, audio, or final effects;
+- no player death experience or level loss;
+- no general PvP, guards, crime, faction, or server-authoritative zone rules;
+- no final enemy population balancing.
+
 Post-Sprint 009 backlog decisions:
 
 - add explicit inventory-slot selection when different copies can have meaningfully different properties;
@@ -223,7 +241,6 @@ Post-Sprint 009 backlog decisions:
 - move enemy population and respawn timing into reusable spawn data instead of relying on scene-only tuning;
 - allow sub-10% and sub-1% loot rates, but balance them from expected kills per reward, time-to-kill, quest rewards, economy, and player frustration rather than treating 10% as a minimum;
 - consider guaranteed starter rewards or a pity rule separately from ordinary rare drops.
-- add short random idle roaming for wolves inside their home area without allowing them into the peaceful village.
 
 ## Version 1.0 - Vertical Slice
 

@@ -13,6 +13,7 @@ Simple enemies:
 Behavior:
 
 - idle;
+- roam near home;
 - detect player;
 - chase;
 - attack;
@@ -49,7 +50,7 @@ Mechanics:
 Initial AI states:
 
 - Idle;
-- Patrol later;
+- Roam;
 - Aggro;
 - Chase;
 - Attack;
@@ -62,9 +63,9 @@ Early spawn system:
 
 - fixed spawn points;
 - respawn after delay;
-- enemies stay near home area.
+- enemies stay near home area;
+- shared territory bounds keep enemies outside peaceful spaces.
 
 ## Boss Rule
 
 Do not add raid-style complexity before normal combat, health, loot, and respawn work reliably.
-

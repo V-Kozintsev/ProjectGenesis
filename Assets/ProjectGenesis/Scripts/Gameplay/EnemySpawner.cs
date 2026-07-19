@@ -9,16 +9,25 @@ namespace ProjectGenesis.Gameplay
     {
         [SerializeField] private GameObject enemyPrefab;
         [SerializeField] private Transform player;
+        [SerializeField] private EnemyTerritory territory;
         [SerializeField, Min(1f)] private float respawnDelay = 12f;
 
         private EnemyBrain currentEnemy;
         private Coroutine respawnRoutine;
 
-        public void Configure(GameObject prefab, Transform playerTransform, float delay)
+        public float RespawnDelay => respawnDelay;
+        public EnemyTerritory Territory => territory;
+
+        public void Configure(
+            GameObject prefab,
+            Transform playerTransform,
+            float delay,
+            EnemyTerritory enemyTerritory = null)
         {
             enemyPrefab = prefab;
             player = playerTransform;
             respawnDelay = Mathf.Max(1f, delay);
+            territory = enemyTerritory;
         }
 
         private IEnumerator Start()
@@ -53,6 +62,7 @@ namespace ProjectGenesis.Gameplay
             }
 
             currentEnemy.SetPlayer(player);
+            currentEnemy.SetTerritory(territory);
             currentEnemy.Died += HandleEnemyDied;
             StartCoroutine(EnableAgentAfterNavMeshReady(currentEnemy));
         }

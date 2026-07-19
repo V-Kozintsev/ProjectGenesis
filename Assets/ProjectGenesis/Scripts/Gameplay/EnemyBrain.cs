@@ -7,6 +7,7 @@ namespace ProjectGenesis.Gameplay
     public enum EnemyState
     {
         Idle,
+        Roam,
         Chase,
         Attack,
         Return,
@@ -24,6 +25,11 @@ namespace ProjectGenesis.Gameplay
         [SerializeField, Min(0f)] private float corpseLifetime = 6f;
         [SerializeField] private string questTargetId = "wolf";
 
+        [Header("Roaming")]
+        [SerializeField, Min(0f)] private float roamingRadius = 1.4f;
+        [SerializeField, Min(0f)] private float minimumIdleDelay = 1.5f;
+        [SerializeField, Min(0f)] private float maximumIdleDelay = 4f;
+
         [Header("References")]
         [SerializeField] private Transform player;
         [SerializeField] private GameObject visualRoot;
@@ -37,9 +43,12 @@ namespace ProjectGenesis.Gameplay
         private CombatStats playerStats;
         private Collider targetCollider;
         private Collider playerCollider;
+        private EnemyTerritory territory;
+        private NavMeshPath roamingPath;
         private Vector3 homePosition;
         private Quaternion livingVisualRotation;
         private float nextAttackTime;
+        private float nextRoamTime;
         private bool hasAggro;
 
         public event Action<EnemyBrain> Died;
@@ -54,7 +63,11 @@ namespace ProjectGenesis.Gameplay
         public float DetectionRadius => detectionRadius;
         public float LeashRadius => leashRadius;
         public float CorpseLifetime => corpseLifetime;
+        public float RoamingRadius => roamingRadius;
+        public float MinimumIdleDelay => minimumIdleDelay;
+        public float MaximumIdleDelay => maximumIdleDelay;
         public Vector3 HomePosition => homePosition;
+        public EnemyTerritory Territory => territory;
 
         private void Awake()
         {
@@ -63,10 +76,12 @@ namespace ProjectGenesis.Gameplay
             regeneration = GetComponent<HealthRegeneration>();
             stats = GetComponent<CombatStats>();
             targetCollider = GetComponent<Collider>();
+            roamingPath = new NavMeshPath();
             homePosition = transform.position;
             livingVisualRotation = visualRoot != null ? visualRoot.transform.localRotation : Quaternion.identity;
             health.Died += HandleDeath;
             regeneration.SetRegenerationAllowed(false);
+            ScheduleNextRoam();
 
             if (player != null)
             {
@@ -93,24 +108,49 @@ namespace ProjectGenesis.Gameplay
 
             if (player == null || playerHealth == null)
             {
-                SetState(EnemyState.Idle);
-                return;
-            }
+                if (State == EnemyState.Return)
+                {
+                    UpdateReturn();
+                }
+                else
+                {
+                    hasAggro = false;
+                    UpdateRoaming();
+                }
 
-            if (playerHealth.IsDead)
-            {
-                BeginReturn();
-                UpdateReturn();
                 return;
             }
 
             float playerFromHome = GetPlanarDistance(homePosition, player.position);
             float distanceFromHome = GetPlanarDistance(homePosition, transform.position);
             float playerDistance = GetDistanceToPlayer();
+            bool playerInsideTerritory = territory == null || territory.Contains(player.position);
+            bool enemyInsideTerritory = territory == null || territory.Contains(transform.position);
+
+            if (playerHealth.IsDead)
+            {
+                if (State == EnemyState.Return)
+                {
+                    UpdateReturn();
+                }
+                else if (hasAggro || distanceFromHome > GetReturnArrivalDistance())
+                {
+                    BeginReturn();
+                }
+                else
+                {
+                    hasAggro = false;
+                    UpdateRoaming();
+                }
+
+                return;
+            }
 
             if (State == EnemyState.Return)
             {
-                if (playerFromHome <= leashRadius && playerDistance <= detectionRadius)
+                if (playerInsideTerritory &&
+                    playerFromHome <= leashRadius &&
+                    playerDistance <= detectionRadius)
                 {
                     hasAggro = true;
                     regeneration.SetRegenerationAllowed(true);
@@ -122,16 +162,16 @@ namespace ProjectGenesis.Gameplay
                 }
             }
 
-            if (hasAggro && distanceFromHome > leashRadius)
+            if (hasAggro &&
+                (!playerInsideTerritory || !enemyInsideTerritory || distanceFromHome > leashRadius))
             {
                 BeginReturn();
                 return;
             }
 
-            if (!hasAggro && playerDistance > detectionRadius)
+            if (!hasAggro && (!playerInsideTerritory || playerDistance > detectionRadius))
             {
-                SetState(EnemyState.Idle);
-                StopAgent();
+                UpdateRoaming();
                 return;
             }
 
@@ -161,13 +201,19 @@ namespace ProjectGenesis.Gameplay
             float leash,
             int reward,
             float despawnDelay = 6f,
-            string objectiveTargetId = "wolf")
+            string objectiveTargetId = "wolf",
+            float roamDistance = 1.4f,
+            float minimumIdleDelay = 1.5f,
+            float maximumIdleDelay = 4f)
         {
             detectionRadius = Mathf.Max(0.5f, detection);
             leashRadius = Mathf.Max(1f, leash);
             experienceReward = Mathf.Max(1, reward);
             corpseLifetime = Mathf.Max(0f, despawnDelay);
             questTargetId = string.IsNullOrWhiteSpace(objectiveTargetId) ? "wolf" : objectiveTargetId;
+            roamingRadius = Mathf.Clamp(roamDistance, 0f, leashRadius);
+            this.minimumIdleDelay = Mathf.Max(0f, minimumIdleDelay);
+            this.maximumIdleDelay = Mathf.Max(this.minimumIdleDelay, maximumIdleDelay);
         }
 
         public void SetPlayer(Transform playerTransform)
@@ -179,6 +225,12 @@ namespace ProjectGenesis.Gameplay
         public void SetHomePosition(Vector3 position)
         {
             homePosition = position;
+            ScheduleNextRoam();
+        }
+
+        public void SetTerritory(EnemyTerritory enemyTerritory)
+        {
+            territory = enemyTerritory;
         }
 
         public void SetVisuals(GameObject bodyVisual, GameObject ring)
@@ -210,6 +262,7 @@ namespace ProjectGenesis.Gameplay
             }
 
             hasAggro = true;
+            StopAgent();
             regeneration.SetRegenerationAllowed(true);
             health.TakeDamage(damage);
         }
@@ -244,8 +297,8 @@ namespace ProjectGenesis.Gameplay
 
         private void UpdateReturn()
         {
-            float arrivalDistance = Mathf.Max(0.35f, agent.stoppingDistance + 0.1f);
-            bool reachedHome = GetPlanarDistance(transform.position, homePosition) <= arrivalDistance;
+            bool reachedHome =
+                GetPlanarDistance(transform.position, homePosition) <= GetReturnArrivalDistance();
 
             if (!reachedHome)
             {
@@ -256,6 +309,116 @@ namespace ProjectGenesis.Gameplay
             StopAgent();
             SetState(EnemyState.Idle);
             regeneration.SetRegenerationAllowed(true, true);
+            ScheduleNextRoam();
+        }
+
+        private void UpdateRoaming()
+        {
+            if (State == EnemyState.Return || State == EnemyState.Dead)
+            {
+                return;
+            }
+
+            if (territory != null && !territory.Contains(transform.position))
+            {
+                BeginReturn();
+                return;
+            }
+
+            if (State == EnemyState.Roam)
+            {
+                float arrivalDistance = Mathf.Max(0.25f, agent.stoppingDistance + 0.1f);
+                if (agent.pathPending ||
+                    (agent.hasPath && agent.remainingDistance > arrivalDistance))
+                {
+                    return;
+                }
+
+                StopAgent();
+                SetState(EnemyState.Idle);
+                ScheduleNextRoam();
+                return;
+            }
+
+            SetState(EnemyState.Idle);
+
+            if (roamingRadius <= 0f || Time.time < nextRoamTime)
+            {
+                return;
+            }
+
+            if (!TryStartRoaming())
+            {
+                ScheduleNextRoam();
+            }
+        }
+
+        private bool TryStartRoaming()
+        {
+            const int maximumAttempts = 8;
+            float minimumTravelDistance = Mathf.Max(0.35f, agent.stoppingDistance + 0.2f);
+
+            for (int attempt = 0; attempt < maximumAttempts; attempt++)
+            {
+                Vector2 offset = UnityEngine.Random.insideUnitCircle * roamingRadius;
+                Vector3 candidate = homePosition + new Vector3(offset.x, 0f, offset.y);
+
+                if (GetPlanarDistance(transform.position, candidate) < minimumTravelDistance ||
+                    (territory != null && !territory.Contains(candidate)))
+                {
+                    continue;
+                }
+
+                if (!NavMesh.SamplePosition(candidate, out NavMeshHit hit, 0.8f, agent.areaMask) ||
+                    GetPlanarDistance(homePosition, hit.position) > roamingRadius + 0.1f ||
+                    (territory != null && !territory.Contains(hit.position)))
+                {
+                    continue;
+                }
+
+                if (!agent.CalculatePath(hit.position, roamingPath) ||
+                    roamingPath.status != NavMeshPathStatus.PathComplete ||
+                    !IsPathInsideTerritory(roamingPath))
+                {
+                    continue;
+                }
+
+                agent.SetDestination(hit.position);
+                SetState(EnemyState.Roam);
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsPathInsideTerritory(NavMeshPath path)
+        {
+            if (territory == null)
+            {
+                return true;
+            }
+
+            foreach (Vector3 corner in path.corners)
+            {
+                if (!territory.Contains(corner))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private float GetReturnArrivalDistance()
+        {
+            return Mathf.Max(0.35f, agent.stoppingDistance + 0.1f);
+        }
+
+        private void ScheduleNextRoam()
+        {
+            float minimum = Mathf.Max(0f, minimumIdleDelay);
+            float maximum = Mathf.Max(minimum, maximumIdleDelay);
+            nextRoamTime = Time.time + UnityEngine.Random.Range(minimum, maximum);
         }
 
         private void HandleDeath(Health _)

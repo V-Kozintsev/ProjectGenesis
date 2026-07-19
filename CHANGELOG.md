@@ -2,6 +2,12 @@
 
 ## 2026-07-19
 
+- Documented Sprint 011 scope and acceptance criteria.
+- Added a reusable `EnemyTerritory` with Inspector-authored dimensions and a selected Scene gizmo.
+- Added idle wolf roaming with configurable radius and random pause range.
+- Restricted wolf detection and pursuit to the northern combat territory so enemies return before entering the peaceful village.
+- Passed territory references through all three spawners and their respawned enemies.
+- Added deterministic validation for roaming defaults, territory dimensions, and spawner assignments.
 - Documented Sprint 010 scope and acceptance criteria.
 - Added reusable delayed, interval-based `HealthRegeneration` with damage-delay resets and death safety.
 - Changed returning wolves to keep their current health instead of healing fully on reaching home.

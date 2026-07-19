@@ -89,6 +89,12 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 011/Rebuild Starter Village Enemy Territory")]
+        public static void RebuildStarterVillageEnemyTerritory()
+        {
+            RebuildStarterVillage();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -124,7 +130,8 @@ namespace ProjectGenesis.Tools.Editor
             CreateRoad("Road_Main_EastWest", new Vector3(0f, 0.02f, 0f), new Vector3(14f, 0.03f, 1.4f), roadMaterial);
 
             CreateVillageBlockout(buildingMaterial, boundaryMaterial, propMaterial);
-            CreateNorthCombatArea(combatAreaMaterial, boundaryMaterial, propMaterial);
+            EnemyTerritory combatTerritory =
+                CreateNorthCombatArea(combatAreaMaterial, boundaryMaterial, propMaterial);
 
             GameObject spawnPoint = CreateSpawnPoint();
             GameObject player = (GameObject)PrefabUtility.InstantiatePrefab(playerPrefab);
@@ -144,7 +151,7 @@ namespace ProjectGenesis.Tools.Editor
             interactionController.SetGameplayCamera(camera);
 
             InteractableNpc villageElder = CreateVillageElder(npcMaterial, targetRingMaterial);
-            CreateWolfSpawners(wolfPrefab, player.transform);
+            CreateWolfSpawners(wolfPrefab, player.transform, combatTerritory);
             FirstContactUi ui = CreateFirstContactUi(player, combatController, villageElder);
             interactionController.SetDialogueWindow(ui.DialogueWindow);
             interactionController.SetPromptView(ui.PromptView);
@@ -313,7 +320,7 @@ namespace ProjectGenesis.Tools.Editor
             CombatStats stats = wolf.AddComponent<CombatStats>();
             stats.Configure(8, 1, 1.05f, 1.1f);
             EnemyBrain brain = wolf.AddComponent<EnemyBrain>();
-            brain.Configure(2.2f, 3.5f, 20, 6f, "wolf");
+            brain.Configure(2.2f, 6f, 20, 6f, "wolf", 2.4f, 0.5f, 1.5f);
             EnemyLootDrop lootDrop = wolf.AddComponent<EnemyLootDrop>();
             lootDrop.Configure(
                 lootTable,
@@ -418,7 +425,7 @@ namespace ProjectGenesis.Tools.Editor
             CreateBoundary("Boundary_West", new Vector3(-8.2f, 0.65f, 0f), new Vector3(0.4f, 1.3f, 17f), boundaryMaterial);
         }
 
-        private static void CreateNorthCombatArea(
+        private static EnemyTerritory CreateNorthCombatArea(
             Material combatAreaMaterial,
             Material boundaryMaterial,
             Material propMaterial)
@@ -435,6 +442,12 @@ namespace ProjectGenesis.Tools.Editor
 
             CreateBuilding("CombatArea_Rock_West", new Vector3(-4.6f, 0.6f, 13.8f), new Vector3(1.4f, 1.2f, 1.1f), propMaterial);
             CreateBuilding("CombatArea_Rock_East", new Vector3(4.7f, 0.45f, 15.4f), new Vector3(1.1f, 0.9f, 1.5f), propMaterial);
+
+            GameObject territoryObject = new("Zone_NorthCombat");
+            territoryObject.transform.position = new Vector3(0f, 0.05f, 13.2f);
+            EnemyTerritory territory = territoryObject.AddComponent<EnemyTerritory>();
+            territory.Configure(new Vector2(15.6f, 9.2f), 0.2f);
+            return territory;
         }
 
         private static void CreateBuilding(string name, Vector3 position, Vector3 scale, Material material)
@@ -516,23 +529,27 @@ namespace ProjectGenesis.Tools.Editor
             return npc;
         }
 
-        private static void CreateWolfSpawners(GameObject wolfPrefab, Transform player)
+        private static void CreateWolfSpawners(
+            GameObject wolfPrefab,
+            Transform player,
+            EnemyTerritory territory)
         {
-            CreateWolfSpawner("WolfSpawn_West", new Vector3(-6.2f, 0.05f, 11.3f), wolfPrefab, player);
-            CreateWolfSpawner("WolfSpawn_North", new Vector3(0f, 0.05f, 16.3f), wolfPrefab, player);
-            CreateWolfSpawner("WolfSpawn_East", new Vector3(6.2f, 0.05f, 14.8f), wolfPrefab, player);
+            CreateWolfSpawner("WolfSpawn_West", new Vector3(-6.2f, 0.05f, 11.3f), wolfPrefab, player, territory);
+            CreateWolfSpawner("WolfSpawn_North", new Vector3(0f, 0.05f, 16.3f), wolfPrefab, player, territory);
+            CreateWolfSpawner("WolfSpawn_East", new Vector3(6.2f, 0.05f, 14.8f), wolfPrefab, player, territory);
         }
 
         private static void CreateWolfSpawner(
             string name,
             Vector3 position,
             GameObject wolfPrefab,
-            Transform player)
+            Transform player,
+            EnemyTerritory territory)
         {
             GameObject spawn = new(name);
             spawn.transform.SetPositionAndRotation(position, Quaternion.Euler(0f, 180f, 0f));
             EnemySpawner spawner = spawn.AddComponent<EnemySpawner>();
-            spawner.Configure(wolfPrefab, player, 12f);
+            spawner.Configure(wolfPrefab, player, 12f, territory);
         }
 
         private static FirstContactUi CreateFirstContactUi(

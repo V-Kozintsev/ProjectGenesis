@@ -265,10 +265,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   detectionRadius: 2.2
-  leashRadius: 3.5
+  leashRadius: 6
   experienceReward: 20
   corpseLifetime: 6
   questTargetId: wolf
+  roamingRadius: 2.4
+  minimumIdleDelay: 0.5
+  maximumIdleDelay: 1.5
   player: {fileID: 0}
   visualRoot: {fileID: 1616227209458042685}
   selectionRing: {fileID: 3439214415301255750}

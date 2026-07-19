@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 010 combat recovery is implemented: returning wolves retain damage and recover gradually after reaching home, while the player slowly regenerates after leaving active combat.
+Sprint 011 enemy territory is implemented: wolves roam around their homes, pursue only inside the northern combat area, and return before entering the peaceful village.
 
 ## Prototype Controls
 
@@ -15,6 +15,7 @@ Sprint 010 combat recovery is implemented: returning wolves retain damage and re
 - Use the mouse wheel to zoom the camera in and out. Click the wheel to switch between the rear and front views.
 - WASD or arrow keys are optional fallback controls and cancel the current click destination.
 - Leave the village through the north gate to reach the first combat area. Its three wolves are spread across the zone and return home before they can chase the player back into the village.
+- Idle wolves alternate between short pauses and small NavMesh walks around their spawn points. Their roaming radius and pause range are editable on the wolf prefab.
 - Click a grey wolf once to select it. Click the selected wolf again at any time to run into range and attack automatically; a quick double-click performs both steps.
 - Clicking the ground or using WASD stops the current approach or attack but keeps the selected target.
 - Press `Esc`, click the `X` in the target panel, or select another creature to clear or switch the current target.
@@ -23,6 +24,7 @@ Sprint 010 combat recovery is implemented: returning wolves retain damage and re
 - A retreating wolf keeps its remaining health. Its leash measures how far the wolf itself has travelled from home, so it visibly pursues before returning. It can be re-engaged while returning by approaching inside its leash. At home it waits five seconds, then restores 3 health every second. It still attacks nearby players while recovering, and every new hit restarts the five-second healing delay.
 - After active combat ends, the player waits eight seconds and then restores 2 health every second. New damage restarts the delay, while death and village respawn still restore full health.
 - Recovery values are editable through `HealthRegeneration` on the player and wolf prefabs. Use `Project Genesis > Sprint 010 > Validate Combat Recovery` to verify saved defaults and health boundaries.
+- The selected `Zone_NorthCombat` object shows its enemy-territory boundary as a green Scene gizmo. Use `Project Genesis > Sprint 011 > Validate Enemy Territory` to verify the zone, spawners, and roaming defaults.
 - Each wolf has an independent 10% chance to drop a visible `Rusty Sword`. Click the drop to approach it and collect it.
 - Regular wolf loot is configured in `Assets/ProjectGenesis/Data/LootTables/LT_Wolf.asset`. Select that asset and edit an entry's `Drop Chance` value in the Inspector; `0.1` means 10%.
 - Rebuilding the starter village preserves edits to an existing loot-table asset. Use `Project Genesis > Sprint 009 > Validate Wolf Loot Table` to check the table and run a fixed-seed 100,000-roll simulation.
@@ -79,6 +81,7 @@ Sprint 010 combat recovery is implemented: returning wolves retain damage and re
 - [25_SPRINT_008.md](25_SPRINT_008.md) - persistent quest journal, reusable quest metadata, abandon flow, notifications, and quest-state validation sprint.
 - [26_SPRINT_009.md](26_SPRINT_009.md) - data-driven loot tables, wolf drop rebalancing, Inspector tuning, and probability-validation sprint.
 - [27_SPRINT_010.md](27_SPRINT_010.md) - delayed player and enemy recovery, preserved retreat health, tunable settings, and validation sprint.
+- [28_SPRINT_011.md](28_SPRINT_011.md) - bounded enemy territory, idle roaming, peaceful-village protection, and validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

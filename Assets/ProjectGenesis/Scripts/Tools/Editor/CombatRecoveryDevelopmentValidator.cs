@@ -18,7 +18,7 @@ namespace ProjectGenesis.Tools.Editor
 
             EnemyBrain wolf = LoadRequiredPrefab(WolfPrefabPath).GetComponent<EnemyBrain>();
             Require(wolf != null, "Wolf prefab is missing EnemyBrain.");
-            Require(Mathf.Approximately(wolf.LeashRadius, 3.5f), "Wolf leash radius must remain 3.5.");
+            Require(Mathf.Approximately(wolf.LeashRadius, 6f), "Wolf leash radius must be 6 metres.");
             Require(Mathf.Approximately(wolf.CorpseLifetime, 6f), "Wolf corpse lifetime must remain 6 seconds.");
 
             Debug.Log("Sprint 010 combat recovery validation passed.");
