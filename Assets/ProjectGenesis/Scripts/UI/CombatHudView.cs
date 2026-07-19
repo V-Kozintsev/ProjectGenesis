@@ -182,7 +182,9 @@ namespace ProjectGenesis.UI
 
             if (playerHealthFill != null && playerHealth != null)
             {
-                playerHealthFill.fillAmount = (float)playerHealth.CurrentHealth / playerHealth.MaximumHealth;
+                SetHealthFill(
+                    playerHealthFill,
+                    (float)playerHealth.CurrentHealth / playerHealth.MaximumHealth);
             }
         }
 
@@ -237,9 +239,22 @@ namespace ProjectGenesis.UI
                 if (hasEnemyTarget)
                 {
                     Health targetHealth = observedTarget.Health;
-                    targetHealthFill.fillAmount = (float)targetHealth.CurrentHealth / targetHealth.MaximumHealth;
+                    SetHealthFill(
+                        targetHealthFill,
+                        (float)targetHealth.CurrentHealth / targetHealth.MaximumHealth);
                 }
             }
+        }
+
+        private static void SetHealthFill(Image fill, float normalizedHealth)
+        {
+            float amount = Mathf.Clamp01(normalizedHealth);
+            RectTransform rect = fill.rectTransform;
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = new Vector2(amount, 1f);
+            rect.offsetMin = new Vector2(2f, 2f);
+            rect.offsetMax = new Vector2(amount > 0f ? -2f : 0f, -2f);
+            fill.enabled = amount > 0f;
         }
     }
 }

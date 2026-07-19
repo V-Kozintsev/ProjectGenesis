@@ -2,6 +2,13 @@
 
 ## 2026-07-19
 
+- Documented Sprint 012 scope and acceptance criteria.
+- Added configurable percentage and minimum experience loss on player death.
+- Added experience removal across level boundaries with level 1 and zero experience as hard floors.
+- Recalculated level-based health and attack bonuses after deleveling without reviving the player before respawn.
+- Preserved inventory, equipment, quests, automatic persistence, and the existing full-health village respawn.
+- Added deterministic validation for prefab tuning, level crossing, exact-zero behavior, the level-1 floor, and disabled penalties.
+- Fixed player and selected-enemy health bars so their visible width follows current health instead of updating only the numeric label.
 - Documented Sprint 011 scope and acceptance criteria.
 - Added a reusable `EnemyTerritory` with Inspector-authored dimensions and a selected Scene gizmo.
 - Added idle wolf roaming with configurable radius and random pause range.

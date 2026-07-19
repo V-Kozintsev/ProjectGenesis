@@ -88,6 +88,8 @@ Examples:
 
 `EnemyTerritory` owns reusable world-space bounds for hostile AI. `EnemySpawner` assigns the scene territory to each spawned `EnemyBrain`; the brain uses it for detection, leash return, and validated NavMesh roaming without coupling player movement to zone rules.
 
+`PlayerProgression` owns experience arithmetic in both directions, including death penalties and level-boundary changes. `PlayerCombatController` only decides when one penalty is applied, then continues the existing respawn flow.
+
 ## Saving
 
 Save only stable runtime state:

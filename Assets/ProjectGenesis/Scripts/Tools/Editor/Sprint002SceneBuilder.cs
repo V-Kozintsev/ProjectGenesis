@@ -269,7 +269,8 @@ namespace ProjectGenesis.Tools.Editor
             regeneration.Configure(8f, 2, 1f, true);
             CombatStats stats = player.AddComponent<CombatStats>();
             stats.Configure(14, 3, 1.35f, 0.8f);
-            player.AddComponent<PlayerProgression>();
+            PlayerProgression progression = player.AddComponent<PlayerProgression>();
+            progression.ConfigureDeathPenalty(0.1f, 10);
             player.AddComponent<PlayerInventory>();
             player.AddComponent<PlayerEquipment>();
             player.AddComponent<PlayerLootController>();
@@ -1006,10 +1007,7 @@ namespace ProjectGenesis.Tools.Editor
             GameObject fillObject = CreatePanel("Fill", background.transform, fillColor);
             Image fill = fillObject.GetComponent<Image>();
             fill.raycastTarget = false;
-            fill.type = Image.Type.Filled;
-            fill.fillMethod = Image.FillMethod.Horizontal;
-            fill.fillOrigin = 0;
-            fill.fillAmount = 1f;
+            fill.type = Image.Type.Simple;
             Stretch(fillObject.GetComponent<RectTransform>(), 2f, 2f, 2f, 2f);
             return fill;
         }

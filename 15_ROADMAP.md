@@ -234,6 +234,21 @@ Sprint 011 exclusions:
 - no general PvP, guards, crime, faction, or server-authoritative zone rules;
 - no final enemy population balancing.
 
+Sprint 012 additions:
+
+- configurable percentage and minimum experience loss on player death;
+- experience loss that can cross a level boundary without falling below level 1;
+- level bonus recalculation followed by the existing full-health village respawn;
+- persistence through the existing level and experience profile fields;
+- deterministic validation of tuning, boundary crossing, the level-1 floor, and disabled penalties.
+
+Sprint 012 exclusions:
+
+- no item, equipment, currency, durability, quest, or quest-progress loss;
+- no corpse running, resurrection service, death window, animation, audio, or final effects;
+- no PvP-specific or server-authoritative death rules;
+- no final live-economy penalty balancing.
+
 Post-Sprint 009 backlog decisions:
 
 - add explicit inventory-slot selection when different copies can have meaningfully different properties;

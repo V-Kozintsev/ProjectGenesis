@@ -257,6 +257,7 @@ namespace ProjectGenesis.Gameplay
         {
             if (!isRespawning)
             {
+                progression.ApplyDeathPenalty();
                 StartCoroutine(RespawnAfterDelay());
             }
         }

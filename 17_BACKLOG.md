@@ -5,7 +5,7 @@
 - Character creation screen with race and class selection.
 - Campfire rest system.
 - Rare enemy variants.
-- Configurable experience and level loss after player death.
+- Tune final experience and level-loss rates against the future economy and PvP rules.
 - First dungeon-like cave.
 - Reputation with village factions.
 - Simple crafting.

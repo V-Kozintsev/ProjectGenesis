@@ -41,3 +41,8 @@ Each class should have a simple growth identity:
 
 The player should notice level 2 quickly. Early feedback matters more than long-term grind balance.
 
+## Death Penalty
+
+The local prototype removes 10% of the current level's experience requirement on death, with a minimum loss of 10 experience. Both values are editable on `PlayerProgression`.
+
+If current-level experience is insufficient, the remaining loss continues into the previous level. Reaching exactly zero keeps the current level; only a later loss crosses that boundary. Level 1 and zero experience are absolute floors. Death does not remove items, equipment, quests, or quest progress.

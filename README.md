@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 011 enemy territory is implemented: wolves roam around their homes, pursue only inside the northern combat area, and return before entering the peaceful village.
+Sprint 012 player death penalty is implemented: death removes configurable experience, can cross a level boundary, and then uses the existing full-health village respawn.
 
 ## Prototype Controls
 
@@ -20,7 +20,9 @@ Sprint 011 enemy territory is implemented: wolves roam around their homes, pursu
 - Clicking the ground or using WASD stops the current approach or attack but keeps the selected target.
 - Press `Esc`, click the `X` in the target panel, or select another creature to clear or switch the current target.
 - The combat HUD shows player health, selected-enemy health, level, and experience.
-- Defeating a wolf awards 20 experience. Its body disappears after six seconds and its spawner creates a new wolf after twelve seconds. If the player dies, the character briefly disappears and returns at the village spawn point with full health.
+- Player and selected-enemy health bars visibly shrink on damage and grow during recovery.
+- Defeating a wolf awards 20 experience. Its body disappears after six seconds and its spawner creates a new wolf after twelve seconds. If the player dies, the character loses 10% of the current level requirement with a minimum loss of 10 experience, then briefly disappears and returns at the village spawn point with full health.
+- Death-loss values are editable on `PlayerProgression` in the player prefab. Loss can cross into the previous level, but the character never falls below level 1; inventory, equipment, and quests are preserved.
 - A retreating wolf keeps its remaining health. Its leash measures how far the wolf itself has travelled from home, so it visibly pursues before returning. It can be re-engaged while returning by approaching inside its leash. At home it waits five seconds, then restores 3 health every second. It still attacks nearby players while recovering, and every new hit restarts the five-second healing delay.
 - After active combat ends, the player waits eight seconds and then restores 2 health every second. New damage restarts the delay, while death and village respawn still restore full health.
 - Recovery values are editable through `HealthRegeneration` on the player and wolf prefabs. Use `Project Genesis > Sprint 010 > Validate Combat Recovery` to verify saved defaults and health boundaries.
@@ -49,7 +51,7 @@ Sprint 011 enemy territory is implemented: wolves roam around their homes, pursu
 - Player position, level, experience, quest state, inventory, and equipped weapon are saved automatically. There is intentionally no save button.
 - For the current offline prototype, persistence uses a local JSON file behind a replaceable interface. In the future online version, the authoritative server will store this state and return the character near the last valid position after login.
 - To start a fresh development playthrough, use `Project Genesis > Development > Clear Local Prototype Profile` while outside Play mode.
-- Healing items and skills, combat-status UI, death penalties, server-authoritative combat, and a real multiplayer backend are intentionally outside Sprint 010.
+- Healing items and skills, item or quest loss on death, server-authoritative combat, and a real multiplayer backend remain outside the current prototype.
 
 ## Documentation Map
 
@@ -82,6 +84,7 @@ Sprint 011 enemy territory is implemented: wolves roam around their homes, pursu
 - [26_SPRINT_009.md](26_SPRINT_009.md) - data-driven loot tables, wolf drop rebalancing, Inspector tuning, and probability-validation sprint.
 - [27_SPRINT_010.md](27_SPRINT_010.md) - delayed player and enemy recovery, preserved retreat health, tunable settings, and validation sprint.
 - [28_SPRINT_011.md](28_SPRINT_011.md) - bounded enemy territory, idle roaming, peaceful-village protection, and validation sprint.
+- [29_SPRINT_012.md](29_SPRINT_012.md) - configurable player death experience and level-loss sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

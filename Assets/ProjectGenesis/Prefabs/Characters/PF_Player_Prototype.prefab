@@ -236,6 +236,8 @@ MonoBehaviour:
   requirementGrowthPerLevel: 50
   healthPerLevel: 10
   attackPowerPerLevel: 2
+  deathExperienceLossRate: 0.1
+  minimumDeathExperienceLoss: 10
 --- !u!114 &743857187644922264
 MonoBehaviour:
   m_ObjectHideFlags: 0
