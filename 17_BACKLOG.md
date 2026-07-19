@@ -1,5 +1,9 @@
 # Backlog
 
+## Idea Intake Rule
+
+New ideas are recorded here even when they are not ready for implementation. Each idea should eventually answer three questions: what player problem it solves, which systems it depends on, and at which roadmap stage it belongs. An idea moves into a sprint only during explicit priority selection or when it unblocks current work.
+
 ## Gameplay Ideas
 
 - Character creation screen with race and class selection.
@@ -28,6 +32,15 @@
 - Merchant caravan.
 - Old battlefield.
 - Hidden cave chest.
+- Seamless physical entrances for caves and interior spaces.
+- Long-distance teleports as world services rather than replacements for nearby travel.
+
+## Story And Visual Ideas
+
+- Create a concise world-history and faction bible before expanding quest content.
+- Define the starter region's main conflict and the player's place in it.
+- Build a visual-reference board and style guide before replacing blockout art.
+- Plan a modular village, wilderness, character, animation, effects, audio, and UI asset pipeline.
 
 ## Multiplayer Ideas
 

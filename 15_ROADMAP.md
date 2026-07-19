@@ -1,5 +1,11 @@
 # Roadmap
 
+## Current Direction
+
+Sprint 014 is complete. The next proposed implementation is **Sprint 015: Skills Foundation**.
+
+This file preserves completed milestone history and the broad delivery order. The user-facing Russian plan and current dependency decisions live in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md). A future feature listed here is not permission to implement it before its dependencies or current priority.
+
 ## Version 0.1 - First Breath
 
 Status: Sprint 002 starter village blockout implemented on 2026-07-15.
@@ -135,17 +141,17 @@ Sprint 006 exclusions:
 
 ## Version 0.6 - First Zone
 
-Status: Sprint 011 enemy-territory foundation implemented on 2026-07-19.
+Status: Sprint 014 first enemy variety implemented on 2026-07-19. Version 0.6 remains in progress.
 
 Goal: the starter area feels like a small world.
 
 Features:
 
-- village polish;
-- enemy zones;
-- cave entrance;
-- more items;
-- more NPCs.
+- reusable enemy zones and peaceful-village boundaries;
+- multiple enemy species and level-aware rewards;
+- player skills and clearer class identity;
+- stronger item, equipment, and quest authoring foundations;
+- a complete and readable starter-region gameplay path.
 
 Sprint 007 additions:
 
@@ -285,6 +291,20 @@ Post-Sprint 009 backlog decisions:
 - move enemy population and respawn timing into reusable spawn data instead of relying on scene-only tuning;
 - allow sub-10% and sub-1% loot rates, but balance them from expected kills per reward, time-to-kill, quest rewards, economy, and player frustration rather than treating 10% as a minimum;
 - consider guaranteed starter rewards or a pity rule separately from ordinary rare drops.
+
+## Planned Delivery Order
+
+The exact sprint numbers after Sprint 015 are provisional. Dependencies and test results decide the final split.
+
+1. Skills foundation and the first active class skill.
+2. Character identity data, creation, selection, and readable stats.
+3. Stable item instances, explicit inventory selection, equipment expansion, and one consumable.
+4. Reusable quest content definitions and a second short quest.
+5. A complete starter-region pass with explicit zone rules and one elite encounter.
+6. World-history brief and visual style guide before major content or art production.
+7. Seamless-world technical slice using streamed or additive neighboring areas.
+8. First real cave route and boss only after world-transition, combat, and reward dependencies are ready.
+9. Online account, authoritative persistence, and synchronization after the local vertical slice is stable.
 
 ## Version 1.0 - Vertical Slice
 

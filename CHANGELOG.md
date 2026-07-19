@@ -2,6 +2,11 @@
 
 ## 2026-07-19
 
+- Replaced the premature cave-entrance Sprint 015 direction with a dependency-based Russian development plan.
+- Set Skills Foundation as the next proposed sprint and separated completed sprint history from future delivery order.
+- Documented seamless connected-world goals, allowed teleport use, and technical gates before building a real cave.
+- Added explicit lore-bible and visual-production stages so content and art follow an approved direction.
+- Added idea-intake, focus, user-testing, and automatic Codex task-handoff rules.
 - Documented Sprint 014 scope and acceptance criteria.
 - Added a distinct reusable level-2 forest-boar prefab with authored health, combat, movement, recovery, and experience values.
 - Replaced the northern wolf spawn with one boar while keeping the combat-area population at three enemies.

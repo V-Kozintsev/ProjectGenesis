@@ -6,6 +6,8 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 Sprint 014 first enemy variety is implemented: the northern combat area now contains two young wolves and one stronger level-2 forest boar using the shared combat and AI systems.
 
+The next proposed implementation is Sprint 015 Skills Foundation. The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
+
 ## Prototype Controls
 
 - Open `Assets/ProjectGenesis/Scenes/StarterVillage.unity` before entering Play mode.
@@ -90,6 +92,7 @@ Sprint 014 first enemy variety is implemented: the northern combat area now cont
 - [29_SPRINT_012.md](29_SPRINT_012.md) - configurable player death experience and level-loss sprint.
 - [30_SPRINT_013.md](30_SPRINT_013.md) - enemy levels, target display, and level-difference experience scaling sprint.
 - [31_SPRINT_014.md](31_SPRINT_014.md) - first forest-boar enemy, mixed population, and shared-system validation sprint.
+- [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md) - current Russian development plan, priorities, seamless-world direction, and task-handoff policy.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

@@ -52,3 +52,17 @@ Inspector fields should be private with `[SerializeField]` unless they truly nee
 
 Prefer explicit references and constructor-like initialization methods over global lookups. Use singletons only when there is a strong reason.
 
+## Visual Production Rule
+
+Blockout geometry exists to test scale, navigation, combat space, and camera behavior. Do not spend a gameplay sprint polishing blockout objects into final art.
+
+Visual development follows these stages:
+
+1. collect focused references for the world and interface;
+2. approve a small style guide for shape, material, color, architecture, characters, and UI;
+3. make an asset list and choose whether each asset is temporary, self-made, purchased, or commissioned;
+4. build reusable modular environment kits and character pipelines;
+5. add materials, lighting, animation, effects, sound, and UI presentation;
+6. polish only after the related playable flow is stable.
+
+Unity is the assembly, lighting, interaction, and runtime environment. External tools or licensed asset packs can be chosen later per asset; the project should not commit to a final art pipeline before the visual direction and production budget are clear.
