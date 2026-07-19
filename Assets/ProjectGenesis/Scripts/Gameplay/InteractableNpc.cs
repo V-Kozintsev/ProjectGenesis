@@ -12,7 +12,8 @@ namespace ProjectGenesis.Gameplay
         [SerializeField] private string completedQuestText = "Спасибо за помощь. Северная дорога теперь безопаснее.";
         [SerializeField] private string questId = "wolves-near-the-road";
         [SerializeField] private string questTitle = "Волчьи трофеи";
-        [SerializeField] private string questObjectiveText = "Собрать волчьи хвосты.";
+        [SerializeField] private string questDescription = "Стая у северной дороги угрожает деревне. Принесите старосте доказательства охоты.";
+        [SerializeField] private string questObjectiveText = "Волчьи хвосты";
         [SerializeField] private string questTargetId = "wolf_tail";
         [SerializeField, Min(1)] private int requiredObjectiveCount = 5;
         [SerializeField, Min(0)] private int rewardExperience = 80;
@@ -25,6 +26,7 @@ namespace ProjectGenesis.Gameplay
         public string CompletedQuestText => completedQuestText;
         public string QuestId => questId;
         public string QuestTitle => questTitle;
+        public string QuestDescription => questDescription;
         public string QuestObjectiveText => questObjectiveText;
         public string QuestTargetId => questTargetId;
         public int RequiredObjectiveCount => requiredObjectiveCount;
@@ -33,6 +35,7 @@ namespace ProjectGenesis.Gameplay
         public void ConfigureQuest(
             string id,
             string title,
+            string description,
             string objectiveText,
             string targetId,
             int requiredCount,
@@ -40,6 +43,7 @@ namespace ProjectGenesis.Gameplay
         {
             questId = id;
             questTitle = title;
+            questDescription = description;
             questObjectiveText = objectiveText;
             questTargetId = targetId;
             requiredObjectiveCount = Mathf.Max(1, requiredCount);

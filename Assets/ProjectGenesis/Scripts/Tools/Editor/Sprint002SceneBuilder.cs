@@ -70,6 +70,12 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 008/Rebuild Starter Village Quest Foundation")]
+        public static void RebuildStarterVillageQuestFoundation()
+        {
+            RebuildStarterVillage();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -461,7 +467,8 @@ namespace ProjectGenesis.Tools.Editor
             npc.ConfigureQuest(
                 "wolves-near-the-road",
                 "Волчьи трофеи",
-                "Собрать волчьи хвосты.",
+                "Стая у северной дороги угрожает деревне. Принесите старосте доказательства охоты.",
+                "Волчьи хвосты",
                 "wolf_tail",
                 5,
                 80);
@@ -529,6 +536,8 @@ namespace ProjectGenesis.Tools.Editor
             DialogueWindow dialogueWindow = CreateDialogueWindow(canvasObject.transform);
             CreateCombatHud(canvasObject, player, combatController);
             CreateQuestTracker(canvasObject, player.GetComponent<QuestLog>(), villageElder);
+            CreateQuestProgressToast(canvasObject, player.GetComponent<QuestLog>());
+            CreateQuestJournalUi(canvasObject, player.GetComponent<QuestLog>(), dialogueWindow);
             CreateInventoryUi(canvasObject, player);
 
             return new FirstContactUi(dialogueWindow, promptView);
@@ -579,6 +588,149 @@ namespace ProjectGenesis.Tools.Editor
             QuestTrackerView tracker = canvasObject.AddComponent<QuestTrackerView>();
             tracker.Initialize(root, title, objective, questLog, questOwner);
             root.SetActive(false);
+        }
+
+        private static void CreateQuestProgressToast(GameObject canvasObject, QuestLog questLog)
+        {
+            GameObject root = CreatePanel(
+                "QuestProgressToast",
+                canvasObject.transform,
+                new Color(0.055f, 0.075f, 0.08f, 0.96f));
+            root.GetComponent<Image>().raycastTarget = false;
+            SetRect(
+                root.GetComponent<RectTransform>(),
+                new Vector2(0f, -146f),
+                new Vector2(520f, 86f),
+                new Vector2(0.5f, 1f));
+
+            Text message = CreateText(
+                "Text_QuestProgressToast",
+                root.transform,
+                "Волчьи трофеи\nВолчьи хвосты: 1 / 5",
+                20,
+                TextAnchor.MiddleCenter);
+            message.color = new Color(1f, 0.86f, 0.5f);
+            message.lineSpacing = 1.05f;
+            Stretch(message.GetComponent<RectTransform>(), 18f, 8f, 18f, 8f);
+
+            QuestProgressToastView toast = canvasObject.AddComponent<QuestProgressToastView>();
+            toast.Initialize(root, message, questLog);
+            root.SetActive(false);
+        }
+
+        private static void CreateQuestJournalUi(
+            GameObject canvasObject,
+            QuestLog questLog,
+            DialogueWindow dialogueWindow)
+        {
+            Button openButton = CreateButton("Button_OpenQuestJournal", canvasObject.transform, "Задания [J]");
+            openButton.GetComponent<Image>().color = new Color(0.12f, 0.18f, 0.22f, 0.96f);
+            SetRect(
+                openButton.GetComponent<RectTransform>(),
+                new Vector2(-24f, 92f),
+                new Vector2(220f, 56f),
+                new Vector2(1f, 0f));
+
+            GameObject window = CreatePanel(
+                "QuestJournalWindow",
+                canvasObject.transform,
+                new Color(0.04f, 0.05f, 0.055f, 0.98f));
+            SetRect(
+                window.GetComponent<RectTransform>(),
+                new Vector2(-180f, 0f),
+                new Vector2(1020f, 640f),
+                new Vector2(0.5f, 0.5f));
+
+            Text header = CreateText("Text_QuestJournalHeader", window.transform, "Журнал заданий", 30, TextAnchor.UpperLeft);
+            header.color = new Color(1f, 0.84f, 0.48f);
+            SetRect(header.GetComponent<RectTransform>(), new Vector2(24f, -20f), new Vector2(760f, 44f), new Vector2(0f, 1f));
+
+            Button closeButton = CreateButton("Button_CloseQuestJournal", window.transform, "X");
+            closeButton.GetComponent<Image>().color = new Color(0.28f, 0.1f, 0.09f, 1f);
+            SetRect(closeButton.GetComponent<RectTransform>(), new Vector2(-18f, -18f), new Vector2(38f, 36f), new Vector2(1f, 1f));
+
+            Button activeTab = CreateButton("Button_ActiveQuests", window.transform, "Активные");
+            SetRect(activeTab.GetComponent<RectTransform>(), new Vector2(24f, -78f), new Vector2(136f, 44f), new Vector2(0f, 1f));
+
+            Button completedTab = CreateButton("Button_CompletedQuests", window.transform, "Завершённые");
+            SetRect(completedTab.GetComponent<RectTransform>(), new Vector2(170f, -78f), new Vector2(166f, 44f), new Vector2(0f, 1f));
+
+            GameObject listRootObject = new("QuestListRoot", typeof(RectTransform));
+            listRootObject.transform.SetParent(window.transform, false);
+            RectTransform listRoot = listRootObject.GetComponent<RectTransform>();
+            SetRect(listRoot, new Vector2(24f, -144f), new Vector2(262f, 390f), new Vector2(0f, 1f));
+
+            Button questButtonTemplate = CreateButton("Button_QuestTemplate", listRoot, "Название задания");
+            SetRect(
+                questButtonTemplate.GetComponent<RectTransform>(),
+                Vector2.zero,
+                new Vector2(262f, 50f),
+                new Vector2(0f, 1f));
+            questButtonTemplate.gameObject.SetActive(false);
+
+            Text emptyText = CreateText("Text_EmptyQuestList", listRoot, "Нет активных заданий", 18, TextAnchor.UpperLeft);
+            emptyText.color = new Color(0.62f, 0.68f, 0.7f);
+            SetRect(emptyText.GetComponent<RectTransform>(), new Vector2(4f, -8f), new Vector2(250f, 60f), new Vector2(0f, 1f));
+
+            GameObject divider = CreatePanel("QuestJournalDivider", window.transform, new Color(0.25f, 0.3f, 0.32f, 1f));
+            divider.GetComponent<Image>().raycastTarget = false;
+            SetRect(divider.GetComponent<RectTransform>(), new Vector2(310f, -142f), new Vector2(2f, 438f), new Vector2(0f, 1f));
+
+            Text title = CreateText("Text_SelectedQuestTitle", window.transform, "Выберите задание", 28, TextAnchor.UpperLeft);
+            title.color = new Color(1f, 0.84f, 0.48f);
+            SetRect(title.GetComponent<RectTransform>(), new Vector2(340f, -142f), new Vector2(638f, 42f), new Vector2(0f, 1f));
+
+            Text state = CreateText("Text_SelectedQuestState", window.transform, "", 19, TextAnchor.UpperLeft);
+            state.color = new Color(0.48f, 0.82f, 1f);
+            SetRect(state.GetComponent<RectTransform>(), new Vector2(340f, -190f), new Vector2(638f, 30f), new Vector2(0f, 1f));
+
+            Text description = CreateText("Text_SelectedQuestDescription", window.transform, "", 20, TextAnchor.UpperLeft);
+            description.color = new Color(0.9f, 0.91f, 0.88f);
+            description.lineSpacing = 1.08f;
+            SetRect(description.GetComponent<RectTransform>(), new Vector2(340f, -234f), new Vector2(638f, 102f), new Vector2(0f, 1f));
+
+            Text objective = CreateText("Text_SelectedQuestObjective", window.transform, "", 21, TextAnchor.UpperLeft);
+            objective.color = new Color(0.76f, 0.91f, 1f);
+            SetRect(objective.GetComponent<RectTransform>(), new Vector2(340f, -350f), new Vector2(638f, 36f), new Vector2(0f, 1f));
+
+            Text giver = CreateText("Text_SelectedQuestGiver", window.transform, "", 19, TextAnchor.UpperLeft);
+            giver.color = new Color(0.73f, 0.78f, 0.8f);
+            SetRect(giver.GetComponent<RectTransform>(), new Vector2(340f, -400f), new Vector2(638f, 32f), new Vector2(0f, 1f));
+
+            Text reward = CreateText("Text_SelectedQuestReward", window.transform, "", 20, TextAnchor.UpperLeft);
+            reward.color = new Color(1f, 0.72f, 0.48f);
+            SetRect(reward.GetComponent<RectTransform>(), new Vector2(340f, -446f), new Vector2(638f, 34f), new Vector2(0f, 1f));
+
+            Button abandonButton = CreateButton("Button_AbandonQuest", window.transform, "Отказаться");
+            abandonButton.GetComponent<Image>().color = new Color(0.3f, 0.13f, 0.1f, 1f);
+            SetRect(abandonButton.GetComponent<RectTransform>(), new Vector2(340f, 30f), new Vector2(240f, 54f), new Vector2(0f, 0f));
+            Text abandonText = abandonButton.GetComponentInChildren<Text>();
+
+            Text hint = CreateText("Text_QuestJournalHint", window.transform, "J - закрыть журнал", 18, TextAnchor.LowerRight);
+            hint.color = new Color(0.62f, 0.68f, 0.7f);
+            SetRect(hint.GetComponent<RectTransform>(), new Vector2(-24f, 42f), new Vector2(230f, 28f), new Vector2(1f, 0f));
+
+            QuestJournalView journal = canvasObject.AddComponent<QuestJournalView>();
+            journal.Initialize(
+                window,
+                openButton,
+                closeButton,
+                activeTab,
+                completedTab,
+                listRoot,
+                questButtonTemplate,
+                emptyText,
+                title,
+                state,
+                description,
+                objective,
+                giver,
+                reward,
+                abandonButton,
+                abandonText,
+                questLog,
+                dialogueWindow);
+            window.SetActive(false);
         }
 
         private static void CreateInventoryUi(GameObject canvasObject, GameObject player)

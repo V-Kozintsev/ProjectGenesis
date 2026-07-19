@@ -2,6 +2,16 @@
 
 ## 2026-07-18
 
+- Documented Sprint 008 scope and acceptance criteria.
+- Extended persisted quest progress with title, description, objective label, quest giver, and reward metadata.
+- Added a `J` quest journal with dynamically generated active and completed tabs plus detailed quest information.
+- Added a two-step abandon confirmation for active and ready-to-turn-in quests; retaking an abandoned quest starts at zero progress.
+- Added short objective-progress notifications that trigger only for new progress, not restored profile data.
+- Prevented the quest journal and NPC dialogue from remaining open on top of each other.
+- Added an editor validator for acceptance, progress, abandon, retake, ready-to-turn-in, completion, and terminal-state rules.
+- Rebuilt the starter village scene and visually verified the journal, persisted metadata, and abandon flow in Play mode.
+- Kept Sprint 008 scoped away from new quests, map markers, dialogue trees, content-authoring tools, final UI art, and server authority.
+
 - Documented Sprint 007 scope and acceptance criteria.
 - Replaced the single fixed wolf encounter with three distributed wolf spawners in the northern combat area.
 - Added six-second corpse cleanup and twelve-second enemy respawn.

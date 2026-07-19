@@ -90,6 +90,10 @@ namespace ProjectGenesis.UI
             {
                 currentQuestLog.TryAcceptQuest(
                     currentNpc.QuestId,
+                    currentNpc.QuestTitle,
+                    currentNpc.QuestDescription,
+                    currentNpc.QuestObjectiveText,
+                    currentNpc.DisplayName,
                     currentNpc.QuestTargetId,
                     currentNpc.RequiredObjectiveCount,
                     currentNpc.RewardExperience);

@@ -8,6 +8,10 @@ namespace ProjectGenesis.Gameplay
     public sealed class QuestProgressData
     {
         public string QuestId;
+        public string Title;
+        public string Description;
+        public string ObjectiveText;
+        public string QuestGiverName;
         public string TargetId;
         public QuestState State;
         public int RequiredCount;
@@ -19,6 +23,10 @@ namespace ProjectGenesis.Gameplay
             return new QuestProgressData
             {
                 QuestId = QuestId,
+                Title = Title,
+                Description = Description,
+                ObjectiveText = ObjectiveText,
+                QuestGiverName = QuestGiverName,
                 TargetId = TargetId,
                 State = State,
                 RequiredCount = RequiredCount,
@@ -34,6 +42,7 @@ namespace ProjectGenesis.Gameplay
         private PlayerProgression progression;
 
         public event Action<QuestLog> Changed;
+        public event Action<QuestProgressData> ObjectiveProgressed;
 
         private void Awake()
         {
@@ -58,6 +67,10 @@ namespace ProjectGenesis.Gameplay
 
         public bool TryAcceptQuest(
             string questId,
+            string title,
+            string description,
+            string objectiveText,
+            string questGiverName,
             string targetId,
             int requiredCount,
             int rewardExperience)
@@ -70,6 +83,10 @@ namespace ProjectGenesis.Gameplay
             quests[questId] = new QuestProgressData
             {
                 QuestId = questId,
+                Title = title ?? string.Empty,
+                Description = description ?? string.Empty,
+                ObjectiveText = objectiveText ?? string.Empty,
+                QuestGiverName = questGiverName ?? string.Empty,
                 TargetId = targetId,
                 State = QuestState.Active,
                 RequiredCount = Mathf.Max(1, requiredCount),
@@ -111,6 +128,7 @@ namespace ProjectGenesis.Gameplay
             }
 
             bool changed = false;
+            List<QuestProgressData> progressedQuests = new();
             foreach (QuestProgressData progress in quests.Values)
             {
                 if (progress.State != QuestState.Active || progress.TargetId != targetId)
@@ -125,11 +143,17 @@ namespace ProjectGenesis.Gameplay
                 }
 
                 changed = true;
+                progressedQuests.Add(progress.Clone());
             }
 
             if (changed)
             {
                 Changed?.Invoke(this);
+
+                foreach (QuestProgressData progress in progressedQuests)
+                {
+                    ObjectiveProgressed?.Invoke(progress);
+                }
             }
 
             return changed;
@@ -147,6 +171,29 @@ namespace ProjectGenesis.Gameplay
             progression?.AddExperience(progress.RewardExperience);
             Changed?.Invoke(this);
             return true;
+        }
+
+        public bool TryAbandonQuest(string questId)
+        {
+            QuestProgressData progress = GetQuestProgress(questId);
+            if (progress == null || progress.State == QuestState.Completed)
+            {
+                return false;
+            }
+
+            quests.Remove(questId);
+            Changed?.Invoke(this);
+            return true;
+        }
+
+        public List<QuestProgressData> GetAllQuestProgress()
+        {
+            List<QuestProgressData> result = CaptureState();
+            result.Sort((first, second) => string.Compare(
+                first.Title,
+                second.Title,
+                StringComparison.CurrentCulture));
+            return result;
         }
 
         public List<QuestProgressData> CaptureState()

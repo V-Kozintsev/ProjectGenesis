@@ -135,7 +135,7 @@ Sprint 006 exclusions:
 
 ## Version 0.6 - First Zone
 
-Status: Sprint 007 first-zone gameplay loop implemented on 2026-07-18.
+Status: Sprint 008 quest-system foundation implemented on 2026-07-18.
 
 Goal: the starter area feels like a small world.
 
@@ -162,6 +162,22 @@ Sprint 007 exclusions:
 - no additional enemy species, caves, bosses, NPCs, or quests;
 - no polished models, animation, audio, or final UI art;
 - no server-authoritative spawning, loot, or quest validation.
+
+Sprint 008 additions:
+
+- persistent display metadata stored with each accepted quest;
+- `J` quest journal with dynamic active and completed lists;
+- detailed objective, giver, state, and reward display;
+- two-step quest abandon confirmation and clean retake from zero;
+- short notifications for real objective progress;
+- deterministic editor validation of the quest state lifecycle.
+
+Sprint 008 exclusions:
+
+- no additional quests, quest chains, dialogue trees, or map markers;
+- no ScriptableObject quest-authoring pipeline or content editor;
+- no polished UI art, animation, or audio;
+- no server-authoritative quest service or multiplayer synchronization.
 
 ## Version 1.0 - Vertical Slice
 

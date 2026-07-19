@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 007 first-zone loop is implemented: the player can accept the Village Elder's task, hunt respawning wolves, collect chance-based quest trophies and equipment, track objective progress, turn in the quest, and continue from the same state after restarting Play mode.
+Sprint 008 quest-system foundation is implemented: the first-zone loop now has a persistent quest journal, active and completed views, reusable quest metadata, progress notifications, and a safe abandon-and-retake flow.
 
 ## Prototype Controls
 
@@ -34,11 +34,15 @@ Sprint 007 first-zone loop is implemented: the player can accept the Village Eld
 - `E` is still available as a temporary fallback while standing near an NPC.
 - Accept the Village Elder's quest, collect five wolf tails beyond the north gate, then return to the elder and choose `Завершить поручение`.
 - The compact tracker in the upper-right corner shows current tail progress and tells the player when it is time to return to the elder.
+- Press `J` or click `Задания [J]` to open the quest journal. Its active and completed tabs are generated from the quest log rather than being hardcoded for one quest.
+- Select a journal entry to see its description, objective, quest giver, state, and experience reward.
+- An active or ready-to-turn-in quest can be abandoned with a two-step confirmation. Its tracker disappears immediately, and accepting it again starts objective progress from zero.
+- Real objective progress briefly appears as a notification near the top of the screen. Loading an existing profile does not replay old notifications.
 - Defeating the wolf grants 20 experience. Turning in the quest grants another 80 experience, raises the player to level 2, increases maximum health to 110, and increases base attack power by 2.
 - Player position, level, experience, quest state, inventory, and equipped weapon are saved automatically. There is intentionally no save button.
 - For the current offline prototype, persistence uses a local JSON file behind a replaceable interface. In the future online version, the authoritative server will store this state and return the character near the last valid position after login.
 - To start a fresh development playthrough, use `Project Genesis > Development > Clear Local Prototype Profile` while outside Play mode.
-- Armor, additional equipment slots, trading, combat skills, multiple quests, authentication, and a real server backend are intentionally outside Sprint 007.
+- Additional quests, map markers, dialogue trees, a quest-content editor, authentication, and a real server backend are intentionally outside Sprint 008.
 
 ## Documentation Map
 
@@ -67,6 +71,7 @@ Sprint 007 first-zone loop is implemented: the player can accept the Village Eld
 - [22_SPRINT_005.md](22_SPRINT_005.md) - first loot, inventory, and equipment reward sprint.
 - [23_SPRINT_006.md](23_SPRINT_006.md) - first complete quest, progression, and automatic persistence loop sprint.
 - [24_SPRINT_007.md](24_SPRINT_007.md) - first-zone enemy population, respawn, chance loot, trophy quest, and tracker sprint.
+- [25_SPRINT_008.md](25_SPRINT_008.md) - persistent quest journal, reusable quest metadata, abandon flow, notifications, and quest-state validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle
