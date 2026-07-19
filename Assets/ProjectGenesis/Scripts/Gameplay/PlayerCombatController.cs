@@ -176,7 +176,9 @@ namespace ProjectGenesis.Gameplay
                 return;
             }
 
-            progression.AddExperience(defeatedEnemy.ExperienceReward);
+            progression.AddEnemyExperience(
+                defeatedEnemy.EnemyLevel,
+                defeatedEnemy.ExperienceReward);
             questLog?.ReportEnemyDefeated(defeatedEnemy.QuestTargetId);
             ClearTargetInternal(false);
         }

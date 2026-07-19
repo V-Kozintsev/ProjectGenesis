@@ -264,6 +264,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfb5513a12597e848bf7a58273fe3b72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  displayName: Молодой волк
+  enemyLevel: 1
   detectionRadius: 2.2
   leashRadius: 6
   experienceReward: 20

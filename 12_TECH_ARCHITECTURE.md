@@ -90,6 +90,8 @@ Examples:
 
 `PlayerProgression` owns experience arithmetic in both directions, including death penalties and level-boundary changes. `PlayerCombatController` only decides when one penalty is applied, then continues the existing respawn flow.
 
+Enemy identity, level, and base experience are authored by `EnemyBrain`. `PlayerProgression` owns the configurable level-difference multiplier because it converts an enemy reward into player progression; fixed quest rewards continue to bypass enemy scaling.
+
 ## Saving
 
 Save only stable runtime state:

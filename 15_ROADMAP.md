@@ -249,6 +249,21 @@ Sprint 012 exclusions:
 - no PvP-specific or server-authoritative death rules;
 - no final live-economy penalty balancing.
 
+Sprint 013 additions:
+
+- Inspector-authored enemy display name, level, and base experience;
+- enemy level displayed in the selected-target panel;
+- configurable weaker-enemy penalties and stronger-enemy bonuses;
+- fixed quest rewards kept separate from scaled combat rewards;
+- deterministic validation of prefab defaults and reward boundaries.
+
+Sprint 013 exclusions:
+
+- no automatic enemy stat scaling, randomized levels, elites, or new enemy species;
+- no party sharing, contribution tracking, rested experience, boosters, or mentoring;
+- no experience notifications, combat log, animation, audio, or final effects;
+- no server-authoritative reward calculation or anti-cheat validation.
+
 Post-Sprint 009 backlog decisions:
 
 - add explicit inventory-slot selection when different copies can have meaningfully different properties;

@@ -2,6 +2,8 @@
 
 ## Enemy Tiers
 
+Every enemy has an authored display name, level, and base experience reward. Level is shown in the selected-target panel and participates in kill-experience calculation; it does not silently rewrite health, damage, loot, or quest data.
+
 ### Common
 
 Simple enemies:

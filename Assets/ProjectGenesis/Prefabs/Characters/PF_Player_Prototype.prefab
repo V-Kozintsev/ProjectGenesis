@@ -238,6 +238,10 @@ MonoBehaviour:
   attackPowerPerLevel: 2
   deathExperienceLossRate: 0.1
   minimumDeathExperienceLoss: 10
+  lowerLevelPenaltyPerLevel: 0.25
+  minimumEnemyRewardMultiplier: 0.1
+  higherLevelBonusPerLevel: 0.1
+  maximumEnemyRewardMultiplier: 1.5
 --- !u!114 &743857187644922264
 MonoBehaviour:
   m_ObjectHideFlags: 0

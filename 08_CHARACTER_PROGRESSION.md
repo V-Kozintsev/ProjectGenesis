@@ -28,6 +28,8 @@ Later sources:
 - crafting;
 - achievements.
 
+Enemy-kill experience starts from the enemy's authored base reward and is then modified by the difference between enemy and player level. Equal-level enemies award 100%. Weaker enemies lose 25 percentage points per level down to a 10% minimum; stronger enemies gain 10 percentage points per level up to a 150% maximum. Quest rewards remain fixed authored values.
+
 ## Class Growth
 
 Each class should have a simple growth identity:

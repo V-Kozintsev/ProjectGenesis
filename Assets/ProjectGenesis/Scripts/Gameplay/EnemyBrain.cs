@@ -19,6 +19,8 @@ namespace ProjectGenesis.Gameplay
     public sealed class EnemyBrain : MonoBehaviour
     {
         [Header("Behavior")]
+        [SerializeField] private string displayName = "Молодой волк";
+        [SerializeField, Min(1)] private int enemyLevel = 1;
         [SerializeField, Min(0.5f)] private float detectionRadius = 4f;
         [SerializeField, Min(1f)] private float leashRadius = 6f;
         [SerializeField, Min(1)] private int experienceReward = 20;
@@ -55,6 +57,8 @@ namespace ProjectGenesis.Gameplay
 
         public EnemyState State { get; private set; } = EnemyState.Idle;
         public bool IsDead => health == null || health.IsDead;
+        public string DisplayName => displayName;
+        public int EnemyLevel => enemyLevel;
         public int ExperienceReward => experienceReward;
         public string QuestTargetId => questTargetId;
         public Health Health => health;
@@ -204,8 +208,12 @@ namespace ProjectGenesis.Gameplay
             string objectiveTargetId = "wolf",
             float roamDistance = 1.4f,
             float minimumIdleDelay = 1.5f,
-            float maximumIdleDelay = 4f)
+            float maximumIdleDelay = 4f,
+            int level = 1,
+            string enemyName = "Молодой волк")
         {
+            displayName = string.IsNullOrWhiteSpace(enemyName) ? "Противник" : enemyName;
+            enemyLevel = Mathf.Max(1, level);
             detectionRadius = Mathf.Max(0.5f, detection);
             leashRadius = Mathf.Max(1f, leash);
             experienceReward = Mathf.Max(1, reward);

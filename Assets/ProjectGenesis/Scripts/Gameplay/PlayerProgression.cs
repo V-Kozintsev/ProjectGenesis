@@ -19,6 +19,12 @@ namespace ProjectGenesis.Gameplay
         [SerializeField, Range(0f, 1f)] private float deathExperienceLossRate = 0.1f;
         [SerializeField, Min(0)] private int minimumDeathExperienceLoss = 10;
 
+        [Header("Enemy Experience Scaling")]
+        [SerializeField, Range(0f, 1f)] private float lowerLevelPenaltyPerLevel = 0.25f;
+        [SerializeField, Range(0f, 1f)] private float minimumEnemyRewardMultiplier = 0.1f;
+        [SerializeField, Range(0f, 1f)] private float higherLevelBonusPerLevel = 0.1f;
+        [SerializeField, Min(1f)] private float maximumEnemyRewardMultiplier = 1.5f;
+
         private Health health;
         private CombatStats combatStats;
 
@@ -30,6 +36,10 @@ namespace ProjectGenesis.Gameplay
         public int MaximumLevel => maximumLevel;
         public float DeathExperienceLossRate => deathExperienceLossRate;
         public int MinimumDeathExperienceLoss => minimumDeathExperienceLoss;
+        public float LowerLevelPenaltyPerLevel => lowerLevelPenaltyPerLevel;
+        public float MinimumEnemyRewardMultiplier => minimumEnemyRewardMultiplier;
+        public float HigherLevelBonusPerLevel => higherLevelBonusPerLevel;
+        public float MaximumEnemyRewardMultiplier => maximumEnemyRewardMultiplier;
         public int ExperienceToNextLevel => level >= maximumLevel
             ? 0
             : GetExperienceRequirement(level);
@@ -64,6 +74,39 @@ namespace ProjectGenesis.Gameplay
             }
 
             ExperienceChanged?.Invoke(this);
+        }
+
+        public int AddEnemyExperience(int enemyLevel, int baseReward)
+        {
+            int reward = CalculateEnemyExperience(enemyLevel, baseReward);
+            AddExperience(reward);
+            return reward;
+        }
+
+        public int CalculateEnemyExperience(int enemyLevel, int baseReward)
+        {
+            if (baseReward <= 0)
+            {
+                return 0;
+            }
+
+            int levelDifference = Mathf.Max(1, enemyLevel) - level;
+            float multiplier;
+
+            if (levelDifference < 0)
+            {
+                multiplier = Mathf.Max(
+                    minimumEnemyRewardMultiplier,
+                    1f + levelDifference * lowerLevelPenaltyPerLevel);
+            }
+            else
+            {
+                multiplier = Mathf.Min(
+                    maximumEnemyRewardMultiplier,
+                    1f + levelDifference * higherLevelBonusPerLevel);
+            }
+
+            return Mathf.Max(0, Mathf.RoundToInt(baseReward * multiplier));
         }
 
         public int ApplyDeathPenalty()
@@ -124,6 +167,18 @@ namespace ProjectGenesis.Gameplay
         {
             deathExperienceLossRate = Mathf.Clamp01(lossRate);
             minimumDeathExperienceLoss = Mathf.Max(0, minimumLoss);
+        }
+
+        public void ConfigureEnemyExperienceScaling(
+            float lowerPenaltyPerLevel,
+            float minimumRewardMultiplier,
+            float higherBonusPerLevel,
+            float maximumRewardMultiplier)
+        {
+            lowerLevelPenaltyPerLevel = Mathf.Clamp01(lowerPenaltyPerLevel);
+            minimumEnemyRewardMultiplier = Mathf.Clamp01(minimumRewardMultiplier);
+            higherLevelBonusPerLevel = Mathf.Clamp01(higherBonusPerLevel);
+            maximumEnemyRewardMultiplier = Mathf.Max(1f, maximumRewardMultiplier);
         }
 
         public void RestoreState(int savedLevel, int savedExperience)

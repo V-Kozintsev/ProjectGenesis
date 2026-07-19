@@ -271,6 +271,7 @@ namespace ProjectGenesis.Tools.Editor
             stats.Configure(14, 3, 1.35f, 0.8f);
             PlayerProgression progression = player.AddComponent<PlayerProgression>();
             progression.ConfigureDeathPenalty(0.1f, 10);
+            progression.ConfigureEnemyExperienceScaling(0.25f, 0.1f, 0.1f, 1.5f);
             player.AddComponent<PlayerInventory>();
             player.AddComponent<PlayerEquipment>();
             player.AddComponent<PlayerLootController>();
@@ -321,7 +322,17 @@ namespace ProjectGenesis.Tools.Editor
             CombatStats stats = wolf.AddComponent<CombatStats>();
             stats.Configure(8, 1, 1.05f, 1.1f);
             EnemyBrain brain = wolf.AddComponent<EnemyBrain>();
-            brain.Configure(2.2f, 6f, 20, 6f, "wolf", 2.4f, 0.5f, 1.5f);
+            brain.Configure(
+                2.2f,
+                6f,
+                20,
+                6f,
+                "wolf",
+                2.4f,
+                0.5f,
+                1.5f,
+                1,
+                "Молодой волк");
             EnemyLootDrop lootDrop = wolf.AddComponent<EnemyLootDrop>();
             lootDrop.Configure(
                 lootTable,

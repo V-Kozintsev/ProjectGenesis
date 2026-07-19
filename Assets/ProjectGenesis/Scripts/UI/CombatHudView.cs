@@ -216,7 +216,9 @@ namespace ProjectGenesis.UI
 
             if (targetNameText != null)
             {
-                targetNameText.text = hasEnemyTarget ? "Молодой волк" : observedNpc.DisplayName;
+                targetNameText.text = hasEnemyTarget
+                    ? $"{observedTarget.DisplayName} [Ур. {observedTarget.EnemyLevel}]"
+                    : observedNpc.DisplayName;
             }
 
             if (targetHealthText != null)

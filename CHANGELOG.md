@@ -2,6 +2,12 @@
 
 ## 2026-07-19
 
+- Documented Sprint 013 scope and acceptance criteria.
+- Added Inspector-authored enemy display names, levels, and base experience rewards.
+- Displayed enemy level in the selected-target panel.
+- Scaled kill experience by enemy-versus-player level difference with configurable weaker-enemy penalties, stronger-enemy bonuses, and multiplier bounds.
+- Kept fixed quest rewards separate from enemy-kill scaling.
+- Added deterministic validation for equal, weaker, stronger, minimum, maximum, and zero-reward cases.
 - Documented Sprint 012 scope and acceptance criteria.
 - Added configurable percentage and minimum experience loss on player death.
 - Added experience removal across level boundaries with level 1 and zero experience as hard floors.
