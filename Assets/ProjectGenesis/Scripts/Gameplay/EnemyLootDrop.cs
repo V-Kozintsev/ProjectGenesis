@@ -8,9 +8,8 @@ namespace ProjectGenesis.Gameplay
     public sealed class EnemyLootDrop : MonoBehaviour
     {
         [Header("Regular Loot")]
-        [SerializeField] private ItemDefinition item;
+        [SerializeField] private LootTableDefinition lootTable;
         [SerializeField] private Material pickupMaterial;
-        [SerializeField, Range(0f, 1f)] private float itemDropChance = 0.35f;
 
         [Header("Quest Loot")]
         [SerializeField] private string questObjectiveTargetId = "wolf_tail";
@@ -34,15 +33,13 @@ namespace ProjectGenesis.Gameplay
         }
 
         public void Configure(
-            ItemDefinition droppedItem,
+            LootTableDefinition regularLootTable,
             Material material,
-            float regularDropChance,
             string objectiveTargetId,
             float objectiveDropChance)
         {
-            item = droppedItem;
+            lootTable = regularLootTable;
             pickupMaterial = material;
-            itemDropChance = Mathf.Clamp01(regularDropChance);
             questObjectiveTargetId = objectiveTargetId;
             questItemDropChance = Mathf.Clamp01(objectiveDropChance);
         }
@@ -56,9 +53,9 @@ namespace ProjectGenesis.Gameplay
 
             hasDropped = true;
 
-            if (item != null && Random.value <= itemDropChance)
+            if (lootTable != null && lootTable.TryRoll(Random.value, out LootTableEntry regularLoot))
             {
-                SpawnRegularItem();
+                SpawnRegularItem(regularLoot.Item);
             }
 
             QuestLog questLog = FindFirstObjectByType<QuestLog>();
@@ -70,7 +67,7 @@ namespace ProjectGenesis.Gameplay
             }
         }
 
-        private void SpawnRegularItem()
+        private void SpawnRegularItem(ItemDefinition item)
         {
             GameObject pickupObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
             pickupObject.transform.SetPositionAndRotation(

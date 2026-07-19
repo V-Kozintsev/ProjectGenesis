@@ -33,6 +33,7 @@ namespace ProjectGenesis.Tools.Editor
         private const string CombatAreaMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Combat_Area.mat";
         private const string LootMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Loot_Weapon.mat";
         private const string RustySwordPath = "Assets/ProjectGenesis/Data/Items/ITM_RustySword.asset";
+        private const string WolfLootTablePath = "Assets/ProjectGenesis/Data/LootTables/LT_Wolf.asset";
 
         [MenuItem("Project Genesis/Sprint 002/Rebuild Starter Village Blockout")]
         public static void RebuildStarterVillageBlockout()
@@ -76,6 +77,12 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 009/Rebuild Starter Village Loot Tables")]
+        public static void RebuildStarterVillageLootTables()
+        {
+            RebuildStarterVillage();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -93,12 +100,13 @@ namespace ProjectGenesis.Tools.Editor
             Material combatAreaMaterial = CreateMaterial(CombatAreaMaterialPath, new Color(0.22f, 0.32f, 0.24f));
             Material lootMaterial = CreateMaterial(LootMaterialPath, new Color(0.92f, 0.62f, 0.16f));
             ItemDefinition rustySword = CreateRustySword();
+            LootTableDefinition wolfLootTable = CreateWolfLootTable(rustySword);
 
             GameObject playerPrefab = CreatePlayerPrefab(playerMaterial, rustySword);
             GameObject wolfPrefab = CreateWolfPrefab(
                 wolfMaterial,
                 targetRingMaterial,
-                rustySword,
+                wolfLootTable,
                 lootMaterial);
 
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -157,7 +165,8 @@ namespace ProjectGenesis.Tools.Editor
                 "Assets/ProjectGenesis/Prefabs/UI",
                 "Assets/ProjectGenesis/Prefabs/World",
                 "Assets/ProjectGenesis/Scenes",
-                "Assets/ProjectGenesis/Data/Items"
+                "Assets/ProjectGenesis/Data/Items",
+                "Assets/ProjectGenesis/Data/LootTables"
             };
 
             foreach (string folder in folders)
@@ -211,6 +220,20 @@ namespace ProjectGenesis.Tools.Editor
             return item;
         }
 
+        private static LootTableDefinition CreateWolfLootTable(ItemDefinition rustySword)
+        {
+            LootTableDefinition lootTable = AssetDatabase.LoadAssetAtPath<LootTableDefinition>(WolfLootTablePath);
+            if (lootTable != null)
+            {
+                return lootTable;
+            }
+
+            lootTable = ScriptableObject.CreateInstance<LootTableDefinition>();
+            lootTable.ConfigureSingleItem(rustySword, 0.1f, LootRarity.Common);
+            AssetDatabase.CreateAsset(lootTable, WolfLootTablePath);
+            return lootTable;
+        }
+
         private static GameObject CreatePlayerPrefab(Material playerMaterial, ItemDefinition rustySword)
         {
             GameObject player = new("PF_Player_Prototype");
@@ -256,7 +279,7 @@ namespace ProjectGenesis.Tools.Editor
         private static GameObject CreateWolfPrefab(
             Material wolfMaterial,
             Material targetRingMaterial,
-            ItemDefinition lootItem,
+            LootTableDefinition lootTable,
             Material lootMaterial)
         {
             GameObject wolf = new("PF_Enemy_Wolf");
@@ -283,9 +306,8 @@ namespace ProjectGenesis.Tools.Editor
             brain.Configure(2.2f, 3.5f, 20, 6f, "wolf");
             EnemyLootDrop lootDrop = wolf.AddComponent<EnemyLootDrop>();
             lootDrop.Configure(
-                lootItem,
+                lootTable,
                 lootMaterial,
-                0.35f,
                 "wolf_tail",
                 0.7f);
 

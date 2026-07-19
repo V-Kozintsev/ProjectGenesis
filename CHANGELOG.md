@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-07-19
+
+- Documented Sprint 009 scope and acceptance criteria.
+- Added reusable `LootTableDefinition` assets with item, rarity, direct chance, no-drop remainder, and one-result-per-roll behavior.
+- Created a shared `LT_Wolf` asset and reduced the `Rusty Sword` chance from 35% to 10%.
+- Changed `EnemyLootDrop` to roll regular world loot from its assigned table while keeping quest-trophy rolls separate.
+- Updated the starter-village builder so an existing loot table and later Inspector tuning are preserved during rebuilds.
+- Added deterministic table validation and a fixed-seed 100,000-roll simulation; the configured table produced a 9.86% observed rate.
+- Rebuilt the starter village and verified a clean Play Mode startup with the existing saved profile.
+- Kept Sprint 009 scoped away from guaranteed drops, pity counters, economy systems, randomized stats, final loot visuals, and server authority.
+
 ## 2026-07-18
 
 - Documented Sprint 008 scope and acceptance criteria.

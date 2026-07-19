@@ -135,7 +135,7 @@ Sprint 006 exclusions:
 
 ## Version 0.6 - First Zone
 
-Status: Sprint 008 quest-system foundation implemented on 2026-07-18.
+Status: Sprint 009 loot-table foundation implemented on 2026-07-19.
 
 Goal: the starter area feels like a small world.
 
@@ -178,6 +178,33 @@ Sprint 008 exclusions:
 - no ScriptableObject quest-authoring pipeline or content editor;
 - no polished UI art, animation, or audio;
 - no server-authoritative quest service or multiplayer synchronization.
+
+Sprint 009 additions:
+
+- reusable ScriptableObject loot tables with direct per-entry chances and a no-drop remainder;
+- shared wolf loot configuration editable from the Inspector;
+- rusty-sword drop chance reduced from 35% to 10%;
+- regular equipment rolls kept separate from conditional quest-trophy progress;
+- deterministic boundary validation and a fixed-seed 100,000-roll simulation;
+- scene rebuilding that preserves existing loot-table tuning.
+
+Sprint 009 exclusions:
+
+- no guaranteed first weapon, pity counter, or personal loot ownership;
+- no currency, vendors, trading, selling, or server economy;
+- no random affixes, item levels, crafting, rarity presentation, or final loot art;
+- no selectable inventory grid or individual item-instance identity;
+- no final rarity-to-drop-rate rules or final economy balancing;
+- no centralized spawn authoring or final respawn/population balancing;
+- no server-authoritative loot rolls or multiplayer synchronization.
+
+Post-Sprint 009 backlog decisions:
+
+- add explicit inventory-slot selection when different copies can have meaningfully different properties;
+- introduce stable item instances before random stats, durability, binding, selling, or trading;
+- move enemy population and respawn timing into reusable spawn data instead of relying on scene-only tuning;
+- allow sub-10% and sub-1% loot rates, but balance them from expected kills per reward, time-to-kill, quest rewards, economy, and player frustration rather than treating 10% as a minimum;
+- consider guaranteed starter rewards or a pity rule separately from ordinary rare drops.
 
 ## Version 1.0 - Vertical Slice
 

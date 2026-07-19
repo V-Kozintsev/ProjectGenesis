@@ -24,6 +24,7 @@ Assets/
       Classes/
       Enemies/
       Items/
+      LootTables/
       Quests/
       Races/
       Skills/
@@ -53,6 +54,7 @@ Contains ScriptableObjects and serializable definitions.
 Examples:
 
 - ItemDefinition;
+- LootTableDefinition;
 - EnemyDefinition;
 - QuestDefinition;
 - ClassDefinition;
