@@ -17,6 +17,7 @@ namespace ProjectGenesis.Gameplay
 
         public float RespawnDelay => respawnDelay;
         public EnemyTerritory Territory => territory;
+        public GameObject EnemyPrefab => enemyPrefab;
 
         public void Configure(
             GameObject prefab,
@@ -52,7 +53,7 @@ namespace ProjectGenesis.Gameplay
             }
 
             GameObject instance = Instantiate(enemyPrefab, transform.position, transform.rotation);
-            instance.name = $"Enemy_YoungWolf_{name}";
+            instance.name = $"{enemyPrefab.name}_{name}";
             currentEnemy = instance.GetComponent<EnemyBrain>();
 
             if (currentEnemy == null)

@@ -2,6 +2,12 @@
 
 ## 2026-07-19
 
+- Documented Sprint 014 scope and acceptance criteria.
+- Added a distinct reusable level-2 forest-boar prefab with authored health, combat, movement, recovery, and experience values.
+- Replaced the northern wolf spawn with one boar while keeping the combat-area population at three enemies.
+- Reused shared enemy AI, territory, selection, combat, recovery, death, cleanup, respawn, and level-scaled experience behavior.
+- Kept boars out of the wolf loot table and wolf-tail quest progress.
+- Added deterministic validation for boar prefab defaults and the two-wolf, one-boar scene population.
 - Documented Sprint 013 scope and acceptance criteria.
 - Added Inspector-authored enemy display names, levels, and base experience rewards.
 - Displayed enemy level in the selected-target panel.

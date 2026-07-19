@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 013 enemy levels and experience scaling are implemented: target panels show enemy levels, and kill experience responds to the difference between enemy and player level.
+Sprint 014 first enemy variety is implemented: the northern combat area now contains two young wolves and one stronger level-2 forest boar using the shared combat and AI systems.
 
 ## Prototype Controls
 
@@ -23,6 +23,7 @@ Sprint 013 enemy levels and experience scaling are implemented: target panels sh
 - Player and selected-enemy health bars visibly shrink on damage and grow during recovery.
 - A level 1 hero receives the young wolf's full 20 base experience. The same level 1 wolf awards 15 experience at player level 2, 10 at level 3, 5 at level 4, and 2 at level 5. Its body disappears after six seconds and its spawner creates a new wolf after twelve seconds.
 - Selected enemies show their authored level beside their name. Enemy level and base experience are editable on `EnemyBrain`; weaker-enemy penalties and stronger-enemy bonuses are editable on `PlayerProgression`.
+- The northern spawn point creates a level-2 `Forest Boar` with 60 health and 30 base experience. It does not drop wolf loot or advance the wolf-tail quest.
 - If the player dies, the character loses 10% of the current level requirement with a minimum loss of 10 experience, then briefly disappears and returns at the village spawn point with full health.
 - Death-loss values are editable on `PlayerProgression` in the player prefab. Loss can cross into the previous level, but the character never falls below level 1; inventory, equipment, and quests are preserved.
 - A retreating wolf keeps its remaining health. Its leash measures how far the wolf itself has travelled from home, so it visibly pursues before returning. It can be re-engaged while returning by approaching inside its leash. At home it waits five seconds, then restores 3 health every second. It still attacks nearby players while recovering, and every new hit restarts the five-second healing delay.
@@ -88,6 +89,7 @@ Sprint 013 enemy levels and experience scaling are implemented: target panels sh
 - [28_SPRINT_011.md](28_SPRINT_011.md) - bounded enemy territory, idle roaming, peaceful-village protection, and validation sprint.
 - [29_SPRINT_012.md](29_SPRINT_012.md) - configurable player death experience and level-loss sprint.
 - [30_SPRINT_013.md](30_SPRINT_013.md) - enemy levels, target display, and level-difference experience scaling sprint.
+- [31_SPRINT_014.md](31_SPRINT_014.md) - first forest-boar enemy, mixed population, and shared-system validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

@@ -9,8 +9,10 @@ Every enemy has an authored display name, level, and base experience reward. Lev
 Simple enemies:
 
 - wolf;
-- boar;
+- forest boar;
 - bandit later.
+
+The starter combat area currently uses two level-1 young wolves and one level-2 forest boar. The boar reuses the shared enemy state machine but has independently authored health, combat stats, movement, recovery, and experience. It intentionally has no wolf loot or wolf-tail quest progress.
 
 Behavior:
 

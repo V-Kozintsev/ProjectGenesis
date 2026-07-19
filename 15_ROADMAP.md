@@ -264,6 +264,20 @@ Sprint 013 exclusions:
 - no experience notifications, combat log, animation, audio, or final effects;
 - no server-authoritative reward calculation or anti-cheat validation.
 
+Sprint 014 additions:
+
+- first reusable level-2 forest-boar prefab with distinct blockout and authored stats;
+- one northern boar spawn replacing the third wolf without increasing total enemy density;
+- shared combat, AI, territory, recovery, death, cleanup, respawn, and level-scaled experience;
+- explicit exclusion from wolf loot and wolf-tail quest progress;
+- deterministic validation of the boar prefab and mixed scene population.
+
+Sprint 014 exclusions:
+
+- no boar loot, quests, unique skills, charge attack, sounds, or animations;
+- no automatic stat scaling, packs, social aggro, elites, bosses, or random variants;
+- no additional spawn points, final assets, or server-authoritative spawning.
+
 Post-Sprint 009 backlog decisions:
 
 - add explicit inventory-slot selection when different copies can have meaningfully different properties;
