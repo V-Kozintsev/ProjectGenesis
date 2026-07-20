@@ -65,6 +65,29 @@ namespace ProjectGenesis.Gameplay
                    characterClass.ClassId == classId;
         }
 
+        public bool TrySetCharacterName(string requestedName)
+        {
+            if (!IsAcceptableName(requestedName))
+            {
+                return false;
+            }
+
+            characterName = NormalizeName(requestedName);
+            Changed?.Invoke(this);
+            return true;
+        }
+
+        public static bool IsAcceptableName(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            int length = value.Trim().Length;
+            return length > 0 && length <= MaximumNameLength;
+        }
+
         public static string NormalizeName(string value, string fallback = DefaultCharacterName)
         {
             string normalized = string.IsNullOrWhiteSpace(value)

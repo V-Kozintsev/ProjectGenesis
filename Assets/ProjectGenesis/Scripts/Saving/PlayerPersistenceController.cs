@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using ProjectGenesis.Data;
 using ProjectGenesis.Gameplay;
@@ -26,9 +27,14 @@ namespace ProjectGenesis.Saving
         private IPlayerPersistence persistence;
         private float nextSaveTime;
         private bool isInitialized;
+        private bool hasCreatedCharacter;
+
+        public event Action<PlayerPersistenceController> Initialized;
 
         public IReadOnlyList<CharacterRaceDefinition> RaceCatalog => raceCatalog;
         public IReadOnlyList<CharacterClassDefinition> ClassCatalog => classCatalog;
+        public bool IsInitialized => isInitialized;
+        public bool HasCreatedCharacter => hasCreatedCharacter;
 
         public void Configure(
             ItemDefinition[] availableItems,
@@ -55,11 +61,13 @@ namespace ProjectGenesis.Saving
         {
             if (persistence.TryLoad(out PlayerProfileData profile))
             {
+                hasCreatedCharacter = ResolveHasCreatedCharacter(profile);
                 Restore(profile);
             }
 
             isInitialized = true;
             nextSaveTime = Time.unscaledTime + saveInterval;
+            Initialized?.Invoke(this);
         }
 
         private void Update()
@@ -83,7 +91,7 @@ namespace ProjectGenesis.Saving
             SaveNow();
         }
 
-        private void SaveNow()
+        public void SaveNow()
         {
             if (!isInitialized || persistence == null)
             {
@@ -97,6 +105,7 @@ namespace ProjectGenesis.Saving
         {
             PlayerProfileData profile = new()
             {
+                HasCreatedCharacter = hasCreatedCharacter,
                 CharacterName = identity.CharacterName,
                 RaceId = identity.Race != null ? identity.Race.RaceId : string.Empty,
                 ClassId = identity.CharacterClass != null
@@ -126,6 +135,31 @@ namespace ProjectGenesis.Saving
             }
 
             return profile;
+        }
+
+        public bool TryCreateCharacter(string requestedName)
+        {
+            if (!isInitialized || hasCreatedCharacter ||
+                identity.Race == null || !identity.Race.IsValid ||
+                identity.CharacterClass == null || !identity.CharacterClass.IsValid)
+            {
+                return false;
+            }
+
+            if (!identity.TrySetCharacterName(requestedName))
+            {
+                return false;
+            }
+
+            hasCreatedCharacter = true;
+            SaveNow();
+            return true;
+        }
+
+        public static bool ResolveHasCreatedCharacter(PlayerProfileData profile)
+        {
+            return profile != null &&
+                   (profile.Version < 3 || profile.HasCreatedCharacter);
         }
 
         private void Restore(PlayerProfileData profile)

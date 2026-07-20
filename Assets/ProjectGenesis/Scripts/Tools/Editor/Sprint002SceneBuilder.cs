@@ -118,6 +118,12 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 017/Rebuild Starter Village Character Entry")]
+        public static void RebuildStarterVillageCharacterEntry()
+        {
+            RebuildStarterVillage();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -805,6 +811,7 @@ namespace ProjectGenesis.Tools.Editor
             CreateQuestJournalUi(canvasObject, player.GetComponent<QuestLog>(), dialogueWindow);
             CreateInventoryUi(canvasObject, player);
             CreateSkillHotbar(canvasObject, player.GetComponent<PlayerSkillController>());
+            CreateCharacterEntryUi(canvasObject, player);
 
             return new FirstContactUi(dialogueWindow, promptView);
         }
@@ -1162,6 +1169,194 @@ namespace ProjectGenesis.Tools.Editor
                 skillController);
         }
 
+        private static void CreateCharacterEntryUi(GameObject canvasObject, GameObject player)
+        {
+            GameObject root = CreatePanel(
+                "CharacterEntryOverlay",
+                canvasObject.transform,
+                new Color(0.025f, 0.03f, 0.035f, 0.985f));
+            Stretch(root.GetComponent<RectTransform>(), 0f, 0f, 0f, 0f);
+
+            GameObject creationRoot = CreatePanel(
+                "CharacterCreationMode",
+                root.transform,
+                Color.clear);
+            creationRoot.GetComponent<Image>().raycastTarget = false;
+            Stretch(creationRoot.GetComponent<RectTransform>(), 0f, 0f, 0f, 0f);
+
+            Text creationTitle = CreateText(
+                "Text_CharacterCreationTitle",
+                creationRoot.transform,
+                "Создание персонажа",
+                38,
+                TextAnchor.MiddleCenter);
+            creationTitle.color = new Color(1f, 0.84f, 0.48f);
+            SetRect(
+                creationTitle.GetComponent<RectTransform>(),
+                new Vector2(0f, -170f),
+                new Vector2(760f, 58f),
+                new Vector2(0.5f, 1f));
+
+            Text creationIdentity = CreateText(
+                "Text_CreationIdentity",
+                creationRoot.transform,
+                "Человек · Воин",
+                23,
+                TextAnchor.MiddleCenter);
+            creationIdentity.color = new Color(0.72f, 0.86f, 0.94f);
+            SetRect(
+                creationIdentity.GetComponent<RectTransform>(),
+                new Vector2(0f, -246f),
+                new Vector2(600f, 40f),
+                new Vector2(0.5f, 1f));
+
+            Text nameLabel = CreateText(
+                "Text_CharacterNameLabel",
+                creationRoot.transform,
+                "Имя персонажа",
+                21,
+                TextAnchor.MiddleLeft);
+            nameLabel.color = new Color(0.88f, 0.9f, 0.92f);
+            SetRect(
+                nameLabel.GetComponent<RectTransform>(),
+                new Vector2(0f, -342f),
+                new Vector2(560f, 36f),
+                new Vector2(0.5f, 1f));
+
+            InputField nameInput = CreateInputField(
+                "Input_CharacterName",
+                creationRoot.transform,
+                "Введите имя");
+            nameInput.characterLimit = PlayerIdentity.MaximumNameLength;
+            SetRect(
+                nameInput.GetComponent<RectTransform>(),
+                new Vector2(0f, -386f),
+                new Vector2(560f, 62f),
+                new Vector2(0.5f, 1f));
+
+            Button createButton = CreateButton(
+                "Button_CreateCharacter",
+                creationRoot.transform,
+                "Создать персонажа");
+            SetRect(
+                createButton.GetComponent<RectTransform>(),
+                new Vector2(0f, -492f),
+                new Vector2(300f, 60f),
+                new Vector2(0.5f, 1f));
+
+            Text creationFeedback = CreateText(
+                "Text_CharacterCreationFeedback",
+                creationRoot.transform,
+                string.Empty,
+                19,
+                TextAnchor.MiddleCenter);
+            creationFeedback.color = new Color(1f, 0.58f, 0.45f);
+            SetRect(
+                creationFeedback.GetComponent<RectTransform>(),
+                new Vector2(0f, -568f),
+                new Vector2(620f, 40f),
+                new Vector2(0.5f, 1f));
+
+            GameObject selectionRoot = CreatePanel(
+                "CharacterSelectionMode",
+                root.transform,
+                Color.clear);
+            selectionRoot.GetComponent<Image>().raycastTarget = false;
+            Stretch(selectionRoot.GetComponent<RectTransform>(), 0f, 0f, 0f, 0f);
+
+            Text selectionTitle = CreateText(
+                "Text_CharacterSelectionTitle",
+                selectionRoot.transform,
+                "Выбор персонажа",
+                38,
+                TextAnchor.MiddleCenter);
+            selectionTitle.color = new Color(1f, 0.84f, 0.48f);
+            SetRect(
+                selectionTitle.GetComponent<RectTransform>(),
+                new Vector2(0f, -190f),
+                new Vector2(760f, 58f),
+                new Vector2(0.5f, 1f));
+
+            Text selectedName = CreateText(
+                "Text_SelectedCharacterName",
+                selectionRoot.transform,
+                PlayerIdentity.DefaultCharacterName,
+                32,
+                TextAnchor.MiddleCenter);
+            selectedName.color = new Color(0.96f, 0.96f, 0.93f);
+            SetRect(
+                selectedName.GetComponent<RectTransform>(),
+                new Vector2(0f, -314f),
+                new Vector2(680f, 50f),
+                new Vector2(0.5f, 1f));
+
+            Text selectedIdentity = CreateText(
+                "Text_SelectedCharacterIdentity",
+                selectionRoot.transform,
+                "Человек · Воин",
+                23,
+                TextAnchor.MiddleCenter);
+            selectedIdentity.color = new Color(0.72f, 0.86f, 0.94f);
+            SetRect(
+                selectedIdentity.GetComponent<RectTransform>(),
+                new Vector2(0f, -376f),
+                new Vector2(620f, 40f),
+                new Vector2(0.5f, 1f));
+
+            Text selectedLevel = CreateText(
+                "Text_SelectedCharacterLevel",
+                selectionRoot.transform,
+                "Уровень 1",
+                21,
+                TextAnchor.MiddleCenter);
+            selectedLevel.color = new Color(0.84f, 0.86f, 0.88f);
+            SetRect(
+                selectedLevel.GetComponent<RectTransform>(),
+                new Vector2(0f, -430f),
+                new Vector2(400f, 38f),
+                new Vector2(0.5f, 1f));
+
+            Button playButton = CreateButton(
+                "Button_EnterCharacter",
+                selectionRoot.transform,
+                "Играть");
+            SetRect(
+                playButton.GetComponent<RectTransform>(),
+                new Vector2(0f, -518f),
+                new Vector2(260f, 60f),
+                new Vector2(0.5f, 1f));
+
+            MonoBehaviour[] gameplayBehaviours =
+            {
+                player.GetComponent<PlayerController>(),
+                player.GetComponent<PlayerInteractionController>(),
+                player.GetComponent<PlayerCombatController>(),
+                player.GetComponent<PlayerSkillController>(),
+                player.GetComponent<PlayerLootController>(),
+                canvasObject.GetComponent<InventoryView>(),
+                canvasObject.GetComponent<QuestJournalView>(),
+                canvasObject.GetComponent<SkillHotbarView>()
+            };
+
+            CharacterEntryView entryView = canvasObject.AddComponent<CharacterEntryView>();
+            entryView.Initialize(
+                root,
+                creationRoot,
+                selectionRoot,
+                nameInput,
+                createButton,
+                playButton,
+                creationFeedback,
+                selectedName,
+                selectedIdentity,
+                selectedLevel,
+                player.GetComponent<PlayerPersistenceController>(),
+                player.GetComponent<PlayerIdentity>(),
+                player.GetComponent<PlayerProgression>(),
+                gameplayBehaviours);
+            root.SetActive(true);
+        }
+
         private static void CreateCombatHud(
             GameObject canvasObject,
             GameObject player,
@@ -1390,6 +1585,37 @@ namespace ProjectGenesis.Tools.Editor
             labelText.color = Color.white;
             Stretch(labelText.GetComponent<RectTransform>(), 8f, 4f, 8f, 4f);
             return button;
+        }
+
+        private static InputField CreateInputField(string name, Transform parent, string placeholderValue)
+        {
+            GameObject inputObject = CreatePanel(name, parent, new Color(0.08f, 0.1f, 0.12f, 1f));
+            InputField input = inputObject.AddComponent<InputField>();
+            input.targetGraphic = inputObject.GetComponent<Image>();
+            input.lineType = InputField.LineType.SingleLine;
+
+            Text valueText = CreateText(
+                "Text_Value",
+                inputObject.transform,
+                string.Empty,
+                23,
+                TextAnchor.MiddleLeft);
+            valueText.color = Color.white;
+            valueText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            Stretch(valueText.GetComponent<RectTransform>(), 16f, 6f, 16f, 6f);
+
+            Text placeholder = CreateText(
+                "Text_Placeholder",
+                inputObject.transform,
+                placeholderValue,
+                23,
+                TextAnchor.MiddleLeft);
+            placeholder.color = new Color(0.55f, 0.6f, 0.64f);
+            Stretch(placeholder.GetComponent<RectTransform>(), 16f, 6f, 16f, 6f);
+
+            input.textComponent = valueText;
+            input.placeholder = placeholder;
+            return input;
         }
 
         private static void SetRect(RectTransform rect, Vector2 anchoredPosition, Vector2 size, Vector2 anchor)

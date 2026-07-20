@@ -2,7 +2,7 @@
 
 ## Current Direction
 
-Sprint 016 Character Identity is complete. The next proposed implementation is **Sprint 017: Character Creation And Selection**.
+Sprint 017 Character Creation And Selection is complete. The next proposed implementation is **Character Stats**.
 
 This file preserves completed milestone history and the broad delivery order. The user-facing Russian plan and current dependency decisions live in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md). A future feature listed here is not permission to implement it before its dependencies or current priority.
 
@@ -313,6 +313,20 @@ Sprint 016 exclusions:
 - no class stat bonuses, weapon-based skill scaling, or new combat content;
 - no final character models, equipment visuals, animation, sound, or UI art;
 - no accounts, server, multiplayer, or networked persistence.
+
+Sprint 017 planned additions:
+
+- version-3 local profile lifecycle with explicit first-character creation state;
+- one editable character name with the currently authored human race and warrior class;
+- a blocking creation overlay for new profiles and a selection overlay for existing profiles;
+- disabled gameplay input until the player selects the character and presses `Играть`;
+- deterministic validation of lifecycle compatibility, name rules, scene wiring, and preserved systems.
+
+Sprint 017 exclusions:
+
+- no multiple character slots, deletion, additional races, classes, or appearance customization;
+- no class bonuses, character-stat screen, or weapon-based Heavy Strike scaling;
+- no separate account or character scenes, final UI art, server, multiplayer, or networked persistence.
 
 Post-Sprint 009 backlog decisions:
 

@@ -76,15 +76,17 @@ namespace ProjectGenesis.Tools.Editor
 
         private static void ValidateProfileCompatibility()
         {
-            Require(PlayerProfileData.CurrentVersion == 2,
-                "Current local profile version must be 2.");
+            Require(PlayerProfileData.CurrentVersion == 3,
+                "Current local profile version must be 3.");
             Require(LocalJsonPlayerPersistence.IsSupportedVersion(1),
                 "Existing version-1 profiles must remain supported.");
             Require(LocalJsonPlayerPersistence.IsSupportedVersion(2),
-                "Current version-2 profiles must be supported.");
+                "Version-2 identity profiles must remain supported.");
+            Require(LocalJsonPlayerPersistence.IsSupportedVersion(3),
+                "Current version-3 profiles must be supported.");
             Require(!LocalJsonPlayerPersistence.IsSupportedVersion(0),
                 "Invalid version 0 must be rejected.");
-            Require(!LocalJsonPlayerPersistence.IsSupportedVersion(3),
+            Require(!LocalJsonPlayerPersistence.IsSupportedVersion(4),
                 "Unknown future profile versions must be rejected.");
 
             PlayerProfileData legacyProfile = JsonUtility.FromJson<PlayerProfileData>(

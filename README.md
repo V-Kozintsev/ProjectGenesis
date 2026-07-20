@@ -4,13 +4,14 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 016 Character Identity is complete: the existing player has reusable race and class data, a persistent name, and minimal identity feedback without a character-creation screen.
+Sprint 017 Character Creation And Selection is complete: a new local profile creates its first named human warrior, while an existing profile selects that character before entering the starter village.
 
-The next proposed implementation is Sprint 017 Character Creation And Selection. The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
+The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
 
 ## Prototype Controls
 
 - Open `Assets/ProjectGenesis/Scenes/StarterVillage.unity` before entering Play mode.
+- A new local profile opens character creation first. Enter a name, press `Создать персонажа`, review the created human warrior, then press `Играть`; later sessions begin at character selection.
 - Left-click the ground to move the character. This is the primary control style, inspired by classic point-and-click MMORPGs such as Lineage 2.
 - Click movement uses NavMesh navigation, so the character routes around simple obstacles and ignores unreachable points.
 - Hold the right mouse button and move the mouse to rotate the camera horizontally and vertically. A short right-click returns it behind the character.
@@ -97,6 +98,7 @@ The next proposed implementation is Sprint 017 Character Creation And Selection.
 - [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md) - current Russian development plan, priorities, seamless-world direction, and task-handoff policy.
 - [33_SPRINT_015.md](33_SPRINT_015.md) - skills foundation, Heavy Strike, hotbar, cooldown, and validation sprint.
 - [34_SPRINT_016.md](34_SPRINT_016.md) - persistent character name, race, class, and compatibility-validation sprint.
+- [35_SPRINT_017.md](35_SPRINT_017.md) - first-character creation, local selection, gameplay gating, and lifecycle-validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

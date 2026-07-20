@@ -2,6 +2,12 @@
 
 ## 2026-07-20
 
+- Accepted Sprint 017 after deterministic validation and the user's Play Mode checks for creation, selection, persisted identity, and persisted level.
+- Recorded stricter fantasy-character naming rules as a separate pre-online hardening task.
+- Started Sprint 017 Character Creation And Selection with documented scope and acceptance criteria.
+- Added profile version 3 with explicit first-character creation state and compatibility for version-1 and version-2 profiles.
+- Added a blocking local creation and selection flow for the first named human warrior, with gameplay input disabled until `Играть` is pressed.
+- Added starter-village builder wiring and deterministic validation for lifecycle rules, name rules, scene wiring, and preserved skill and identity systems.
 - Accepted Sprint 016 after Unity compilation, deterministic validators, and the user's Play Mode visual check.
 - Set Sprint 017 Character Creation And Selection as the next proposed implementation step.
 - Documented Sprint 016 Character Identity scope and acceptance criteria.

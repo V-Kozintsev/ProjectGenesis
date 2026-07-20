@@ -28,6 +28,7 @@ sysinfo.txt
 
 # Visual Studio / Rider / VS Code
 .vs/
+.vsconfig
 .idea/
 .vscode/
 *.DotSettings.user
@@ -41,4 +42,3 @@ desktop.ini
 *.apk
 *.aab
 *.unitypackage
-
