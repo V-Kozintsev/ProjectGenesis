@@ -23,7 +23,7 @@ namespace ProjectGenesis.Saving
 
                 string json = File.ReadAllText(ProfilePath);
                 profile = JsonUtility.FromJson<PlayerProfileData>(json);
-                return profile != null && profile.Version == 1;
+                return profile != null && IsSupportedVersion(profile.Version);
             }
             catch (Exception exception)
             {
@@ -42,6 +42,7 @@ namespace ProjectGenesis.Saving
 
             try
             {
+                profile.Version = PlayerProfileData.CurrentVersion;
                 string directory = Path.GetDirectoryName(ProfilePath);
                 if (!string.IsNullOrEmpty(directory))
                 {
@@ -89,6 +90,11 @@ namespace ProjectGenesis.Saving
                 Debug.LogWarning($"Could not clear the local prototype profile: {exception.Message}");
                 return false;
             }
+        }
+
+        public static bool IsSupportedVersion(int version)
+        {
+            return version >= 1 && version <= PlayerProfileData.CurrentVersion;
         }
     }
 }

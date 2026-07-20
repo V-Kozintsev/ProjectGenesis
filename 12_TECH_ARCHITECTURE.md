@@ -98,6 +98,7 @@ Enemy prefabs compose the shared `EnemyBrain`, `Health`, `HealthRegeneration`, `
 
 Save only stable runtime state:
 
+- character name, race id, and class id;
 - player position;
 - level and experience;
 - equipped items by id;
@@ -108,6 +109,8 @@ Save only stable runtime state:
 Do not serialize entire scene objects.
 
 The current prototype saves automatically through `IPlayerPersistence`. `LocalJsonPlayerPersistence` is an offline development implementation, not the final ownership model. It writes a small versioned profile containing only stable ids and values, while `PlayerPersistenceController` captures and restores Unity runtime components.
+
+Profile version 2 adds character identity while continuing to load version-1 files. Missing identity fields fall back to the authored player-prefab defaults and are written in the current format on the next automatic save.
 
 There is no player-facing save/load button. The intended online flow is automatic, server-authoritative persistence: the server stores character progress and a validated last position, then restores that state after the player logs in again. Replacing local JSON with a server adapter should not require gameplay systems to know where the profile is stored.
 

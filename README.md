@@ -4,9 +4,9 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 015 Skills Foundation is complete: the prototype has reusable active-skill data, one warrior skill, automatic skill approach, cooldown feedback, continued basic autoattacks, and a minimal hotbar without final UI art.
+Sprint 016 Character Identity is complete: the existing player has reusable race and class data, a persistent name, and minimal identity feedback without a character-creation screen.
 
-The next proposed implementation is Sprint 016 Character Identity. The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
+The next proposed implementation is Sprint 017 Character Creation And Selection. The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
 
 ## Prototype Controls
 
@@ -38,6 +38,7 @@ The next proposed implementation is Sprint 016 Character Identity. The Russian d
 - Rebuilding the starter village preserves edits to an existing loot-table asset. Use `Project Genesis > Sprint 009 > Validate Wolf Loot Table` to check the table and run a fixed-seed 100,000-roll simulation.
 - While the Village Elder's quest is active and incomplete, each wolf also has a 70% chance to add a `Wolf Tail` directly to objective progress. Quest trophies do not appear on the ground or occupy normal inventory slots, and progress stops at `5 / 5`.
 - Press `I` or click `Инвентарь [I]` to open the eight-slot inventory.
+- The inventory header shows the current prototype identity: `Путник`, `Человек`, and `Воин`.
 - Click `Надеть` to equip the sword in the main-hand slot and increase attack power from 14 to 18. Click `Снять` to remove the bonus without deleting the item.
 - The camera shortens its distance when a wall or prop blocks the view, then returns to the requested zoom when clear.
 - Click the Village Elder once to select him and show his target panel.
@@ -95,6 +96,7 @@ The next proposed implementation is Sprint 016 Character Identity. The Russian d
 - [31_SPRINT_014.md](31_SPRINT_014.md) - first forest-boar enemy, mixed population, and shared-system validation sprint.
 - [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md) - current Russian development plan, priorities, seamless-world direction, and task-handoff policy.
 - [33_SPRINT_015.md](33_SPRINT_015.md) - skills foundation, Heavy Strike, hotbar, cooldown, and validation sprint.
+- [34_SPRINT_016.md](34_SPRINT_016.md) - persistent character name, race, class, and compatibility-validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

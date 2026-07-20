@@ -7,7 +7,12 @@ namespace ProjectGenesis.Saving
     [Serializable]
     public sealed class PlayerProfileData
     {
-        public int Version = 1;
+        public const int CurrentVersion = 2;
+
+        public int Version = CurrentVersion;
+        public string CharacterName;
+        public string RaceId;
+        public string ClassId;
         public bool HasPosition;
         public float PositionX;
         public float PositionY;

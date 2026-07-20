@@ -37,6 +37,8 @@ namespace ProjectGenesis.Tools.Editor
         private const string RustySwordPath = "Assets/ProjectGenesis/Data/Items/ITM_RustySword.asset";
         private const string WolfLootTablePath = "Assets/ProjectGenesis/Data/LootTables/LT_Wolf.asset";
         private const string HeavyStrikePath = "Assets/ProjectGenesis/Data/Skills/SO_Skill_HeavyStrike.asset";
+        private const string HumanRacePath = "Assets/ProjectGenesis/Data/Races/SO_Race_Human.asset";
+        private const string WarriorClassPath = "Assets/ProjectGenesis/Data/Classes/SO_Class_Warrior.asset";
 
         [MenuItem("Project Genesis/Sprint 002/Rebuild Starter Village Blockout")]
         public static void RebuildStarterVillageBlockout()
@@ -110,6 +112,12 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 016/Rebuild Starter Village Character Identity")]
+        public static void RebuildStarterVillageCharacterIdentity()
+        {
+            RebuildStarterVillage();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -130,8 +138,15 @@ namespace ProjectGenesis.Tools.Editor
             ItemDefinition rustySword = CreateRustySword();
             LootTableDefinition wolfLootTable = CreateWolfLootTable(rustySword);
             SkillDefinition heavyStrike = CreateHeavyStrike();
+            CharacterRaceDefinition humanRace = CreateHumanRace();
+            CharacterClassDefinition warriorClass = CreateWarriorClass();
 
-            GameObject playerPrefab = CreatePlayerPrefab(playerMaterial, rustySword, heavyStrike);
+            GameObject playerPrefab = CreatePlayerPrefab(
+                playerMaterial,
+                rustySword,
+                heavyStrike,
+                humanRace,
+                warriorClass);
             GameObject wolfPrefab = CreateWolfPrefab(
                 wolfMaterial,
                 targetRingMaterial,
@@ -198,7 +213,9 @@ namespace ProjectGenesis.Tools.Editor
                 "Assets/ProjectGenesis/Scenes",
                 "Assets/ProjectGenesis/Data/Items",
                 "Assets/ProjectGenesis/Data/LootTables",
-                "Assets/ProjectGenesis/Data/Skills"
+                "Assets/ProjectGenesis/Data/Skills",
+                "Assets/ProjectGenesis/Data/Races",
+                "Assets/ProjectGenesis/Data/Classes"
             };
 
             foreach (string folder in folders)
@@ -287,10 +304,42 @@ namespace ProjectGenesis.Tools.Editor
             return skill;
         }
 
+        private static CharacterRaceDefinition CreateHumanRace()
+        {
+            CharacterRaceDefinition race =
+                AssetDatabase.LoadAssetAtPath<CharacterRaceDefinition>(HumanRacePath);
+            if (race == null)
+            {
+                race = ScriptableObject.CreateInstance<CharacterRaceDefinition>();
+                AssetDatabase.CreateAsset(race, HumanRacePath);
+            }
+
+            race.Configure("race.human", "Человек");
+            EditorUtility.SetDirty(race);
+            return race;
+        }
+
+        private static CharacterClassDefinition CreateWarriorClass()
+        {
+            CharacterClassDefinition characterClass =
+                AssetDatabase.LoadAssetAtPath<CharacterClassDefinition>(WarriorClassPath);
+            if (characterClass == null)
+            {
+                characterClass = ScriptableObject.CreateInstance<CharacterClassDefinition>();
+                AssetDatabase.CreateAsset(characterClass, WarriorClassPath);
+            }
+
+            characterClass.Configure("class.warrior", "Воин");
+            EditorUtility.SetDirty(characterClass);
+            return characterClass;
+        }
+
         private static GameObject CreatePlayerPrefab(
             Material playerMaterial,
             ItemDefinition rustySword,
-            SkillDefinition heavyStrike)
+            SkillDefinition heavyStrike,
+            CharacterRaceDefinition humanRace,
+            CharacterClassDefinition warriorClass)
         {
             GameObject player = new("PF_Player_Prototype");
             player.transform.position = Vector3.zero;
@@ -318,8 +367,13 @@ namespace ProjectGenesis.Tools.Editor
             player.AddComponent<PlayerInventory>();
             player.AddComponent<PlayerEquipment>();
             player.AddComponent<PlayerLootController>();
+            PlayerIdentity identity = player.AddComponent<PlayerIdentity>();
+            identity.Configure(PlayerIdentity.DefaultCharacterName, humanRace, warriorClass);
             PlayerPersistenceController persistence = player.AddComponent<PlayerPersistenceController>();
-            persistence.Configure(new[] { rustySword });
+            persistence.Configure(
+                new[] { rustySword },
+                new[] { humanRace },
+                new[] { warriorClass });
             PlayerCombatController combatController = player.AddComponent<PlayerCombatController>();
             PlayerSkillController skillController = player.AddComponent<PlayerSkillController>();
             skillController.ConfigureQuickSlots(new[] { heavyStrike });
@@ -962,7 +1016,7 @@ namespace ProjectGenesis.Tools.Editor
             SetRect(
                 window.GetComponent<RectTransform>(),
                 new Vector2(-28f, 0f),
-                new Vector2(520f, 560f),
+                new Vector2(520f, 640f),
                 new Vector2(1f, 0.5f));
 
             Text title = CreateText("Text_InventoryTitle", window.transform, "Инвентарь", 30, TextAnchor.UpperLeft);
@@ -973,29 +1027,55 @@ namespace ProjectGenesis.Tools.Editor
             closeButton.GetComponent<Image>().color = new Color(0.28f, 0.1f, 0.09f, 1f);
             SetRect(closeButton.GetComponent<RectTransform>(), new Vector2(-18f, -18f), new Vector2(38f, 36f), new Vector2(1f, 1f));
 
+            Text characterNameText = CreateText(
+                "Text_CharacterName",
+                window.transform,
+                PlayerIdentity.DefaultCharacterName,
+                24,
+                TextAnchor.UpperLeft);
+            characterNameText.color = new Color(0.95f, 0.95f, 0.92f);
+            SetRect(
+                characterNameText.GetComponent<RectTransform>(),
+                new Vector2(24f, -76f),
+                new Vector2(468f, 34f),
+                new Vector2(0f, 1f));
+
+            Text identityDetailsText = CreateText(
+                "Text_CharacterIdentity",
+                window.transform,
+                "Человек · Воин",
+                19,
+                TextAnchor.UpperLeft);
+            identityDetailsText.color = new Color(0.72f, 0.82f, 0.88f);
+            SetRect(
+                identityDetailsText.GetComponent<RectTransform>(),
+                new Vector2(24f, -112f),
+                new Vector2(468f, 30f),
+                new Vector2(0f, 1f));
+
             Text capacityText = CreateText("Text_InventoryCapacity", window.transform, "Ячейки: 0 / 8", 21, TextAnchor.UpperLeft);
             capacityText.color = new Color(0.82f, 0.88f, 0.92f);
-            SetRect(capacityText.GetComponent<RectTransform>(), new Vector2(24f, -82f), new Vector2(220f, 30f), new Vector2(0f, 1f));
+            SetRect(capacityText.GetComponent<RectTransform>(), new Vector2(24f, -158f), new Vector2(220f, 30f), new Vector2(0f, 1f));
 
             Text attackText = CreateText("Text_AttackPower", window.transform, "Сила атаки: 14", 21, TextAnchor.UpperLeft);
             attackText.color = new Color(1f, 0.72f, 0.48f);
-            SetRect(attackText.GetComponent<RectTransform>(), new Vector2(272f, -82f), new Vector2(220f, 30f), new Vector2(0f, 1f));
+            SetRect(attackText.GetComponent<RectTransform>(), new Vector2(272f, -158f), new Vector2(220f, 30f), new Vector2(0f, 1f));
 
             Text mainHandText = CreateText("Text_MainHand", window.transform, "Оружие: не экипировано", 21, TextAnchor.UpperLeft);
             mainHandText.color = new Color(0.72f, 0.9f, 1f);
-            SetRect(mainHandText.GetComponent<RectTransform>(), new Vector2(24f, -126f), new Vector2(468f, 34f), new Vector2(0f, 1f));
+            SetRect(mainHandText.GetComponent<RectTransform>(), new Vector2(24f, -202f), new Vector2(468f, 34f), new Vector2(0f, 1f));
 
             GameObject divider = CreatePanel("Divider", window.transform, new Color(0.28f, 0.32f, 0.34f, 1f));
             divider.GetComponent<Image>().raycastTarget = false;
-            SetRect(divider.GetComponent<RectTransform>(), new Vector2(24f, -178f), new Vector2(468f, 2f), new Vector2(0f, 1f));
+            SetRect(divider.GetComponent<RectTransform>(), new Vector2(24f, -250f), new Vector2(468f, 2f), new Vector2(0f, 1f));
 
             Text contentsTitle = CreateText("Text_ContentsTitle", window.transform, "Содержимое", 22, TextAnchor.UpperLeft);
             contentsTitle.color = new Color(0.9f, 0.92f, 0.94f);
-            SetRect(contentsTitle.GetComponent<RectTransform>(), new Vector2(24f, -202f), new Vector2(468f, 32f), new Vector2(0f, 1f));
+            SetRect(contentsTitle.GetComponent<RectTransform>(), new Vector2(24f, -274f), new Vector2(468f, 32f), new Vector2(0f, 1f));
 
             Text itemNameText = CreateText("Text_ItemName", window.transform, "Инвентарь пуст", 24, TextAnchor.UpperLeft);
             itemNameText.color = new Color(1f, 0.82f, 0.42f);
-            SetRect(itemNameText.GetComponent<RectTransform>(), new Vector2(24f, -254f), new Vector2(468f, 36f), new Vector2(0f, 1f));
+            SetRect(itemNameText.GetComponent<RectTransform>(), new Vector2(24f, -326f), new Vector2(468f, 36f), new Vector2(0f, 1f));
 
             Text itemDetailsText = CreateText(
                 "Text_ItemDetails",
@@ -1005,7 +1085,7 @@ namespace ProjectGenesis.Tools.Editor
                 TextAnchor.UpperLeft);
             itemDetailsText.color = new Color(0.82f, 0.84f, 0.82f);
             itemDetailsText.lineSpacing = 1.1f;
-            SetRect(itemDetailsText.GetComponent<RectTransform>(), new Vector2(24f, -302f), new Vector2(468f, 80f), new Vector2(0f, 1f));
+            SetRect(itemDetailsText.GetComponent<RectTransform>(), new Vector2(24f, -374f), new Vector2(468f, 80f), new Vector2(0f, 1f));
 
             Button actionButton = CreateButton("Button_ItemAction", window.transform, "Надеть");
             SetRect(actionButton.GetComponent<RectTransform>(), new Vector2(24f, 28f), new Vector2(200f, 58f), new Vector2(0f, 0f));
@@ -1030,6 +1110,12 @@ namespace ProjectGenesis.Tools.Editor
                 player.GetComponent<PlayerInventory>(),
                 player.GetComponent<PlayerEquipment>(),
                 player.GetComponent<CombatStats>());
+
+            CharacterIdentityView identityView = canvasObject.AddComponent<CharacterIdentityView>();
+            identityView.Initialize(
+                characterNameText,
+                identityDetailsText,
+                player.GetComponent<PlayerIdentity>());
             window.SetActive(false);
         }
 

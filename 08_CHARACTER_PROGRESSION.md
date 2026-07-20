@@ -32,6 +32,8 @@ Enemy-kill experience starts from the enemy's authored base reward and is then m
 
 ## Class Growth
 
+The current character-identity foundation records the authored class but does not apply class bonuses yet. Class growth and weapon-based skill scaling belong to the later unified character-stats pass.
+
 Each class should have a simple growth identity:
 
 - Warrior: health and melee power.

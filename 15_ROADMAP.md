@@ -2,7 +2,7 @@
 
 ## Current Direction
 
-Sprint 015 Skills Foundation is complete. The next proposed implementation is **Sprint 016: Character Identity**.
+Sprint 016 Character Identity is complete. The next proposed implementation is **Sprint 017: Character Creation And Selection**.
 
 This file preserves completed milestone history and the broad delivery order. The user-facing Russian plan and current dependency decisions live in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md). A future feature listed here is not permission to implement it before its dependencies or current priority.
 
@@ -298,6 +298,21 @@ Sprint 015 exclusions:
 - no full skill tree, multi-class kits, mana, or other resources;
 - no final models, animations, VFX, sound, icons, or UI art;
 - no character creation, server, multiplayer, or networked persistence.
+
+Sprint 016 planned additions:
+
+- separate reusable race and class definitions with stable ids;
+- one human race, one warrior class, and a default prototype character name;
+- runtime player identity with versioned local persistence and version-1 save compatibility;
+- minimal identity feedback in the existing inventory window;
+- deterministic validation of identity data, prefab wiring, save compatibility, and scene UI.
+
+Sprint 016 exclusions:
+
+- no character creation or selection screen, editable names, additional races, or additional classes;
+- no class stat bonuses, weapon-based skill scaling, or new combat content;
+- no final character models, equipment visuals, animation, sound, or UI art;
+- no accounts, server, multiplayer, or networked persistence.
 
 Post-Sprint 009 backlog decisions:
 

@@ -2,6 +2,13 @@
 
 ## 2026-07-20
 
+- Accepted Sprint 016 after Unity compilation, deterministic validators, and the user's Play Mode visual check.
+- Set Sprint 017 Character Creation And Selection as the next proposed implementation step.
+- Documented Sprint 016 Character Identity scope and acceptance criteria.
+- Added reusable race and class data definitions plus runtime player identity.
+- Added version-2 identity persistence with backward compatibility for version-1 local profiles.
+- Added temporary character name, race, and class feedback to the inventory window.
+- Added Sprint 016 builder wiring and deterministic identity validation.
 - Accepted Sprint 015 after Unity compilation, deterministic validators, and the user's Play Mode checks.
 - Set Sprint 016 Character Identity as the next proposed implementation step.
 - Recorded weapon- and class-based skill scaling as part of the future Character Stats work.
