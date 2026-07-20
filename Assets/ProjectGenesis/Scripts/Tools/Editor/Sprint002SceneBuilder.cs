@@ -36,6 +36,7 @@ namespace ProjectGenesis.Tools.Editor
         private const string LootMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Loot_Weapon.mat";
         private const string RustySwordPath = "Assets/ProjectGenesis/Data/Items/ITM_RustySword.asset";
         private const string WolfLootTablePath = "Assets/ProjectGenesis/Data/LootTables/LT_Wolf.asset";
+        private const string HeavyStrikePath = "Assets/ProjectGenesis/Data/Skills/SO_Skill_HeavyStrike.asset";
 
         [MenuItem("Project Genesis/Sprint 002/Rebuild Starter Village Blockout")]
         public static void RebuildStarterVillageBlockout()
@@ -103,6 +104,12 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 015/Rebuild Starter Village Skills Foundation")]
+        public static void RebuildStarterVillageSkillsFoundation()
+        {
+            RebuildStarterVillage();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -122,8 +129,9 @@ namespace ProjectGenesis.Tools.Editor
             Material lootMaterial = CreateMaterial(LootMaterialPath, new Color(0.92f, 0.62f, 0.16f));
             ItemDefinition rustySword = CreateRustySword();
             LootTableDefinition wolfLootTable = CreateWolfLootTable(rustySword);
+            SkillDefinition heavyStrike = CreateHeavyStrike();
 
-            GameObject playerPrefab = CreatePlayerPrefab(playerMaterial, rustySword);
+            GameObject playerPrefab = CreatePlayerPrefab(playerMaterial, rustySword, heavyStrike);
             GameObject wolfPrefab = CreateWolfPrefab(
                 wolfMaterial,
                 targetRingMaterial,
@@ -189,7 +197,8 @@ namespace ProjectGenesis.Tools.Editor
                 "Assets/ProjectGenesis/Prefabs/World",
                 "Assets/ProjectGenesis/Scenes",
                 "Assets/ProjectGenesis/Data/Items",
-                "Assets/ProjectGenesis/Data/LootTables"
+                "Assets/ProjectGenesis/Data/LootTables",
+                "Assets/ProjectGenesis/Data/Skills"
             };
 
             foreach (string folder in folders)
@@ -257,7 +266,31 @@ namespace ProjectGenesis.Tools.Editor
             return lootTable;
         }
 
-        private static GameObject CreatePlayerPrefab(Material playerMaterial, ItemDefinition rustySword)
+        private static SkillDefinition CreateHeavyStrike()
+        {
+            SkillDefinition skill = AssetDatabase.LoadAssetAtPath<SkillDefinition>(HeavyStrikePath);
+            if (skill == null)
+            {
+                skill = ScriptableObject.CreateInstance<SkillDefinition>();
+                AssetDatabase.CreateAsset(skill, HeavyStrikePath);
+            }
+
+            skill.Configure(
+                "warrior.heavy_strike",
+                "Heavy Strike",
+                SkillClassRequirement.Warrior,
+                SkillTargetType.Enemy,
+                22,
+                1.55f,
+                4f);
+            EditorUtility.SetDirty(skill);
+            return skill;
+        }
+
+        private static GameObject CreatePlayerPrefab(
+            Material playerMaterial,
+            ItemDefinition rustySword,
+            SkillDefinition heavyStrike)
         {
             GameObject player = new("PF_Player_Prototype");
             player.transform.position = Vector3.zero;
@@ -288,6 +321,8 @@ namespace ProjectGenesis.Tools.Editor
             PlayerPersistenceController persistence = player.AddComponent<PlayerPersistenceController>();
             persistence.Configure(new[] { rustySword });
             PlayerCombatController combatController = player.AddComponent<PlayerCombatController>();
+            PlayerSkillController skillController = player.AddComponent<PlayerSkillController>();
+            skillController.ConfigureQuickSlots(new[] { heavyStrike });
 
             GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             visual.name = "Visual";
@@ -715,6 +750,7 @@ namespace ProjectGenesis.Tools.Editor
             CreateQuestProgressToast(canvasObject, player.GetComponent<QuestLog>());
             CreateQuestJournalUi(canvasObject, player.GetComponent<QuestLog>(), dialogueWindow);
             CreateInventoryUi(canvasObject, player);
+            CreateSkillHotbar(canvasObject, player.GetComponent<PlayerSkillController>());
 
             return new FirstContactUi(dialogueWindow, promptView);
         }
@@ -995,6 +1031,49 @@ namespace ProjectGenesis.Tools.Editor
                 player.GetComponent<PlayerEquipment>(),
                 player.GetComponent<CombatStats>());
             window.SetActive(false);
+        }
+
+        private static void CreateSkillHotbar(GameObject canvasObject, PlayerSkillController skillController)
+        {
+            GameObject root = CreatePanel(
+                "SkillHotbar",
+                canvasObject.transform,
+                new Color(0.035f, 0.045f, 0.05f, 0.9f));
+            root.GetComponent<Image>().raycastTarget = false;
+            SetRect(
+                root.GetComponent<RectTransform>(),
+                new Vector2(0f, 24f),
+                new Vector2(260f, 72f),
+                new Vector2(0.5f, 0f));
+
+            Button heavyStrikeButton = CreateButton("Button_Skill_HeavyStrike", root.transform, "Heavy Strike");
+            SetRect(
+                heavyStrikeButton.GetComponent<RectTransform>(),
+                new Vector2(12f, 12f),
+                new Vector2(236f, 48f),
+                new Vector2(0f, 0f));
+            Text heavyStrikeLabel = heavyStrikeButton.GetComponentInChildren<Text>();
+            heavyStrikeLabel.fontSize = 18;
+
+            Text feedback = CreateText(
+                "Text_SkillFeedback",
+                canvasObject.transform,
+                "Heavy Strike",
+                20,
+                TextAnchor.MiddleCenter);
+            feedback.color = new Color(1f, 0.86f, 0.5f);
+            SetRect(
+                feedback.GetComponent<RectTransform>(),
+                new Vector2(0f, 106f),
+                new Vector2(620f, 34f),
+                new Vector2(0.5f, 0f));
+
+            SkillHotbarView hotbar = canvasObject.AddComponent<SkillHotbarView>();
+            hotbar.Initialize(
+                new[] { heavyStrikeButton },
+                new[] { heavyStrikeLabel },
+                feedback,
+                skillController);
         }
 
         private static void CreateCombatHud(

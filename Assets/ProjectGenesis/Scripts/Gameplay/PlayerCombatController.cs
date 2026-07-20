@@ -144,6 +144,19 @@ namespace ProjectGenesis.Gameplay
             StopAgent();
         }
 
+        public void ResumeCombatAfterSkill()
+        {
+            if (target == null || target.IsDead || IsInputLocked)
+            {
+                return;
+            }
+
+            isCombatActive = true;
+            nextAttackTime = Time.time + stats.AttackInterval;
+            regeneration.SetRegenerationAllowed(false);
+            MoveTowardTarget();
+        }
+
         public void ClearTarget()
         {
             ClearTargetInternal(true);

@@ -23,6 +23,7 @@ namespace ProjectGenesis.Gameplay
         private PlayerInteractionController interactionController;
         private PlayerCombatController combatController;
         private PlayerLootController lootController;
+        private PlayerSkillController skillController;
 
         private void Awake()
         {
@@ -30,6 +31,7 @@ namespace ProjectGenesis.Gameplay
             interactionController = GetComponent<PlayerInteractionController>();
             combatController = GetComponent<PlayerCombatController>();
             lootController = GetComponent<PlayerLootController>();
+            skillController = GetComponent<PlayerSkillController>();
             if (agent == null)
             {
                 agent = gameObject.AddComponent<NavMeshAgent>();
@@ -64,6 +66,7 @@ namespace ProjectGenesis.Gameplay
             if (moveInput.sqrMagnitude > 0.001f)
             {
                 combatController?.StopCombatAction();
+                skillController?.CancelSkillAction();
                 interactionController?.CancelForMovement();
                 lootController?.CancelLootAction();
                 CancelClickMovement();
@@ -125,6 +128,7 @@ namespace ProjectGenesis.Gameplay
             if (clickedEnemy != null)
             {
                 HideDestinationMarker();
+                skillController?.CancelSkillAction();
                 interactionController?.CancelForCombat();
                 lootController?.CancelLootAction();
                 combatController?.HandleEnemyClick(clickedEnemy);
@@ -136,6 +140,7 @@ namespace ProjectGenesis.Gameplay
             {
                 HideDestinationMarker();
                 combatController?.ClearTarget();
+                skillController?.CancelSkillAction();
                 lootController?.CancelLootAction();
                 interactionController?.HandleNpcClick(clickedNpc);
                 return;
@@ -146,6 +151,7 @@ namespace ProjectGenesis.Gameplay
             {
                 HideDestinationMarker();
                 combatController?.StopCombatAction();
+                skillController?.CancelSkillAction();
                 interactionController?.CancelForMovement();
                 lootController?.HandleLootClick(clickedLoot);
                 return;
@@ -177,6 +183,7 @@ namespace ProjectGenesis.Gameplay
             }
 
             combatController?.StopCombatAction();
+            skillController?.CancelSkillAction();
             interactionController?.CancelForMovement();
             lootController?.CancelLootAction();
 
@@ -202,6 +209,7 @@ namespace ProjectGenesis.Gameplay
             }
 
             combatController?.ClearTarget();
+            skillController?.CancelSkillAction();
             interactionController?.ClearSelection();
             lootController?.CancelLootAction();
             HideDestinationMarker();

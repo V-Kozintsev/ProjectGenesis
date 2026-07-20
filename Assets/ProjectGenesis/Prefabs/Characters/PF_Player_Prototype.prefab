@@ -106,6 +106,7 @@ GameObject:
   - component: {fileID: 3380113414659367393}
   - component: {fileID: 1151744357416748806}
   - component: {fileID: 4857155830772707276}
+  - component: {fileID: 8499092032952935784}
   m_Layer: 0
   m_Name: PF_Player_Prototype
   m_TagString: Untagged
@@ -315,3 +316,19 @@ MonoBehaviour:
   maximumTargetDistance: 30
   respawnPoint: {fileID: 0}
   visualRoot: {fileID: 1313147602143778910}
+--- !u!114 &8499092032952935784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5875306266831850917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24421449d0b09dc468b2f48fdf456955, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  quickSlots:
+  - {fileID: 11400000, guid: dbb6011dca8b4264e8a0149d27521d98, type: 2}
+  approachPadding: 0.35
+  maximumTargetDistance: 30

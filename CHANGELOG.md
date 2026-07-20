@@ -1,7 +1,18 @@
 # Changelog
 
+## 2026-07-20
+
+- Accepted Sprint 015 after Unity compilation, deterministic validators, and the user's Play Mode checks.
+- Set Sprint 016 Character Identity as the next proposed implementation step.
+- Recorded weapon- and class-based skill scaling as part of the future Character Stats work.
+
 ## 2026-07-19
 
+- Documented Sprint 015 scope and acceptance criteria.
+- Added reusable active-skill data with a warrior Heavy Strike skill asset.
+- Added selected-target skill execution with NavMesh approach, cooldown tracking, temporary hotbar feedback, and cancellation on movement or competing actions.
+- Continued basic autoattacks against the same living target after Heavy Strike resolves.
+- Updated the starter-village builder and added deterministic Sprint 015 validation for skill data, player wiring, hotbar presence, and preserved enemy population.
 - Replaced the premature cave-entrance Sprint 015 direction with a dependency-based Russian development plan.
 - Set Skills Foundation as the next proposed sprint and separated completed sprint history from future delivery order.
 - Documented seamless connected-world goals, allowed teleport use, and technical gates before building a real cave.

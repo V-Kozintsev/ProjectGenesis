@@ -2,7 +2,7 @@
 
 ## Current Direction
 
-Sprint 014 is complete. The next proposed implementation is **Sprint 015: Skills Foundation**.
+Sprint 015 Skills Foundation is complete. The next proposed implementation is **Sprint 016: Character Identity**.
 
 This file preserves completed milestone history and the broad delivery order. The user-facing Russian plan and current dependency decisions live in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md). A future feature listed here is not permission to implement it before its dependencies or current priority.
 
@@ -283,6 +283,21 @@ Sprint 014 exclusions:
 - no boar loot, quests, unique skills, charge attack, sounds, or animations;
 - no automatic stat scaling, packs, social aggro, elites, bosses, or random variants;
 - no additional spawn points, final assets, or server-authoritative spawning.
+
+Sprint 015 planned additions:
+
+- reusable ScriptableObject skill definitions with future class compatibility;
+- one warrior active skill, Heavy Strike;
+- selected-enemy skill application with NavMesh approach into range;
+- cooldown state and temporary hotbar feedback;
+- deterministic validation of skill data, player wiring, hotbar presence, and preserved enemy population.
+
+Sprint 015 exclusions:
+
+- no cave, new zones, decorative world rebuild, new NPCs, quests, enemies, or items;
+- no full skill tree, multi-class kits, mana, or other resources;
+- no final models, animations, VFX, sound, icons, or UI art;
+- no character creation, server, multiplayer, or networked persistence.
 
 Post-Sprint 009 backlog decisions:
 

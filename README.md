@@ -4,9 +4,9 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 014 first enemy variety is implemented: the northern combat area now contains two young wolves and one stronger level-2 forest boar using the shared combat and AI systems.
+Sprint 015 Skills Foundation is complete: the prototype has reusable active-skill data, one warrior skill, automatic skill approach, cooldown feedback, continued basic autoattacks, and a minimal hotbar without final UI art.
 
-The next proposed implementation is Sprint 015 Skills Foundation. The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
+The next proposed implementation is Sprint 016 Character Identity. The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
 
 ## Prototype Controls
 
@@ -19,6 +19,7 @@ The next proposed implementation is Sprint 015 Skills Foundation. The Russian de
 - Leave the village through the north gate to reach the first combat area. Its three wolves are spread across the zone and return home before they can chase the player back into the village.
 - Idle wolves alternate between short pauses and small NavMesh walks around their spawn points. Their roaming radius and pause range are editable on the wolf prefab.
 - Click a grey wolf once to select it. Click the selected wolf again at any time to run into range and attack automatically; a quick double-click performs both steps.
+- Click `Heavy Strike` on the temporary hotbar to use the first warrior skill on the selected enemy. If the enemy is out of skill range, the character approaches automatically; after the skill, basic autoattacks continue against the same living target. The button shows cooldown seconds while unavailable.
 - Clicking the ground or using WASD stops the current approach or attack but keeps the selected target.
 - Press `Esc`, click the `X` in the target panel, or select another creature to clear or switch the current target.
 - The combat HUD shows player health, selected-enemy health, level, and experience.
@@ -93,6 +94,7 @@ The next proposed implementation is Sprint 015 Skills Foundation. The Russian de
 - [30_SPRINT_013.md](30_SPRINT_013.md) - enemy levels, target display, and level-difference experience scaling sprint.
 - [31_SPRINT_014.md](31_SPRINT_014.md) - first forest-boar enemy, mixed population, and shared-system validation sprint.
 - [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md) - current Russian development plan, priorities, seamless-world direction, and task-handoff policy.
+- [33_SPRINT_015.md](33_SPRINT_015.md) - skills foundation, Heavy Strike, hotbar, cooldown, and validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle
