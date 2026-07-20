@@ -90,6 +90,8 @@ Examples:
 
 `PlayerProgression` owns experience arithmetic in both directions, including death penalties and level-boundary changes. `PlayerCombatController` only decides when one penalty is applied, then continues the existing respawn flow.
 
+`CombatStats` owns attack composition and damage formulas. Base, class, progression, and equipment contributions remain separately readable but produce one total attack power. `PlayerProgression` applies authored class and level growth to `Health` and `CombatStats`; `PlayerEquipment` supplies only the equipped-weapon contribution. `SkillDefinition` stores an attack-power multiplier and player-facing description, and `PlayerSkillController` asks `CombatStats` for the final defense-aware skill damage. `CharacterStatsView` and `SkillTooltipView` only present these runtime values. `DraggableWindow` is a reusable UI adapter attached to window headers and keeps moved prototype windows reachable on screen.
+
 Enemy identity, level, and base experience are authored by `EnemyBrain`. `PlayerProgression` owns the configurable level-difference multiplier because it converts an enemy reward into player progression; fixed quest rewards continue to bypass enemy scaling.
 
 Enemy prefabs compose the shared `EnemyBrain`, `Health`, `HealthRegeneration`, `CombatStats`, and `NavMeshAgent` behavior with independently authored values. Optional reward components such as `EnemyLootDrop` are attached only when that enemy actually participates in those loot or quest rules.

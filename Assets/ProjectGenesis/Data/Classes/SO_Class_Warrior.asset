@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   classId: class.warrior
   displayName: "\u0412\u043E\u0438\u043D"
+  maximumHealthBonus: 10
+  attackPowerBonus: 2

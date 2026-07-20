@@ -32,7 +32,9 @@ Enemy-kill experience starts from the enemy's authored base reward and is then m
 
 ## Class Growth
 
-The current character-identity foundation records the authored class but does not apply class bonuses yet. Class growth and weapon-based skill scaling belong to the later unified character-stats pass.
+The current warrior class contributes 10 maximum health and 2 attack power. The player prefab contributes 90 base health and 12 base attack, preserving the familiar level-1 totals of 100 health and 14 attack. Each level after the first continues to add 10 health and 2 attack.
+
+Heavy Strike scales from total current attack power, so class, level, and equipped-weapon bonuses strengthen it through the same combat formula instead of separate hardcoded damage.
 
 Each class should have a simple growth identity:
 

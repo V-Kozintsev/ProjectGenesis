@@ -33,13 +33,20 @@ Initial stats:
 
 Start simple:
 
-Damage = Attacker Attack Power - Target Defense
+Basic Damage = Attacker Attack Power - Target Defense
 
 Then clamp to a minimum value.
 
+The current Heavy Strike uses the same rule with an authored skill coefficient:
+
+Heavy Strike Damage = round(Attacker Attack Power x 1.7) - Target Defense
+
+Attack Power already includes base, class, level, and equipped-weapon contributions, so equipping a weapon strengthens both basic attacks and Heavy Strike.
+
+The temporary hotbar exposes player-facing skill data on hover: purpose, current damage or attack-power percentage, range, and cooldown. The description comes from the skill asset so future classes can reuse the same tooltip path.
+
 Later additions:
 
-- skill coefficient;
 - random variance;
 - critical hit;
 - armor type;

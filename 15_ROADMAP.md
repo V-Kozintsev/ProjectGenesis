@@ -2,7 +2,7 @@
 
 ## Current Direction
 
-Sprint 017 Character Creation And Selection is complete. The next proposed implementation is **Character Stats**.
+Sprint 018 Character Stats is complete. The next proposed implementation is **Item Instances And Inventory Selection**.
 
 This file preserves completed milestone history and the broad delivery order. The user-facing Russian plan and current dependency decisions live in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md). A future feature listed here is not permission to implement it before its dependencies or current priority.
 
@@ -327,6 +327,21 @@ Sprint 017 exclusions:
 - no multiple character slots, deletion, additional races, classes, or appearance customization;
 - no class bonuses, character-stat screen, or weapon-based Heavy Strike scaling;
 - no separate account or character scenes, final UI art, server, multiplayer, or networked persistence.
+
+Sprint 018 delivered additions:
+
+- authored warrior health and attack bonuses while preserving existing level-1 totals;
+- explicit base, class, level, and equipment attack contributions;
+- Heavy Strike scaling from current attack power and target defense;
+- a temporary character-stats window with health, attack, defense, experience, timing, and skill power;
+- deterministic validation of exact stat composition, damage results, prefab defaults, and scene wiring.
+- movable character, inventory, and quest windows plus a data-driven Heavy Strike hover tooltip.
+
+Sprint 018 exclusions:
+
+- no attributes, distributable points, critical hits, random damage, resistances, or armor types;
+- no mana, rage, stamina, additional classes, skills, equipment slots, enemies, items, quests, or zones;
+- no final models, animations, VFX, sound, icons, UI art, server, multiplayer, or networked persistence.
 
 Post-Sprint 009 backlog decisions:
 

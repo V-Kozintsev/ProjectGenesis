@@ -5,6 +5,7 @@ namespace ProjectGenesis.Gameplay
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Health), typeof(CombatStats))]
+    [RequireComponent(typeof(PlayerIdentity))]
     public sealed class PlayerProgression : MonoBehaviour
     {
         [SerializeField, Min(1)] private int level = 1;
@@ -12,6 +13,7 @@ namespace ProjectGenesis.Gameplay
         [SerializeField, Min(1)] private int maximumLevel = 5;
         [SerializeField, Min(1)] private int baseExperienceRequirement = 100;
         [SerializeField, Min(0)] private int requirementGrowthPerLevel = 50;
+        [SerializeField, Min(1)] private int baseMaximumHealth = 90;
         [SerializeField, Min(0)] private int healthPerLevel = 10;
         [SerializeField, Min(0)] private int attackPowerPerLevel = 2;
 
@@ -27,6 +29,7 @@ namespace ProjectGenesis.Gameplay
 
         private Health health;
         private CombatStats combatStats;
+        private PlayerIdentity identity;
 
         public event Action<PlayerProgression> ExperienceChanged;
         public event Action<PlayerProgression> LevelChanged;
@@ -34,6 +37,13 @@ namespace ProjectGenesis.Gameplay
         public int Level => level;
         public int CurrentExperience => currentExperience;
         public int MaximumLevel => maximumLevel;
+        public int BaseMaximumHealth => baseMaximumHealth;
+        public int ClassHealthBonus => identity != null && identity.CharacterClass != null
+            ? identity.CharacterClass.MaximumHealthBonus
+            : 0;
+        public int ProgressionHealthBonus => Mathf.Max(0, level - 1) * healthPerLevel;
+        public int HealthPerLevel => healthPerLevel;
+        public int AttackPowerPerLevel => attackPowerPerLevel;
         public float DeathExperienceLossRate => deathExperienceLossRate;
         public int MinimumDeathExperienceLoss => minimumDeathExperienceLoss;
         public float LowerLevelPenaltyPerLevel => lowerLevelPenaltyPerLevel;
@@ -47,7 +57,16 @@ namespace ProjectGenesis.Gameplay
         private void Awake()
         {
             CacheDependencies();
-            ApplyLevelBonuses(false);
+            identity.Changed += HandleIdentityChanged;
+            ApplyLevelBonuses(true);
+        }
+
+        private void OnDestroy()
+        {
+            if (identity != null)
+            {
+                identity.Changed -= HandleIdentityChanged;
+            }
         }
 
         public void AddExperience(int amount)
@@ -181,6 +200,16 @@ namespace ProjectGenesis.Gameplay
             maximumEnemyRewardMultiplier = Mathf.Max(1f, maximumRewardMultiplier);
         }
 
+        public void ConfigureGrowth(
+            int startingMaximumHealth,
+            int maximumHealthPerLevel,
+            int powerPerLevel)
+        {
+            baseMaximumHealth = Mathf.Max(1, startingMaximumHealth);
+            healthPerLevel = Mathf.Max(0, maximumHealthPerLevel);
+            attackPowerPerLevel = Mathf.Max(0, powerPerLevel);
+        }
+
         public void RestoreState(int savedLevel, int savedExperience)
         {
             level = Mathf.Clamp(savedLevel, 1, maximumLevel);
@@ -195,14 +224,46 @@ namespace ProjectGenesis.Gameplay
         {
             CacheDependencies();
             int levelsGained = Mathf.Max(0, level - 1);
-            health.SetMaximumHealth(100 + levelsGained * healthPerLevel, restoreHealth);
+            int classHealthBonus = identity.CharacterClass != null
+                ? identity.CharacterClass.MaximumHealthBonus
+                : 0;
+            int classAttackBonus = identity.CharacterClass != null
+                ? identity.CharacterClass.AttackPowerBonus
+                : 0;
+
+            health.SetMaximumHealth(
+                CalculateMaximumHealth(
+                    baseMaximumHealth,
+                    classHealthBonus,
+                    level,
+                    healthPerLevel),
+                restoreHealth);
+            combatStats.SetClassAttackBonus(classAttackBonus);
             combatStats.SetProgressionAttackBonus(levelsGained * attackPowerPerLevel);
+        }
+
+        public static int CalculateMaximumHealth(
+            int baseHealth,
+            int classBonus,
+            int characterLevel,
+            int perLevelBonus)
+        {
+            int levelsGained = Mathf.Max(0, characterLevel - 1);
+            return Mathf.Max(1, baseHealth) +
+                   Mathf.Max(0, classBonus) +
+                   levelsGained * Mathf.Max(0, perLevelBonus);
+        }
+
+        private void HandleIdentityChanged(PlayerIdentity _)
+        {
+            ApplyLevelBonuses(false);
         }
 
         private void CacheDependencies()
         {
             health ??= GetComponent<Health>();
             combatStats ??= GetComponent<CombatStats>();
+            identity ??= GetComponent<PlayerIdentity>();
         }
 
         private int GetExperienceRequirement(int sourceLevel)

@@ -16,6 +16,7 @@ namespace ProjectGenesis.Gameplay
         private float[] nextReadyTimes = Array.Empty<float>();
         private NavMeshAgent agent;
         private Health health;
+        private CombatStats stats;
         private PlayerCombatController combatController;
         private Collider playerCollider;
         private int pendingSlotIndex = -1;
@@ -30,6 +31,7 @@ namespace ProjectGenesis.Gameplay
         {
             agent = GetComponent<NavMeshAgent>();
             health = GetComponent<Health>();
+            stats = GetComponent<CombatStats>();
             combatController = GetComponent<PlayerCombatController>();
             playerCollider = GetComponent<Collider>();
             EnsureCooldownStorage();
@@ -208,10 +210,13 @@ namespace ProjectGenesis.Gameplay
                 return;
             }
 
-            target.ReceiveAttack(combatController, skill.Damage);
+            int damage = stats.CalculateScaledDamageAgainst(
+                target.CombatStats,
+                skill.AttackPowerMultiplier);
+            target.ReceiveAttack(combatController, damage);
             nextReadyTimes[slotIndex] = Time.time + skill.Cooldown;
             CooldownChanged?.Invoke(slotIndex, skill, skill.Cooldown);
-            PublishFeedback($"{skill.DisplayName}: {skill.Damage} урона.");
+            PublishFeedback($"{skill.DisplayName}: {damage} урона.");
             combatController.ResumeCombatAfterSkill();
         }
 

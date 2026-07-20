@@ -124,6 +124,12 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 018/Rebuild Starter Village Character Stats")]
+        public static void RebuildStarterVillageCharacterStats()
+        {
+            RebuildStarterVillage();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -303,9 +309,10 @@ namespace ProjectGenesis.Tools.Editor
                 "Heavy Strike",
                 SkillClassRequirement.Warrior,
                 SkillTargetType.Enemy,
-                22,
+                1.7f,
                 1.55f,
-                4f);
+                4f,
+                "Мощный удар оружием по выбранному врагу.");
             EditorUtility.SetDirty(skill);
             return skill;
         }
@@ -335,7 +342,7 @@ namespace ProjectGenesis.Tools.Editor
                 AssetDatabase.CreateAsset(characterClass, WarriorClassPath);
             }
 
-            characterClass.Configure("class.warrior", "Воин");
+            characterClass.Configure("class.warrior", "Воин", 10, 2);
             EditorUtility.SetDirty(characterClass);
             return characterClass;
         }
@@ -362,19 +369,20 @@ namespace ProjectGenesis.Tools.Editor
 
             player.AddComponent<PlayerController>();
             Health health = player.AddComponent<Health>();
-            health.Configure(100);
+            health.Configure(90);
             HealthRegeneration regeneration = player.AddComponent<HealthRegeneration>();
             regeneration.Configure(8f, 2, 1f, true);
             CombatStats stats = player.AddComponent<CombatStats>();
-            stats.Configure(14, 3, 1.35f, 0.8f);
+            stats.Configure(12, 3, 1.35f, 0.8f);
+            PlayerIdentity identity = player.AddComponent<PlayerIdentity>();
+            identity.Configure(PlayerIdentity.DefaultCharacterName, humanRace, warriorClass);
             PlayerProgression progression = player.AddComponent<PlayerProgression>();
+            progression.ConfigureGrowth(90, 10, 2);
             progression.ConfigureDeathPenalty(0.1f, 10);
             progression.ConfigureEnemyExperienceScaling(0.25f, 0.1f, 0.1f, 1.5f);
             player.AddComponent<PlayerInventory>();
             player.AddComponent<PlayerEquipment>();
             player.AddComponent<PlayerLootController>();
-            PlayerIdentity identity = player.AddComponent<PlayerIdentity>();
-            identity.Configure(PlayerIdentity.DefaultCharacterName, humanRace, warriorClass);
             PlayerPersistenceController persistence = player.AddComponent<PlayerPersistenceController>();
             persistence.Configure(
                 new[] { rustySword },
@@ -810,6 +818,7 @@ namespace ProjectGenesis.Tools.Editor
             CreateQuestProgressToast(canvasObject, player.GetComponent<QuestLog>());
             CreateQuestJournalUi(canvasObject, player.GetComponent<QuestLog>(), dialogueWindow);
             CreateInventoryUi(canvasObject, player);
+            CreateCharacterStatsUi(canvasObject, player);
             CreateSkillHotbar(canvasObject, player.GetComponent<PlayerSkillController>());
             CreateCharacterEntryUi(canvasObject, player);
 
@@ -913,6 +922,7 @@ namespace ProjectGenesis.Tools.Editor
                 new Vector2(-180f, 0f),
                 new Vector2(1020f, 640f),
                 new Vector2(0.5f, 0.5f));
+            CreateWindowDragHandle(window, 950f);
 
             Text header = CreateText("Text_QuestJournalHeader", window.transform, "Журнал заданий", 30, TextAnchor.UpperLeft);
             header.color = new Color(1f, 0.84f, 0.48f);
@@ -1025,6 +1035,7 @@ namespace ProjectGenesis.Tools.Editor
                 new Vector2(-28f, 0f),
                 new Vector2(520f, 640f),
                 new Vector2(1f, 0.5f));
+            CreateWindowDragHandle(window, 450f);
 
             Text title = CreateText("Text_InventoryTitle", window.transform, "Инвентарь", 30, TextAnchor.UpperLeft);
             title.color = new Color(1f, 0.84f, 0.48f);
@@ -1126,6 +1137,184 @@ namespace ProjectGenesis.Tools.Editor
             window.SetActive(false);
         }
 
+        private static void CreateCharacterStatsUi(GameObject canvasObject, GameObject player)
+        {
+            Button openButton = CreateButton(
+                "Button_OpenCharacterStats",
+                canvasObject.transform,
+                "Характеристики [C]");
+            openButton.GetComponent<Image>().color = new Color(0.12f, 0.18f, 0.22f, 0.96f);
+            SetRect(
+                openButton.GetComponent<RectTransform>(),
+                new Vector2(-24f, 160f),
+                new Vector2(220f, 56f),
+                new Vector2(1f, 0f));
+
+            GameObject window = CreatePanel(
+                "CharacterStatsWindow",
+                canvasObject.transform,
+                new Color(0.045f, 0.055f, 0.06f, 0.97f));
+            SetRect(
+                window.GetComponent<RectTransform>(),
+                new Vector2(28f, 0f),
+                new Vector2(520f, 600f),
+                new Vector2(0f, 0.5f));
+            CreateWindowDragHandle(window, 450f);
+
+            Text title = CreateText(
+                "Text_CharacterStatsTitle",
+                window.transform,
+                "Характеристики",
+                30,
+                TextAnchor.UpperLeft);
+            title.color = new Color(1f, 0.84f, 0.48f);
+            SetRect(
+                title.GetComponent<RectTransform>(),
+                new Vector2(24f, -22f),
+                new Vector2(390f, 42f),
+                new Vector2(0f, 1f));
+
+            Button closeButton = CreateButton("Button_CloseCharacterStats", window.transform, "X");
+            closeButton.GetComponent<Image>().color = new Color(0.28f, 0.1f, 0.09f, 1f);
+            SetRect(
+                closeButton.GetComponent<RectTransform>(),
+                new Vector2(-18f, -18f),
+                new Vector2(38f, 36f),
+                new Vector2(1f, 1f));
+
+            Text characterName = CreateText(
+                "Text_StatsCharacterName",
+                window.transform,
+                PlayerIdentity.DefaultCharacterName,
+                26,
+                TextAnchor.UpperLeft);
+            characterName.color = new Color(0.95f, 0.95f, 0.92f);
+            SetRect(
+                characterName.GetComponent<RectTransform>(),
+                new Vector2(24f, -76f),
+                new Vector2(468f, 36f),
+                new Vector2(0f, 1f));
+
+            Text identity = CreateText(
+                "Text_StatsIdentity",
+                window.transform,
+                "Уровень 1 · Человек · Воин",
+                19,
+                TextAnchor.UpperLeft);
+            identity.color = new Color(0.72f, 0.82f, 0.88f);
+            SetRect(
+                identity.GetComponent<RectTransform>(),
+                new Vector2(24f, -114f),
+                new Vector2(468f, 30f),
+                new Vector2(0f, 1f));
+
+            GameObject divider = CreatePanel(
+                "Divider_CharacterStats",
+                window.transform,
+                new Color(0.28f, 0.32f, 0.34f, 1f));
+            divider.GetComponent<Image>().raycastTarget = false;
+            SetRect(
+                divider.GetComponent<RectTransform>(),
+                new Vector2(24f, -158f),
+                new Vector2(468f, 2f),
+                new Vector2(0f, 1f));
+
+            Text experience = CreateText(
+                "Text_StatsExperience",
+                window.transform,
+                "Опыт: 0 / 100",
+                20,
+                TextAnchor.UpperLeft);
+            experience.color = new Color(0.82f, 0.88f, 0.92f);
+            SetRect(experience.GetComponent<RectTransform>(), new Vector2(24f, -184f), new Vector2(468f, 30f), new Vector2(0f, 1f));
+
+            Text health = CreateText(
+                "Text_StatsHealth",
+                window.transform,
+                "Здоровье: 100 / 100",
+                22,
+                TextAnchor.UpperLeft);
+            health.color = new Color(0.48f, 0.9f, 0.58f);
+            SetRect(health.GetComponent<RectTransform>(), new Vector2(24f, -232f), new Vector2(468f, 32f), new Vector2(0f, 1f));
+
+            Text healthBreakdown = CreateText(
+                "Text_StatsHealthBreakdown",
+                window.transform,
+                "Бонусы: класс +10 · уровень +0",
+                18,
+                TextAnchor.UpperLeft);
+            healthBreakdown.color = new Color(0.68f, 0.74f, 0.72f);
+            SetRect(healthBreakdown.GetComponent<RectTransform>(), new Vector2(24f, -266f), new Vector2(468f, 28f), new Vector2(0f, 1f));
+
+            Text attack = CreateText(
+                "Text_StatsAttack",
+                window.transform,
+                "Сила атаки: 14",
+                22,
+                TextAnchor.UpperLeft);
+            attack.color = new Color(1f, 0.72f, 0.48f);
+            SetRect(attack.GetComponent<RectTransform>(), new Vector2(24f, -316f), new Vector2(468f, 32f), new Vector2(0f, 1f));
+
+            Text attackBreakdown = CreateText(
+                "Text_StatsAttackBreakdown",
+                window.transform,
+                "Бонусы: класс +2 · уровень +0 · оружие +0",
+                18,
+                TextAnchor.UpperLeft);
+            attackBreakdown.color = new Color(0.72f, 0.7f, 0.66f);
+            SetRect(attackBreakdown.GetComponent<RectTransform>(), new Vector2(24f, -350f), new Vector2(468f, 28f), new Vector2(0f, 1f));
+
+            Text defense = CreateText(
+                "Text_StatsDefense",
+                window.transform,
+                "Защита: 3",
+                21,
+                TextAnchor.UpperLeft);
+            defense.color = new Color(0.62f, 0.8f, 1f);
+            SetRect(defense.GetComponent<RectTransform>(), new Vector2(24f, -400f), new Vector2(468f, 30f), new Vector2(0f, 1f));
+
+            Text attackTiming = CreateText(
+                "Text_StatsAttackTiming",
+                window.transform,
+                "Скорость атаки: 1 удар каждые 0,8 с",
+                18,
+                TextAnchor.UpperLeft);
+            attackTiming.color = new Color(0.78f, 0.8f, 0.82f);
+            SetRect(attackTiming.GetComponent<RectTransform>(), new Vector2(24f, -442f), new Vector2(468f, 48f), new Vector2(0f, 1f));
+
+            Text skillPower = CreateText(
+                "Text_StatsHeavyStrike",
+                window.transform,
+                "Heavy Strike: усиленный удар (170% силы атаки)",
+                20,
+                TextAnchor.UpperLeft);
+            skillPower.color = new Color(1f, 0.84f, 0.48f);
+            SetRect(skillPower.GetComponent<RectTransform>(), new Vector2(24f, -510f), new Vector2(468f, 52f), new Vector2(0f, 1f));
+
+            CharacterStatsView statsView = canvasObject.AddComponent<CharacterStatsView>();
+            statsView.Initialize(
+                window,
+                openButton,
+                closeButton,
+                characterName,
+                identity,
+                experience,
+                health,
+                healthBreakdown,
+                attack,
+                attackBreakdown,
+                defense,
+                attackTiming,
+                skillPower,
+                player.GetComponent<PlayerIdentity>(),
+                player.GetComponent<PlayerProgression>(),
+                player.GetComponent<Health>(),
+                player.GetComponent<CombatStats>(),
+                player.GetComponent<PlayerCombatController>(),
+                player.GetComponent<PlayerSkillController>());
+            window.SetActive(false);
+        }
+
         private static void CreateSkillHotbar(GameObject canvasObject, PlayerSkillController skillController)
         {
             GameObject root = CreatePanel(
@@ -1167,6 +1356,66 @@ namespace ProjectGenesis.Tools.Editor
                 new[] { heavyStrikeLabel },
                 feedback,
                 skillController);
+
+            GameObject tooltip = CreatePanel(
+                "SkillTooltip",
+                canvasObject.transform,
+                new Color(0.035f, 0.045f, 0.05f, 0.98f));
+            tooltip.GetComponent<Image>().raycastTarget = false;
+            SetRect(
+                tooltip.GetComponent<RectTransform>(),
+                new Vector2(0f, 148f),
+                new Vector2(430f, 196f),
+                new Vector2(0.5f, 0f));
+
+            Text tooltipName = CreateText(
+                "Text_SkillTooltipName",
+                tooltip.transform,
+                "Heavy Strike",
+                23,
+                TextAnchor.UpperLeft);
+            tooltipName.color = new Color(1f, 0.84f, 0.48f);
+            SetRect(tooltipName.GetComponent<RectTransform>(), new Vector2(18f, -14f), new Vector2(394f, 30f), new Vector2(0f, 1f));
+
+            Text tooltipDescription = CreateText(
+                "Text_SkillTooltipDescription",
+                tooltip.transform,
+                "Мощный удар оружием по выбранному врагу.",
+                18,
+                TextAnchor.UpperLeft);
+            tooltipDescription.color = new Color(0.88f, 0.9f, 0.92f);
+            SetRect(tooltipDescription.GetComponent<RectTransform>(), new Vector2(18f, -50f), new Vector2(394f, 48f), new Vector2(0f, 1f));
+
+            Text tooltipDamage = CreateText(
+                "Text_SkillTooltipDamage",
+                tooltip.transform,
+                "Урон: 170% силы атаки",
+                19,
+                TextAnchor.UpperLeft);
+            tooltipDamage.color = new Color(1f, 0.72f, 0.48f);
+            SetRect(tooltipDamage.GetComponent<RectTransform>(), new Vector2(18f, -108f), new Vector2(394f, 28f), new Vector2(0f, 1f));
+
+            Text tooltipDetails = CreateText(
+                "Text_SkillTooltipDetails",
+                tooltip.transform,
+                "Дальность: 1,55 · Перезарядка: 4 с",
+                17,
+                TextAnchor.UpperLeft);
+            tooltipDetails.color = new Color(0.7f, 0.78f, 0.82f);
+            SetRect(tooltipDetails.GetComponent<RectTransform>(), new Vector2(18f, -146f), new Vector2(394f, 28f), new Vector2(0f, 1f));
+
+            SkillTooltipView tooltipView = heavyStrikeButton.gameObject.AddComponent<SkillTooltipView>();
+            tooltipView.Initialize(
+                tooltip,
+                tooltipName,
+                tooltipDescription,
+                tooltipDamage,
+                tooltipDetails,
+                skillController,
+                skillController.GetComponent<PlayerCombatController>(),
+                skillController.GetComponent<CombatStats>(),
+                0);
+            tooltip.SetActive(false);
         }
 
         private static void CreateCharacterEntryUi(GameObject canvasObject, GameObject player)
@@ -1335,7 +1584,8 @@ namespace ProjectGenesis.Tools.Editor
                 player.GetComponent<PlayerLootController>(),
                 canvasObject.GetComponent<InventoryView>(),
                 canvasObject.GetComponent<QuestJournalView>(),
-                canvasObject.GetComponent<SkillHotbarView>()
+                canvasObject.GetComponent<SkillHotbarView>(),
+                canvasObject.GetComponent<CharacterStatsView>()
             };
 
             CharacterEntryView entryView = canvasObject.AddComponent<CharacterEntryView>();
@@ -1616,6 +1866,20 @@ namespace ProjectGenesis.Tools.Editor
             input.textComponent = valueText;
             input.placeholder = placeholder;
             return input;
+        }
+
+        private static void CreateWindowDragHandle(GameObject window, float handleWidth)
+        {
+            GameObject handle = CreatePanel("DragHandle", window.transform, Color.clear);
+            SetRect(
+                handle.GetComponent<RectTransform>(),
+                Vector2.zero,
+                new Vector2(handleWidth, 64f),
+                new Vector2(0f, 1f));
+
+            DraggableWindow draggable = handle.AddComponent<DraggableWindow>();
+            draggable.Initialize(window.GetComponent<RectTransform>());
+            handle.transform.SetAsFirstSibling();
         }
 
         private static void SetRect(RectTransform rect, Vector2 anchoredPosition, Vector2 size, Vector2 anchor)

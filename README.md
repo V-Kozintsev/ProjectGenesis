@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 017 Character Creation And Selection is complete: a new local profile creates its first named human warrior, while an existing profile selects that character before entering the starter village.
+Sprint 018 Character Stats is complete: player health and attack expose readable warrior-class, level, and equipment bonuses, while Heavy Strike scales from the same current attack power as basic attacks. Character, inventory, and quest windows are movable, and the skill hotbar provides a data-driven hover tooltip.
 
 The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
 
@@ -21,6 +21,8 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - Idle wolves alternate between short pauses and small NavMesh walks around their spawn points. Their roaming radius and pause range are editable on the wolf prefab.
 - Click a grey wolf once to select it. Click the selected wolf again at any time to run into range and attack automatically; a quick double-click performs both steps.
 - Click `Heavy Strike` on the temporary hotbar to use the first warrior skill on the selected enemy. If the enemy is out of skill range, the character approaches automatically; after the skill, basic autoattacks continue against the same living target. The button shows cooldown seconds while unavailable.
+- Press `C` or click `Характеристики [C]` to inspect health, attack, defense, experience, attack timing, and Heavy Strike power. Equipping the Rusty Sword raises level-1 attack from 14 to 18 and Heavy Strike damage against the current wolf from 22 to 29. Hover Heavy Strike for its description, damage, range, and cooldown.
+- Drag the title area of the character-stats, inventory, or quest-journal window to move it; the window is kept within reachable screen bounds.
 - Clicking the ground or using WASD stops the current approach or attack but keeps the selected target.
 - Press `Esc`, click the `X` in the target panel, or select another creature to clear or switch the current target.
 - The combat HUD shows player health, selected-enemy health, level, and experience.
@@ -99,6 +101,7 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - [33_SPRINT_015.md](33_SPRINT_015.md) - skills foundation, Heavy Strike, hotbar, cooldown, and validation sprint.
 - [34_SPRINT_016.md](34_SPRINT_016.md) - persistent character name, race, class, and compatibility-validation sprint.
 - [35_SPRINT_017.md](35_SPRINT_017.md) - first-character creation, local selection, gameplay gating, and lifecycle-validation sprint.
+- [36_SPRINT_018.md](36_SPRINT_018.md) - unified character stats, warrior bonuses, weapon-scaled Heavy Strike, stats UI, and validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

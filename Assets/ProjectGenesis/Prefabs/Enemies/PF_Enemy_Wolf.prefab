@@ -250,6 +250,7 @@ MonoBehaviour:
   defense: 1
   attackRange: 1.05
   attackInterval: 1.1
+  classAttackBonus: 0
   equipmentAttackBonus: 0
   progressionAttackBonus: 0
 --- !u!114 &5858290719935994172

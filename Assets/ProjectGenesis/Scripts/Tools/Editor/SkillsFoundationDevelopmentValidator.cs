@@ -35,7 +35,8 @@ namespace ProjectGenesis.Tools.Editor
             Require(skill.ClassRequirement == SkillClassRequirement.Warrior,
                 "Heavy Strike must be authored as a warrior skill.");
             Require(skill.TargetType == SkillTargetType.Enemy, "Heavy Strike must target enemies.");
-            Require(skill.Damage == 22, "Heavy Strike damage must be 22.");
+            Require(Mathf.Approximately(skill.AttackPowerMultiplier, 1.7f),
+                "Heavy Strike must use the current 1.7 attack-power multiplier.");
             Require(Mathf.Approximately(skill.Range, 1.55f), "Heavy Strike range must be 1.55.");
             Require(Mathf.Approximately(skill.Cooldown, 4f), "Heavy Strike cooldown must be 4 seconds.");
         }

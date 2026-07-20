@@ -2,6 +2,14 @@
 
 ## 2026-07-20
 
+- Accepted Sprint 018 after deterministic validation and the user's Play Mode checks for character stats, weapon-scaled Heavy Strike, hover tooltip, and movable windows.
+- Set stable item instances and explicit inventory selection as the proposed Sprint 019 direction.
+- Started Sprint 018 Character Stats with documented scope and acceptance criteria.
+- Added authored warrior health and attack bonuses while preserving the existing level-1 totals.
+- Unified attack composition across base, class, level, and weapon contributions.
+- Changed Heavy Strike from fixed direct damage to a 1.7 current-attack multiplier that respects target defense.
+- Added a temporary live character-stats window and deterministic validation for exact health, attack, and skill results.
+- Simplified player-facing stat explanations, made stats, inventory, and quest windows draggable, and added a data-driven Heavy Strike hover tooltip.
 - Accepted Sprint 017 after deterministic validation and the user's Play Mode checks for creation, selection, persisted identity, and persisted level.
 - Recorded stricter fantasy-character naming rules as a separate pre-online hardening task.
 - Started Sprint 017 Character Creation And Selection with documented scope and acceptance criteria.

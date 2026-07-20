@@ -27,6 +27,8 @@ Owns:
 - current stats;
 - equipment-derived modifiers.
 
+The current player attack total is composed from base, class, level, and equipped-weapon contributions. Player maximum health is composed from base, class, and level contributions. These values remain runtime state; UI reads them but does not recalculate them independently.
+
 Does not own:
 
 - quest definitions;
@@ -87,4 +89,3 @@ Use data assets for:
 - quests;
 - skills;
 - loot tables.
-

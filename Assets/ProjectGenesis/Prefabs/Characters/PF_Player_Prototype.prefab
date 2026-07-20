@@ -100,11 +100,11 @@ GameObject:
   - component: {fileID: 8010310046048321749}
   - component: {fileID: 2647403240327495271}
   - component: {fileID: 4704407190682888797}
+  - component: {fileID: 5695950783252150108}
   - component: {fileID: 779681520609666833}
   - component: {fileID: 743857187644922264}
   - component: {fileID: 7566425608953301210}
   - component: {fileID: 3380113414659367393}
-  - component: {fileID: 5695950783252150108}
   - component: {fileID: 1151744357416748806}
   - component: {fileID: 4857155830772707276}
   - component: {fileID: 8499092032952935784}
@@ -183,8 +183,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65065efd6bdb706478ad6671d4d5a695, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maximumHealth: 100
-  currentHealth: 100
+  maximumHealth: 90
+  currentHealth: 90
 --- !u!114 &2647403240327495271
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,12 +213,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70b8f5a104298804f90f7686f71e730c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackPower: 14
+  attackPower: 12
   defense: 3
   attackRange: 1.35
   attackInterval: 0.8
+  classAttackBonus: 0
   equipmentAttackBonus: 0
   progressionAttackBonus: 0
+--- !u!114 &5695950783252150108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5875306266831850917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8eb9e94a73e22e04d82e207e9006886a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+  race: {fileID: 11400000, guid: b56ed424301d8f24282af072387e2364, type: 2}
+  characterClass: {fileID: 11400000, guid: 7e5916acd0eb54840ba4d18924d9f301, type: 2}
 --- !u!114 &779681520609666833
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -236,6 +252,7 @@ MonoBehaviour:
   maximumLevel: 5
   baseExperienceRequirement: 100
   requirementGrowthPerLevel: 50
+  baseMaximumHealth: 90
   healthPerLevel: 10
   attackPowerPerLevel: 2
   deathExperienceLossRate: 0.1
@@ -285,21 +302,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pickupDistance: 0.85
   maximumClickDistance: 30
---- !u!114 &5695950783252150108
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5875306266831850917}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8eb9e94a73e22e04d82e207e9006886a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  characterName: "\u041F\u0443\u0442\u043D\u0438\u043A"
-  race: {fileID: 11400000, guid: b56ed424301d8f24282af072387e2364, type: 2}
-  characterClass: {fileID: 11400000, guid: 7e5916acd0eb54840ba4d18924d9f301, type: 2}
 --- !u!114 &1151744357416748806
 MonoBehaviour:
   m_ObjectHideFlags: 0

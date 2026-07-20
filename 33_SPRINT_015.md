@@ -53,6 +53,8 @@ Acceptance criteria:
 - Heavy Strike cooldown: 4 seconds;
 - quick slot count: 1.
 
+Sprint 018 replaces the original fixed 22 direct damage with a 1.7 attack-power multiplier. The unarmed level-1 result against the current wolf remains 22, while equipment and levels can now strengthen the skill.
+
 ## Not In This Sprint
 
 - cave, new zones, or decorative world rebuilds;
