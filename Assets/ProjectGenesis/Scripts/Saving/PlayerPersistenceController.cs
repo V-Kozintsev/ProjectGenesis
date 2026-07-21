@@ -31,6 +31,7 @@ namespace ProjectGenesis.Saving
 
         public event Action<PlayerPersistenceController> Initialized;
 
+        public IReadOnlyList<ItemDefinition> ItemCatalog => itemCatalog;
         public IReadOnlyList<CharacterRaceDefinition> RaceCatalog => raceCatalog;
         public IReadOnlyList<CharacterClassDefinition> ClassCatalog => classCatalog;
         public bool IsInitialized => isInitialized;
@@ -113,7 +114,9 @@ namespace ProjectGenesis.Saving
                     : string.Empty,
                 Level = progression.Level,
                 CurrentExperience = progression.CurrentExperience,
-                MainHandItemId = equipment.MainHand != null ? equipment.MainHand.ItemId : string.Empty,
+                MainHandInstanceId = equipment.MainHand != null
+                    ? equipment.MainHand.InstanceId
+                    : string.Empty,
                 Quests = questLog != null ? questLog.CaptureState() : new List<QuestProgressData>()
             };
 
@@ -126,11 +129,15 @@ namespace ProjectGenesis.Saving
                 profile.PositionZ = position.z;
             }
 
-            foreach (ItemDefinition item in inventory.Items)
+            foreach (ItemInstance item in inventory.Items)
             {
-                if (item != null)
+                if (item != null && item.IsValid)
                 {
-                    profile.InventoryItemIds.Add(item.ItemId);
+                    profile.InventoryItems.Add(new ItemInstanceData
+                    {
+                        InstanceId = item.InstanceId,
+                        ItemId = item.ItemId
+                    });
                 }
             }
 
@@ -169,23 +176,12 @@ namespace ProjectGenesis.Saving
                 FindRace(profile.RaceId),
                 FindClass(profile.ClassId));
 
-            List<ItemDefinition> restoredItems = new();
-            if (profile.InventoryItemIds != null)
-            {
-                foreach (string itemId in profile.InventoryItemIds)
-                {
-                    ItemDefinition item = FindItem(itemId);
-                    if (item != null)
-                    {
-                        restoredItems.Add(item);
-                    }
-                }
-            }
+            List<ItemInstance> restoredItems = BuildInventoryInstances(profile, FindItem);
 
             inventory.RestoreItems(restoredItems);
             progression.RestoreState(profile.Level, profile.CurrentExperience);
             questLog?.RestoreState(profile.Quests);
-            equipment.RestoreMainHand(FindItem(profile.MainHandItemId));
+            equipment.RestoreMainHand(ResolveMainHandInstanceId(profile, restoredItems));
 
             if (profile.HasPosition)
             {
@@ -227,6 +223,93 @@ namespace ProjectGenesis.Saving
             }
 
             return null;
+        }
+
+        public static List<ItemInstance> BuildInventoryInstances(
+            PlayerProfileData profile,
+            Func<string, ItemDefinition> itemResolver)
+        {
+            List<ItemInstance> restoredItems = new();
+            if (profile == null || itemResolver == null)
+            {
+                return restoredItems;
+            }
+
+            bool hasVersionFourItems = profile.InventoryItems != null &&
+                                       profile.InventoryItems.Count > 0;
+            if (hasVersionFourItems)
+            {
+                foreach (ItemInstanceData savedItem in profile.InventoryItems)
+                {
+                    if (savedItem == null ||
+                        string.IsNullOrWhiteSpace(savedItem.InstanceId) ||
+                        restoredItems.Exists(item =>
+                            item.InstanceId == savedItem.InstanceId))
+                    {
+                        continue;
+                    }
+
+                    ItemInstance instance = ItemInstance.Create(
+                        itemResolver(savedItem.ItemId),
+                        savedItem.InstanceId);
+                    if (instance != null)
+                    {
+                        restoredItems.Add(instance);
+                    }
+                }
+
+                return restoredItems;
+            }
+
+            if (profile.InventoryItemIds == null)
+            {
+                return restoredItems;
+            }
+
+            foreach (string itemId in profile.InventoryItemIds)
+            {
+                ItemInstance instance = ItemInstance.Create(itemResolver(itemId));
+                if (instance != null)
+                {
+                    restoredItems.Add(instance);
+                }
+            }
+
+            return restoredItems;
+        }
+
+        public static string ResolveMainHandInstanceId(
+            PlayerProfileData profile,
+            IReadOnlyList<ItemInstance> restoredItems)
+        {
+            if (profile == null || restoredItems == null)
+            {
+                return string.Empty;
+            }
+
+            if (!string.IsNullOrWhiteSpace(profile.MainHandInstanceId))
+            {
+                foreach (ItemInstance item in restoredItems)
+                {
+                    if (item != null && item.InstanceId == profile.MainHandInstanceId)
+                    {
+                        return item.InstanceId;
+                    }
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(profile.MainHandItemId))
+            {
+                foreach (ItemInstance item in restoredItems)
+                {
+                    if (item != null && item.ItemId == profile.MainHandItemId)
+                    {
+                        return item.InstanceId;
+                    }
+                }
+            }
+
+            return string.Empty;
         }
 
         private CharacterRaceDefinition FindRace(string raceId)

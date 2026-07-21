@@ -6,6 +6,8 @@ New ideas are recorded here even when they are not ready for implementation. Eac
 
 ## Gameplay Ideas
 
+- Add explicit inventory-slot movement and swapping, then verify exact-instance equipment with a second weapon definition that has visibly different stats.
+
 - Expand character creation with race and class choices after more options are authored.
 - Harden character names before online profiles: 3-20 Unicode letters, single internal spaces, hyphens, or apostrophes; no digits, edge separators, repeated separators, control characters, or mixed-script lookalikes. Keep profanity, reserved-name, and uniqueness checks server-authoritative later.
 - Campfire rest system.

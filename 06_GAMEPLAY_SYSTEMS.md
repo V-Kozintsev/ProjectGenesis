@@ -55,7 +55,8 @@ Does not own:
 
 Owns:
 
-- item stacks;
+- stable identities for collected item instances;
+- inventory capacity and concrete-slot selection data exposed to UI;
 - equipment slots;
 - add/remove/equip/unequip rules.
 
@@ -63,6 +64,8 @@ Does not own:
 
 - visual item icons beyond references;
 - enemy loot table evaluation, except receiving generated items.
+
+`ItemDefinition` is shared authored data. `ItemInstance` represents one physical collected copy and owns its stable instance id. Equipment references an `ItemInstance`, so two items created from one definition remain distinguishable in inventory and persistence.
 
 ### Quest System
 

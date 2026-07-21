@@ -2,7 +2,7 @@
 
 ## Current Direction
 
-Sprint 018 Character Stats is complete. The next proposed implementation is **Item Instances And Inventory Selection**.
+Sprint 019 Item Instances And Inventory Selection is complete. The next proposed implementation is **Inventory Rearrangement And Weapon Variety**.
 
 This file preserves completed milestone history and the broad delivery order. The user-facing Russian plan and current dependency decisions live in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md). A future feature listed here is not permission to implement it before its dependencies or current priority.
 
@@ -342,6 +342,19 @@ Sprint 018 exclusions:
 - no attributes, distributable points, critical hits, random damage, resistances, or armor types;
 - no mana, rage, stamina, additional classes, skills, equipment slots, enemies, items, quests, or zones;
 - no final models, animations, VFX, sound, icons, UI art, server, multiplayer, or networked persistence.
+
+Sprint 019 delivered additions:
+
+- stable runtime identity for every collected item copy;
+- profile version 4 with exact item-instance and equipped-instance persistence;
+- migration support for version-1 through version-3 profiles;
+- eight explicit inventory slot buttons with concrete-item selection;
+- deterministic validation of duplicate rejection, migration, exact-instance equipment, prefab defaults, and scene wiring.
+
+Sprint 019 exclusions:
+
+- no additional equipment slots, armor, consumables, vendors, currency, selling, trading, crafting, stacks, sorting, or drag-and-drop;
+- no random affixes, durability, binding, item levels, new content, final UI art, server, multiplayer, or networked persistence.
 
 Post-Sprint 009 backlog decisions:
 

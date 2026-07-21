@@ -5,9 +5,16 @@ using ProjectGenesis.Gameplay;
 namespace ProjectGenesis.Saving
 {
     [Serializable]
+    public sealed class ItemInstanceData
+    {
+        public string InstanceId;
+        public string ItemId;
+    }
+
+    [Serializable]
     public sealed class PlayerProfileData
     {
-        public const int CurrentVersion = 3;
+        public const int CurrentVersion = 4;
 
         public int Version = CurrentVersion;
         public bool HasCreatedCharacter;
@@ -22,6 +29,8 @@ namespace ProjectGenesis.Saving
         public int CurrentExperience;
         public List<string> InventoryItemIds = new();
         public string MainHandItemId;
+        public List<ItemInstanceData> InventoryItems = new();
+        public string MainHandInstanceId;
         public List<QuestProgressData> Quests = new();
     }
 }

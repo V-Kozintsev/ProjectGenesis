@@ -92,6 +92,8 @@ Examples:
 
 `CombatStats` owns attack composition and damage formulas. Base, class, progression, and equipment contributions remain separately readable but produce one total attack power. `PlayerProgression` applies authored class and level growth to `Health` and `CombatStats`; `PlayerEquipment` supplies only the equipped-weapon contribution. `SkillDefinition` stores an attack-power multiplier and player-facing description, and `PlayerSkillController` asks `CombatStats` for the final defense-aware skill damage. `CharacterStatsView` and `SkillTooltipView` only present these runtime values. `DraggableWindow` is a reusable UI adapter attached to window headers and keeps moved prototype windows reachable on screen.
 
+`ItemDefinition` remains immutable authored content, while each collected `ItemInstance` carries a stable unique id and references its definition. `PlayerInventory` owns instances, `PlayerEquipment` references the exact equipped instance, and profile version 4 persists instance id plus definition id. Versions 1-3 migrate their definition-id lists into unique instances during restoration.
+
 Enemy identity, level, and base experience are authored by `EnemyBrain`. `PlayerProgression` owns the configurable level-difference multiplier because it converts an enemy reward into player progression; fixed quest rewards continue to bypass enemy scaling.
 
 Enemy prefabs compose the shared `EnemyBrain`, `Health`, `HealthRegeneration`, `CombatStats`, and `NavMeshAgent` behavior with independently authored values. Optional reward components such as `EnemyLootDrop` are attached only when that enemy actually participates in those loot or quest rules.

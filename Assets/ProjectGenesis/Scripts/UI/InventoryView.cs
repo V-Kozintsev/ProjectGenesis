@@ -1,3 +1,4 @@
+using System;
 using ProjectGenesis.Data;
 using ProjectGenesis.Gameplay;
 using UnityEngine;
@@ -12,6 +13,8 @@ namespace ProjectGenesis.UI
         [SerializeField] private Button openButton;
         [SerializeField] private Button closeButton;
         [SerializeField] private Button itemActionButton;
+        [SerializeField] private Button[] slotButtons;
+        [SerializeField] private Text[] slotTexts;
         [SerializeField] private Text capacityText;
         [SerializeField] private Text attackPowerText;
         [SerializeField] private Text mainHandText;
@@ -21,12 +24,19 @@ namespace ProjectGenesis.UI
         [SerializeField] private PlayerInventory inventory;
         [SerializeField] private PlayerEquipment equipment;
         [SerializeField] private CombatStats combatStats;
+        [SerializeField] private string selectedInstanceId;
+
+        public GameObject WindowRoot => windowRoot;
+        public int SlotCount => slotButtons != null ? slotButtons.Length : 0;
+        public string SelectedInstanceId => selectedInstanceId;
 
         public void Initialize(
             GameObject inventoryWindow,
             Button inventoryOpenButton,
             Button inventoryCloseButton,
             Button actionButton,
+            Button[] inventorySlotButtons,
+            Text[] inventorySlotTexts,
             Text capacityLabel,
             Text attackPowerLabel,
             Text mainHandLabel,
@@ -41,6 +51,8 @@ namespace ProjectGenesis.UI
             openButton = inventoryOpenButton;
             closeButton = inventoryCloseButton;
             itemActionButton = actionButton;
+            slotButtons = inventorySlotButtons ?? Array.Empty<Button>();
+            slotTexts = inventorySlotTexts ?? Array.Empty<Text>();
             capacityText = capacityLabel;
             attackPowerText = attackPowerLabel;
             mainHandText = mainHandLabel;
@@ -67,6 +79,12 @@ namespace ProjectGenesis.UI
             if (itemActionButton != null)
             {
                 itemActionButton.onClick.AddListener(HandleItemAction);
+            }
+
+            for (int index = 0; index < slotButtons.Length; index++)
+            {
+                int slotIndex = index;
+                slotButtons[index]?.onClick.AddListener(() => HandleSlotSelected(slotIndex));
             }
 
             if (inventory != null)
@@ -103,6 +121,14 @@ namespace ProjectGenesis.UI
             if (itemActionButton != null)
             {
                 itemActionButton.onClick.RemoveListener(HandleItemAction);
+            }
+
+            if (slotButtons != null)
+            {
+                foreach (Button slotButton in slotButtons)
+                {
+                    slotButton?.onClick.RemoveAllListeners();
+                }
             }
 
             if (inventory != null)
@@ -151,13 +177,14 @@ namespace ProjectGenesis.UI
 
         private void HandleItemAction()
         {
-            ItemDefinition item = GetFirstItem();
+            ItemInstance item = GetSelectedItem();
             if (item == null || equipment == null)
             {
                 return;
             }
 
-            if (equipment.MainHand == item)
+            if (equipment.MainHand != null &&
+                equipment.MainHand.InstanceId == item.InstanceId)
             {
                 equipment.UnequipMainHand();
             }
@@ -165,6 +192,18 @@ namespace ProjectGenesis.UI
             {
                 equipment.EquipMainHand(item);
             }
+        }
+
+        private void HandleSlotSelected(int slotIndex)
+        {
+            if (inventory == null || slotIndex < 0 || slotIndex >= inventory.Count)
+            {
+                return;
+            }
+
+            ItemInstance item = inventory.Items[slotIndex];
+            selectedInstanceId = item != null ? item.InstanceId : string.Empty;
+            Refresh();
         }
 
         private void HandleInventoryChanged(PlayerInventory _)
@@ -206,8 +245,10 @@ namespace ProjectGenesis.UI
                     : "Оружие: не экипировано";
             }
 
-            ItemDefinition item = GetFirstItem();
+            ItemInstance item = ResolveSelectedItem();
             bool hasItem = item != null;
+
+            RefreshSlots(item);
 
             if (itemNameText != null)
             {
@@ -228,13 +269,78 @@ namespace ProjectGenesis.UI
 
             if (itemActionText != null && hasItem)
             {
-                itemActionText.text = equipment.MainHand == item ? "Снять" : "Надеть";
+                itemActionText.text = equipment.MainHand != null &&
+                                      equipment.MainHand.InstanceId == item.InstanceId
+                    ? "Снять"
+                    : "Надеть";
             }
         }
 
-        private ItemDefinition GetFirstItem()
+        private ItemInstance ResolveSelectedItem()
         {
-            return inventory != null && inventory.Count > 0 ? inventory.Items[0] : null;
+            ItemInstance selected = GetSelectedItem();
+            if (selected != null)
+            {
+                return selected;
+            }
+
+            selected = inventory != null && inventory.Count > 0 ? inventory.Items[0] : null;
+            selectedInstanceId = selected != null ? selected.InstanceId : string.Empty;
+            return selected;
+        }
+
+        private ItemInstance GetSelectedItem()
+        {
+            return inventory != null
+                ? inventory.FindByInstanceId(selectedInstanceId)
+                : null;
+        }
+
+        private void RefreshSlots(ItemInstance selected)
+        {
+            if (slotButtons == null || slotTexts == null)
+            {
+                return;
+            }
+
+            int visibleSlots = Mathf.Min(slotButtons.Length, slotTexts.Length);
+            for (int index = 0; index < visibleSlots; index++)
+            {
+                Button button = slotButtons[index];
+                Text label = slotTexts[index];
+                ItemInstance item = inventory != null && index < inventory.Count
+                    ? inventory.Items[index]
+                    : null;
+                bool isSelected = item != null && selected != null &&
+                                  item.InstanceId == selected.InstanceId;
+                bool isEquipped = item != null && equipment.MainHand != null &&
+                                  item.InstanceId == equipment.MainHand.InstanceId;
+
+                if (label != null)
+                {
+                    label.text = item != null
+                        ? $"{index + 1}. {item.DisplayName}{(isEquipped ? "  [Надето]" : string.Empty)}"
+                        : $"{index + 1}. Пусто";
+                    label.color = item != null
+                        ? Color.white
+                        : new Color(0.55f, 0.6f, 0.64f);
+                }
+
+                if (button != null)
+                {
+                    button.interactable = item != null;
+                    ColorBlock colors = button.colors;
+                    colors.normalColor = isSelected
+                        ? new Color(0.42f, 0.32f, 0.12f, 1f)
+                        : new Color(0.16f, 0.25f, 0.34f, 1f);
+                    colors.highlightedColor = isSelected
+                        ? new Color(0.5f, 0.39f, 0.16f, 1f)
+                        : new Color(0.22f, 0.34f, 0.44f, 1f);
+                    colors.selectedColor = colors.highlightedColor;
+                    colors.disabledColor = new Color(0.1f, 0.12f, 0.14f, 0.72f);
+                    button.colors = colors;
+                }
+            }
         }
     }
 }

@@ -1,7 +1,15 @@
 # Changelog
 
+## 2026-07-21
+
+- Accepted Sprint 019 after deterministic validation and the user's Play Mode check of separate inventory slots and weapon instances.
+- Set inventory-slot rearrangement and a second weapon with contrasting stats as the next proposed implementation.
+
 ## 2026-07-20
 
+- Started Sprint 019 Item Instances And Inventory Selection with documented scope and acceptance criteria.
+- Added stable runtime item instances, profile-version-4 persistence, and migration from legacy item-id lists.
+- Added eight explicit inventory slot controls and exact-instance equip and unequip actions.
 - Accepted Sprint 018 after deterministic validation and the user's Play Mode checks for character stats, weapon-scaled Heavy Strike, hover tooltip, and movable windows.
 - Set stable item instances and explicit inventory selection as the proposed Sprint 019 direction.
 - Started Sprint 018 Character Stats with documented scope and acceptance criteria.

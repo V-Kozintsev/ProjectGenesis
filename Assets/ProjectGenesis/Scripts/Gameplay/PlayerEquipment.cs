@@ -8,25 +8,30 @@ namespace ProjectGenesis.Gameplay
     [RequireComponent(typeof(PlayerInventory), typeof(CombatStats))]
     public sealed class PlayerEquipment : MonoBehaviour
     {
-        [SerializeField] private ItemDefinition mainHand;
+        [SerializeField] private ItemInstance mainHand;
 
         private PlayerInventory inventory;
         private CombatStats combatStats;
 
         public event Action<PlayerEquipment> Changed;
 
-        public ItemDefinition MainHand => mainHand;
+        public ItemInstance MainHand => mainHand != null && mainHand.IsValid ? mainHand : null;
 
         private void Awake()
         {
-            inventory = GetComponent<PlayerInventory>();
-            combatStats = GetComponent<CombatStats>();
+            EnsureDependencies();
+            if (mainHand != null && !mainHand.IsValid)
+            {
+                mainHand = null;
+            }
+
             ApplyMainHandBonus();
         }
 
-        public bool EquipMainHand(ItemDefinition item)
+        public bool EquipMainHand(ItemInstance item)
         {
-            if (item == null || item.ItemType != ItemType.Weapon || !inventory.Contains(item))
+            if (!EnsureDependencies() || item == null ||
+                item.ItemType != ItemType.Weapon || !inventory.Contains(item))
             {
                 return false;
             }
@@ -49,9 +54,16 @@ namespace ProjectGenesis.Gameplay
             Changed?.Invoke(this);
         }
 
-        public void RestoreMainHand(ItemDefinition item)
+        public void RestoreMainHand(string instanceId)
         {
-            mainHand = item != null && item.ItemType == ItemType.Weapon && inventory.Contains(item)
+            if (!EnsureDependencies())
+            {
+                mainHand = null;
+                return;
+            }
+
+            ItemInstance item = inventory.FindByInstanceId(instanceId);
+            mainHand = item != null && item.ItemType == ItemType.Weapon
                 ? item
                 : null;
             ApplyMainHandBonus();
@@ -60,8 +72,28 @@ namespace ProjectGenesis.Gameplay
 
         private void ApplyMainHandBonus()
         {
-            int bonus = mainHand != null ? mainHand.AttackBonus : 0;
+            if (!EnsureDependencies())
+            {
+                return;
+            }
+
+            int bonus = MainHand != null ? MainHand.AttackBonus : 0;
             combatStats.SetEquipmentAttackBonus(bonus);
+        }
+
+        private bool EnsureDependencies()
+        {
+            if (inventory == null)
+            {
+                inventory = GetComponent<PlayerInventory>();
+            }
+
+            if (combatStats == null)
+            {
+                combatStats = GetComponent<CombatStats>();
+            }
+
+            return inventory != null && combatStats != null;
         }
     }
 }

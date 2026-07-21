@@ -1091,9 +1091,31 @@ namespace ProjectGenesis.Tools.Editor
             contentsTitle.color = new Color(0.9f, 0.92f, 0.94f);
             SetRect(contentsTitle.GetComponent<RectTransform>(), new Vector2(24f, -274f), new Vector2(468f, 32f), new Vector2(0f, 1f));
 
+            Button[] slotButtons = new Button[8];
+            Text[] slotTexts = new Text[8];
+            for (int index = 0; index < slotButtons.Length; index++)
+            {
+                int column = index % 2;
+                int row = index / 2;
+                Button slotButton = CreateButton(
+                    $"Button_InventorySlot_{index + 1}",
+                    window.transform,
+                    $"{index + 1}. Пусто");
+                SetRect(
+                    slotButton.GetComponent<RectTransform>(),
+                    new Vector2(24f + column * 238f, -312f - row * 48f),
+                    new Vector2(230f, 40f),
+                    new Vector2(0f, 1f));
+                Text slotText = slotButton.GetComponentInChildren<Text>();
+                slotText.fontSize = 16;
+                slotText.alignment = TextAnchor.MiddleLeft;
+                slotButtons[index] = slotButton;
+                slotTexts[index] = slotText;
+            }
+
             Text itemNameText = CreateText("Text_ItemName", window.transform, "Инвентарь пуст", 24, TextAnchor.UpperLeft);
             itemNameText.color = new Color(1f, 0.82f, 0.42f);
-            SetRect(itemNameText.GetComponent<RectTransform>(), new Vector2(24f, -326f), new Vector2(468f, 36f), new Vector2(0f, 1f));
+            SetRect(itemNameText.GetComponent<RectTransform>(), new Vector2(24f, -510f), new Vector2(468f, 32f), new Vector2(0f, 1f));
 
             Text itemDetailsText = CreateText(
                 "Text_ItemDetails",
@@ -1103,15 +1125,16 @@ namespace ProjectGenesis.Tools.Editor
                 TextAnchor.UpperLeft);
             itemDetailsText.color = new Color(0.82f, 0.84f, 0.82f);
             itemDetailsText.lineSpacing = 1.1f;
-            SetRect(itemDetailsText.GetComponent<RectTransform>(), new Vector2(24f, -374f), new Vector2(468f, 80f), new Vector2(0f, 1f));
+            SetRect(itemDetailsText.GetComponent<RectTransform>(), new Vector2(24f, -548f), new Vector2(468f, 40f), new Vector2(0f, 1f));
 
             Button actionButton = CreateButton("Button_ItemAction", window.transform, "Надеть");
-            SetRect(actionButton.GetComponent<RectTransform>(), new Vector2(24f, 28f), new Vector2(200f, 58f), new Vector2(0f, 0f));
+            SetRect(actionButton.GetComponent<RectTransform>(), new Vector2(24f, 8f), new Vector2(180f, 42f), new Vector2(0f, 0f));
             Text actionText = actionButton.GetComponentInChildren<Text>();
+            actionText.fontSize = 18;
 
             Text hintText = CreateText("Text_InventoryHint", window.transform, "Нажмите I, чтобы закрыть", 18, TextAnchor.LowerRight);
             hintText.color = new Color(0.62f, 0.68f, 0.7f);
-            SetRect(hintText.GetComponent<RectTransform>(), new Vector2(-24f, 42f), new Vector2(240f, 28f), new Vector2(1f, 0f));
+            SetRect(hintText.GetComponent<RectTransform>(), new Vector2(-24f, 16f), new Vector2(240f, 28f), new Vector2(1f, 0f));
 
             InventoryView inventoryView = canvasObject.AddComponent<InventoryView>();
             inventoryView.Initialize(
@@ -1119,6 +1142,8 @@ namespace ProjectGenesis.Tools.Editor
                 openButton,
                 closeButton,
                 actionButton,
+                slotButtons,
+                slotTexts,
                 capacityText,
                 attackText,
                 mainHandText,

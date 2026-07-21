@@ -28,15 +28,17 @@ namespace ProjectGenesis.Tools.Editor
 
         private static void ValidateProfileLifecycle()
         {
-            Require(PlayerProfileData.CurrentVersion == 3,
-                "Current profile version must be 3.");
+            Require(PlayerProfileData.CurrentVersion == 4,
+                "Current profile version must be 4.");
             Require(LocalJsonPlayerPersistence.IsSupportedVersion(1),
                 "Version-1 profiles must remain supported.");
             Require(LocalJsonPlayerPersistence.IsSupportedVersion(2),
                 "Version-2 profiles must remain supported.");
             Require(LocalJsonPlayerPersistence.IsSupportedVersion(3),
                 "Version-3 profiles must be supported.");
-            Require(!LocalJsonPlayerPersistence.IsSupportedVersion(4),
+            Require(LocalJsonPlayerPersistence.IsSupportedVersion(4),
+                "Version-4 item-instance profiles must be supported.");
+            Require(!LocalJsonPlayerPersistence.IsSupportedVersion(5),
                 "Unknown future profile versions must be rejected.");
 
             Require(PlayerPersistenceController.ResolveHasCreatedCharacter(
