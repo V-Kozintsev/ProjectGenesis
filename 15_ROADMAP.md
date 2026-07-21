@@ -2,7 +2,7 @@
 
 ## Current Direction
 
-Sprint 019 Item Instances And Inventory Selection is complete. The next proposed implementation is **Inventory Rearrangement And Weapon Variety**.
+Sprint 020 Inventory Rearrangement And Weapon Variety is complete. **Sprint 021: Equipment Slots And First Consumable** is the next proposed implementation.
 
 This file preserves completed milestone history and the broad delivery order. The user-facing Russian plan and current dependency decisions live in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md). A future feature listed here is not permission to implement it before its dependencies or current priority.
 
@@ -355,6 +355,19 @@ Sprint 019 exclusions:
 
 - no additional equipment slots, armor, consumables, vendors, currency, selling, trading, crafting, stacks, sorting, or drag-and-drop;
 - no random affixes, durability, binding, item levels, new content, final UI art, server, multiplayer, or networked persistence.
+
+Sprint 020 delivered additions:
+
+- eight persistent inventory positions, including empty gaps;
+- drag-and-drop movement into an empty position and swapping between occupied positions;
+- profile version 5 with slot-index persistence and version-1 through version-4 migration;
+- a +7 Worn Axe definition and a reusable 20% boar loot table;
+- deterministic validation of movement, swaps, exact equipment, migration, data, prefabs, and scene wiring.
+
+Sprint 020 exclusions:
+
+- no additional equipment slots, armor, consumables, stacks, sorting buttons, vendors, currency, selling, trading, crafting, or item destruction;
+- no random affixes, durability, binding, item levels, new quests or zones, final UI art, server, multiplayer, or networked persistence.
 
 Post-Sprint 009 backlog decisions:
 

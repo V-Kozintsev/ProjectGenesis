@@ -2,6 +2,11 @@
 
 ## 2026-07-21
 
+- Started Sprint 020 Inventory Rearrangement And Weapon Variety with documented scope and acceptance criteria.
+- Added fixed inventory positions, drag-and-drop movement and swapping, and profile-version-5 slot persistence with legacy migration.
+- Added a +7 Worn Axe definition, reusable boar loot, and deterministic comparison against the +4 Rusty Sword.
+- Accepted Sprint 020 after deterministic validation and the user's Play Mode check of movement, swapping, weapon stat changes, exact equipment, and persistence.
+- Recorded polished drag feedback for the future inventory UI pass and set equipment slots plus one consumable as the next proposed implementation.
 - Accepted Sprint 019 after deterministic validation and the user's Play Mode check of separate inventory slots and weapon instances.
 - Set inventory-slot rearrangement and a second weapon with contrasting stats as the next proposed implementation.
 

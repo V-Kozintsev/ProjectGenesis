@@ -18,6 +18,10 @@ namespace ProjectGenesis.Gameplay
         private Health health;
         private bool hasDropped;
 
+        public LootTableDefinition LootTable => lootTable;
+        public string QuestObjectiveTargetId => questObjectiveTargetId;
+        public float QuestItemDropChance => questItemDropChance;
+
         private void Awake()
         {
             health = GetComponent<Health>();

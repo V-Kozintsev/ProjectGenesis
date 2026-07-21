@@ -30,6 +30,17 @@ namespace ProjectGenesis.UI
         public int SlotCount => slotButtons != null ? slotButtons.Length : 0;
         public string SelectedInstanceId => selectedInstanceId;
 
+        public bool CanDragSlot(int slotIndex)
+        {
+            return inventory != null && inventory.GetItemAt(slotIndex) != null;
+        }
+
+        public bool TryMoveOrSwapSlots(int sourceSlotIndex, int targetSlotIndex)
+        {
+            return inventory != null &&
+                   inventory.TryMoveOrSwap(sourceSlotIndex, targetSlotIndex);
+        }
+
         public void Initialize(
             GameObject inventoryWindow,
             Button inventoryOpenButton,
@@ -196,12 +207,17 @@ namespace ProjectGenesis.UI
 
         private void HandleSlotSelected(int slotIndex)
         {
-            if (inventory == null || slotIndex < 0 || slotIndex >= inventory.Count)
+            if (inventory == null)
             {
                 return;
             }
 
-            ItemInstance item = inventory.Items[slotIndex];
+            ItemInstance item = inventory.GetItemAt(slotIndex);
+            if (item == null)
+            {
+                return;
+            }
+
             selectedInstanceId = item != null ? item.InstanceId : string.Empty;
             Refresh();
         }
@@ -284,7 +300,7 @@ namespace ProjectGenesis.UI
                 return selected;
             }
 
-            selected = inventory != null && inventory.Count > 0 ? inventory.Items[0] : null;
+            selected = GetFirstOccupiedItem();
             selectedInstanceId = selected != null ? selected.InstanceId : string.Empty;
             return selected;
         }
@@ -308,9 +324,7 @@ namespace ProjectGenesis.UI
             {
                 Button button = slotButtons[index];
                 Text label = slotTexts[index];
-                ItemInstance item = inventory != null && index < inventory.Count
-                    ? inventory.Items[index]
-                    : null;
+                ItemInstance item = inventory != null ? inventory.GetItemAt(index) : null;
                 bool isSelected = item != null && selected != null &&
                                   item.InstanceId == selected.InstanceId;
                 bool isEquipped = item != null && equipment.MainHand != null &&
@@ -341,6 +355,25 @@ namespace ProjectGenesis.UI
                     button.colors = colors;
                 }
             }
+        }
+
+        private ItemInstance GetFirstOccupiedItem()
+        {
+            if (inventory == null)
+            {
+                return null;
+            }
+
+            for (int index = 0; index < inventory.Capacity; index++)
+            {
+                ItemInstance item = inventory.GetItemAt(index);
+                if (item != null)
+                {
+                    return item;
+                }
+            }
+
+            return null;
         }
     }
 }

@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 019 Item Instances And Inventory Selection is complete: collected items receive stable identities, local profiles preserve exact copies, and the eight-slot inventory lets the player select the concrete item used by equipment actions.
+Sprint 020 Inventory Rearrangement And Weapon Variety is complete: inventory positions persist, items move or swap by drag-and-drop, and a contrasting Worn Axe verifies exact-item equipment and stat changes. The next proposed step is Sprint 021 Equipment Slots And First Consumable.
 
 The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
 
@@ -42,6 +42,9 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - While the Village Elder's quest is active and incomplete, each wolf also has a 70% chance to add a `Wolf Tail` directly to objective progress. Quest trophies do not appear on the ground or occupy normal inventory slots, and progress stops at `5 / 5`.
 - Press `I` or click `Инвентарь [I]` to open the eight-slot inventory.
 - Click an occupied inventory slot to select that exact item, then use `Надеть` or `Снять`. Separate copies of the Rusty Sword remain separate entries.
+- Drag an occupied slot onto an empty slot to move it, or onto another occupied slot to swap the two exact item instances. Reordered positions persist after restarting Play Mode.
+- Boars have a 20% chance to drop a `Потёртый топор` with `+7` attack; the Rusty Sword remains `+4` attack.
+- During Sprint 020 Play Mode testing, use `Project Genesis > Sprint 020 > Add Sword And Axe In Play Mode` to add both contrasting weapons immediately.
 - During Sprint 019 Play Mode testing, use `Project Genesis > Sprint 019 > Add Two Rusty Swords In Play Mode` to create two distinct copies without waiting for random drops.
 - The inventory header shows the current prototype identity: `Путник`, `Человек`, and `Воин`.
 - Click `Надеть` to equip the sword in the main-hand slot and increase attack power from 14 to 18. Click `Снять` to remove the bonus without deleting the item.
@@ -105,6 +108,7 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - [35_SPRINT_017.md](35_SPRINT_017.md) - first-character creation, local selection, gameplay gating, and lifecycle-validation sprint.
 - [36_SPRINT_018.md](36_SPRINT_018.md) - unified character stats, warrior bonuses, weapon-scaled Heavy Strike, stats UI, and validation sprint.
 - [37_SPRINT_019.md](37_SPRINT_019.md) - stable item instances, profile migration, explicit inventory selection, and validation sprint.
+- [38_SPRINT_020.md](38_SPRINT_020.md) - persistent inventory positions, drag-and-drop swapping, weapon variety, and validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

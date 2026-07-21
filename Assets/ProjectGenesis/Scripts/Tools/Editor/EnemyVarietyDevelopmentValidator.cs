@@ -42,8 +42,12 @@ namespace ProjectGenesis.Tools.Editor
             Require(stats != null, "Boar prefab is missing CombatStats.");
             Require(stats.BaseAttackPower == 10 && stats.Defense == 2,
                 "Forest boar combat stats are unexpected.");
-            Require(boarPrefab.GetComponent<EnemyLootDrop>() == null,
-                "Forest boar must not use the wolf loot or quest-trophy rules.");
+            EnemyLootDrop lootDrop = boarPrefab.GetComponent<EnemyLootDrop>();
+            Require(lootDrop != null && lootDrop.LootTable != null,
+                "Forest boar must have its own regular loot table.");
+            Require(string.IsNullOrEmpty(lootDrop.QuestObjectiveTargetId) &&
+                    Mathf.Approximately(lootDrop.QuestItemDropChance, 0f),
+                "Forest boar must not use the wolf quest-trophy rules.");
         }
 
         private static void ValidateSceneSpawners(GameObject wolfPrefab, GameObject boarPrefab)

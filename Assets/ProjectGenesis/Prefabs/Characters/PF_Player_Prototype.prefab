@@ -274,7 +274,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   capacity: 8
-  items: []
+  items:
+  - instanceId: 
+    definition: {fileID: 0}
+  - instanceId: 
+    definition: {fileID: 0}
+  - instanceId: 
+    definition: {fileID: 0}
+  - instanceId: 
+    definition: {fileID: 0}
+  - instanceId: 
+    definition: {fileID: 0}
+  - instanceId: 
+    definition: {fileID: 0}
+  - instanceId: 
+    definition: {fileID: 0}
+  - instanceId: 
+    definition: {fileID: 0}
 --- !u!114 &7566425608953301210
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -319,6 +335,7 @@ MonoBehaviour:
   saveInterval: 2
   itemCatalog:
   - {fileID: 11400000, guid: af70d6da1d148ba4c84d128117b61d47, type: 2}
+  - {fileID: 11400000, guid: 725d23b85eef776439624c5ee23856d2, type: 2}
   raceCatalog:
   - {fileID: 11400000, guid: b56ed424301d8f24282af072387e2364, type: 2}
   classCatalog:

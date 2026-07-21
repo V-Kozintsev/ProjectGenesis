@@ -9,12 +9,13 @@ namespace ProjectGenesis.Saving
     {
         public string InstanceId;
         public string ItemId;
+        public int SlotIndex = -1;
     }
 
     [Serializable]
     public sealed class PlayerProfileData
     {
-        public const int CurrentVersion = 4;
+        public const int CurrentVersion = 5;
 
         public int Version = CurrentVersion;
         public bool HasCreatedCharacter;

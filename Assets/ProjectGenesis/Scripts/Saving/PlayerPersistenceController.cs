@@ -129,14 +129,16 @@ namespace ProjectGenesis.Saving
                 profile.PositionZ = position.z;
             }
 
-            foreach (ItemInstance item in inventory.Items)
+            for (int slotIndex = 0; slotIndex < inventory.Capacity; slotIndex++)
             {
+                ItemInstance item = inventory.GetItemAt(slotIndex);
                 if (item != null && item.IsValid)
                 {
                     profile.InventoryItems.Add(new ItemInstanceData
                     {
                         InstanceId = item.InstanceId,
-                        ItemId = item.ItemId
+                        ItemId = item.ItemId,
+                        SlotIndex = slotIndex
                     });
                 }
             }
@@ -176,9 +178,12 @@ namespace ProjectGenesis.Saving
                 FindRace(profile.RaceId),
                 FindClass(profile.ClassId));
 
-            List<ItemInstance> restoredItems = BuildInventoryInstances(profile, FindItem);
+            List<ItemInstance> restoredItems = BuildInventorySlots(
+                profile,
+                FindItem,
+                inventory.Capacity);
 
-            inventory.RestoreItems(restoredItems);
+            inventory.RestoreSlots(restoredItems);
             progression.RestoreState(profile.Level, profile.CurrentExperience);
             questLog?.RestoreState(profile.Quests);
             equipment.RestoreMainHand(ResolveMainHandInstanceId(profile, restoredItems));
@@ -276,6 +281,55 @@ namespace ProjectGenesis.Saving
             }
 
             return restoredItems;
+        }
+
+        public static List<ItemInstance> BuildInventorySlots(
+            PlayerProfileData profile,
+            Func<string, ItemDefinition> itemResolver,
+            int capacity)
+        {
+            int boundedCapacity = Mathf.Max(1, capacity);
+            List<ItemInstance> restoredSlots = new(boundedCapacity);
+            for (int index = 0; index < boundedCapacity; index++)
+            {
+                restoredSlots.Add(null);
+            }
+
+            List<ItemInstance> restoredItems = BuildInventoryInstances(profile, itemResolver);
+            if (profile != null && profile.Version >= 5 && profile.InventoryItems != null)
+            {
+                Dictionary<string, ItemInstance> instancesById = new();
+                foreach (ItemInstance item in restoredItems)
+                {
+                    if (item != null)
+                    {
+                        instancesById[item.InstanceId] = item;
+                    }
+                }
+
+                foreach (ItemInstanceData savedItem in profile.InventoryItems)
+                {
+                    if (savedItem == null || savedItem.SlotIndex < 0 ||
+                        savedItem.SlotIndex >= boundedCapacity ||
+                        restoredSlots[savedItem.SlotIndex] != null ||
+                        !instancesById.TryGetValue(savedItem.InstanceId, out ItemInstance item))
+                    {
+                        continue;
+                    }
+
+                    restoredSlots[savedItem.SlotIndex] = item;
+                }
+
+                return restoredSlots;
+            }
+
+            int sequentialCount = Mathf.Min(boundedCapacity, restoredItems.Count);
+            for (int index = 0; index < sequentialCount; index++)
+            {
+                restoredSlots[index] = restoredItems[index];
+            }
+
+            return restoredSlots;
         }
 
         public static string ResolveMainHandInstanceId(

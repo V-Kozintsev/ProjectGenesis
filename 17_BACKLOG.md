@@ -6,7 +6,6 @@ New ideas are recorded here even when they are not ready for implementation. Eac
 
 ## Gameplay Ideas
 
-- Add explicit inventory-slot movement and swapping, then verify exact-instance equipment with a second weapon definition that has visibly different stats.
 
 - Expand character creation with race and class choices after more options are authored.
 - Harden character names before online profiles: 3-20 Unicode letters, single internal spaces, hyphens, or apostrophes; no digits, edge separators, repeated separators, control characters, or mixed-script lookalikes. Keep profanity, reserved-name, and uniqueness checks server-authoritative later.
@@ -44,6 +43,7 @@ New ideas are recorded here even when they are not ready for implementation. Eac
 - Define the starter region's main conflict and the player's place in it.
 - Build a visual-reference board and style guide before replacing blockout art.
 - Plan a modular village, wilderness, character, animation, effects, audio, and UI asset pipeline.
+- During the final inventory UI pass, add item icons, a drag preview that follows the pointer, destination highlighting, and a short move, swap, or snap-back animation.
 
 ## Multiplayer Ideas
 

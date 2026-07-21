@@ -35,7 +35,9 @@ namespace ProjectGenesis.Tools.Editor
         private const string CombatAreaMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Combat_Area.mat";
         private const string LootMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Loot_Weapon.mat";
         private const string RustySwordPath = "Assets/ProjectGenesis/Data/Items/ITM_RustySword.asset";
+        private const string WornAxePath = "Assets/ProjectGenesis/Data/Items/ITM_WornAxe.asset";
         private const string WolfLootTablePath = "Assets/ProjectGenesis/Data/LootTables/LT_Wolf.asset";
+        private const string BoarLootTablePath = "Assets/ProjectGenesis/Data/LootTables/LT_Boar.asset";
         private const string HeavyStrikePath = "Assets/ProjectGenesis/Data/Skills/SO_Skill_HeavyStrike.asset";
         private const string HumanRacePath = "Assets/ProjectGenesis/Data/Races/SO_Race_Human.asset";
         private const string WarriorClassPath = "Assets/ProjectGenesis/Data/Classes/SO_Class_Warrior.asset";
@@ -130,6 +132,12 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 020/Rebuild Starter Village Inventory Rearrangement")]
+        public static void RebuildStarterVillageInventoryRearrangement()
+        {
+            RebuildStarterVillage();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -148,7 +156,9 @@ namespace ProjectGenesis.Tools.Editor
             Material combatAreaMaterial = CreateMaterial(CombatAreaMaterialPath, new Color(0.22f, 0.32f, 0.24f));
             Material lootMaterial = CreateMaterial(LootMaterialPath, new Color(0.92f, 0.62f, 0.16f));
             ItemDefinition rustySword = CreateRustySword();
+            ItemDefinition wornAxe = CreateWornAxe();
             LootTableDefinition wolfLootTable = CreateWolfLootTable(rustySword);
+            LootTableDefinition boarLootTable = CreateBoarLootTable(wornAxe);
             SkillDefinition heavyStrike = CreateHeavyStrike();
             CharacterRaceDefinition humanRace = CreateHumanRace();
             CharacterClassDefinition warriorClass = CreateWarriorClass();
@@ -156,6 +166,7 @@ namespace ProjectGenesis.Tools.Editor
             GameObject playerPrefab = CreatePlayerPrefab(
                 playerMaterial,
                 rustySword,
+                wornAxe,
                 heavyStrike,
                 humanRace,
                 warriorClass);
@@ -164,7 +175,11 @@ namespace ProjectGenesis.Tools.Editor
                 targetRingMaterial,
                 wolfLootTable,
                 lootMaterial);
-            GameObject boarPrefab = CreateBoarPrefab(boarMaterial, targetRingMaterial);
+            GameObject boarPrefab = CreateBoarPrefab(
+                boarMaterial,
+                targetRingMaterial,
+                boarLootTable,
+                lootMaterial);
 
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             scene.name = "StarterVillage";
@@ -281,6 +296,20 @@ namespace ProjectGenesis.Tools.Editor
             return item;
         }
 
+        private static ItemDefinition CreateWornAxe()
+        {
+            ItemDefinition item = AssetDatabase.LoadAssetAtPath<ItemDefinition>(WornAxePath);
+            if (item == null)
+            {
+                item = ScriptableObject.CreateInstance<ItemDefinition>();
+                AssetDatabase.CreateAsset(item, WornAxePath);
+            }
+
+            item.Configure("weapon.worn_axe", "Потёртый топор", ItemType.Weapon, 7);
+            EditorUtility.SetDirty(item);
+            return item;
+        }
+
         private static LootTableDefinition CreateWolfLootTable(ItemDefinition rustySword)
         {
             LootTableDefinition lootTable = AssetDatabase.LoadAssetAtPath<LootTableDefinition>(WolfLootTablePath);
@@ -292,6 +321,21 @@ namespace ProjectGenesis.Tools.Editor
             lootTable = ScriptableObject.CreateInstance<LootTableDefinition>();
             lootTable.ConfigureSingleItem(rustySword, 0.1f, LootRarity.Common);
             AssetDatabase.CreateAsset(lootTable, WolfLootTablePath);
+            return lootTable;
+        }
+
+        private static LootTableDefinition CreateBoarLootTable(ItemDefinition wornAxe)
+        {
+            LootTableDefinition lootTable =
+                AssetDatabase.LoadAssetAtPath<LootTableDefinition>(BoarLootTablePath);
+            if (lootTable != null)
+            {
+                return lootTable;
+            }
+
+            lootTable = ScriptableObject.CreateInstance<LootTableDefinition>();
+            lootTable.ConfigureSingleItem(wornAxe, 0.2f, LootRarity.Uncommon);
+            AssetDatabase.CreateAsset(lootTable, BoarLootTablePath);
             return lootTable;
         }
 
@@ -350,6 +394,7 @@ namespace ProjectGenesis.Tools.Editor
         private static GameObject CreatePlayerPrefab(
             Material playerMaterial,
             ItemDefinition rustySword,
+            ItemDefinition wornAxe,
             SkillDefinition heavyStrike,
             CharacterRaceDefinition humanRace,
             CharacterClassDefinition warriorClass)
@@ -385,7 +430,7 @@ namespace ProjectGenesis.Tools.Editor
             player.AddComponent<PlayerLootController>();
             PlayerPersistenceController persistence = player.AddComponent<PlayerPersistenceController>();
             persistence.Configure(
-                new[] { rustySword },
+                new[] { rustySword, wornAxe },
                 new[] { humanRace },
                 new[] { warriorClass });
             PlayerCombatController combatController = player.AddComponent<PlayerCombatController>();
@@ -499,7 +544,9 @@ namespace ProjectGenesis.Tools.Editor
 
         private static GameObject CreateBoarPrefab(
             Material boarMaterial,
-            Material targetRingMaterial)
+            Material targetRingMaterial,
+            LootTableDefinition lootTable,
+            Material lootMaterial)
         {
             GameObject boar = new("PF_Enemy_Boar");
 
@@ -535,6 +582,8 @@ namespace ProjectGenesis.Tools.Editor
                 2.2f,
                 2,
                 "Лесной кабан");
+            EnemyLootDrop lootDrop = boar.AddComponent<EnemyLootDrop>();
+            lootDrop.Configure(lootTable, lootMaterial, string.Empty, 0f);
 
             GameObject visualRoot = new("Visual");
             visualRoot.transform.SetParent(boar.transform, false);
@@ -1132,7 +1181,7 @@ namespace ProjectGenesis.Tools.Editor
             Text actionText = actionButton.GetComponentInChildren<Text>();
             actionText.fontSize = 18;
 
-            Text hintText = CreateText("Text_InventoryHint", window.transform, "Нажмите I, чтобы закрыть", 18, TextAnchor.LowerRight);
+            Text hintText = CreateText("Text_InventoryHint", window.transform, "Перетащите предмет · I закрыть", 18, TextAnchor.LowerRight);
             hintText.color = new Color(0.62f, 0.68f, 0.7f);
             SetRect(hintText.GetComponent<RectTransform>(), new Vector2(-24f, 16f), new Vector2(240f, 28f), new Vector2(1f, 0f));
 
@@ -1153,6 +1202,13 @@ namespace ProjectGenesis.Tools.Editor
                 player.GetComponent<PlayerInventory>(),
                 player.GetComponent<PlayerEquipment>(),
                 player.GetComponent<CombatStats>());
+
+            for (int index = 0; index < slotButtons.Length; index++)
+            {
+                InventorySlotDragHandler dragHandler =
+                    slotButtons[index].gameObject.AddComponent<InventorySlotDragHandler>();
+                dragHandler.Initialize(inventoryView, index);
+            }
 
             CharacterIdentityView identityView = canvasObject.AddComponent<CharacterIdentityView>();
             identityView.Initialize(

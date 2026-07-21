@@ -187,6 +187,7 @@ GameObject:
   - component: {fileID: 4982223646346479808}
   - component: {fileID: 5581817142302824102}
   - component: {fileID: 7401482209335804484}
+  - component: {fileID: 5785546097878266537}
   m_Layer: 0
   m_Name: PF_Enemy_Boar
   m_TagString: Untagged
@@ -328,6 +329,22 @@ MonoBehaviour:
   player: {fileID: 0}
   visualRoot: {fileID: 3680087861948361931}
   selectionRing: {fileID: 7392022926702310154}
+--- !u!114 &5785546097878266537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2617824513635479252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbfb0aa41cae355448fdc7cf0d737827, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lootTable: {fileID: 11400000, guid: fdf6766d7f22fd449a7d7f7882f36e60, type: 2}
+  pickupMaterial: {fileID: 2100000, guid: 38cf18dcf7f68d241917c7df2b035395, type: 2}
+  questObjectiveTargetId: 
+  questItemDropChance: 0
 --- !u!1 &3633668035058237908
 GameObject:
   m_ObjectHideFlags: 0

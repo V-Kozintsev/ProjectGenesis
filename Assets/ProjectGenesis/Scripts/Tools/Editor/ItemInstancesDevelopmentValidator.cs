@@ -104,15 +104,15 @@ namespace ProjectGenesis.Tools.Editor
 
         private static void ValidateProfileMigration(ItemDefinition sword)
         {
-            Require(PlayerProfileData.CurrentVersion == 4,
-                "Current local profile version must be 4.");
-            for (int version = 1; version <= 4; version++)
+            Require(PlayerProfileData.CurrentVersion == 5,
+                "Current local profile version must be 5.");
+            for (int version = 1; version <= 5; version++)
             {
                 Require(LocalJsonPlayerPersistence.IsSupportedVersion(version),
                     $"Profile version {version} must remain supported.");
             }
 
-            Require(!LocalJsonPlayerPersistence.IsSupportedVersion(5),
+            Require(!LocalJsonPlayerPersistence.IsSupportedVersion(6),
                 "Unknown future profile versions must be rejected.");
 
             PlayerProfileData legacy = new()
@@ -169,8 +169,7 @@ namespace ProjectGenesis.Tools.Editor
                 "Player prefab must retain equipment.");
             Require(equipment.MainHand == null,
                 "Player prefab must begin without a valid equipped item instance.");
-            Require(persistence != null && persistence.ItemCatalog.Count == 1 &&
-                    persistence.ItemCatalog[0] == sword,
+            Require(persistence != null && persistence.ItemCatalog.Contains(sword),
                 "Persistence item catalog must retain the Rusty Sword definition.");
         }
 
