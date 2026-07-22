@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 021 Equipment Slots And First Consumable is complete: body armor, defense equipment bonuses, one healing consumable, exact-instance persistence, and the temporary equipped marker are in place. Sprint 022 Death State And Respawn Choice is the next proposed foundation step.
+Sprint 022 Death State And Respawn Choice is complete and accepted after deterministic validation and the user's Play Mode check: player death now enters an explicit dead state, blocks gameplay input, keeps the character at the death position, and returns to the village only after the temporary resurrection button is pressed. Sprint 023 Character Equipment View is the next proposed foundation step.
 
 The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
 
@@ -30,10 +30,10 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - A level 1 hero receives the young wolf's full 20 base experience. The same level 1 wolf awards 15 experience at player level 2, 10 at level 3, 5 at level 4, and 2 at level 5. Its body disappears after six seconds and its spawner creates a new wolf after twelve seconds.
 - Selected enemies show their authored level beside their name. Enemy level and base experience are editable on `EnemyBrain`; weaker-enemy penalties and stronger-enemy bonuses are editable on `PlayerProgression`.
 - The northern spawn point creates a level-2 `Forest Boar` with 60 health and 30 base experience. It does not drop wolf loot or advance the wolf-tail quest.
-- If the player dies, the character loses 10% of the current level requirement with a minimum loss of 10 experience, then briefly disappears and returns at the village spawn point with full health.
+- If the player dies, the character loses 10% of the current level requirement with a minimum loss of 10 experience, stays at the death position, and shows a centered resurrection window. Click `Воскреснуть в деревне` to return to the village spawn point with full health.
 - Death-loss values are editable on `PlayerProgression` in the player prefab. Loss can cross into the previous level, but the character never falls below level 1; inventory, equipment, and quests are preserved.
 - A retreating wolf keeps its remaining health. Its leash measures how far the wolf itself has travelled from home, so it visibly pursues before returning. It can be re-engaged while returning by approaching inside its leash. At home it waits five seconds, then restores 3 health every second. It still attacks nearby players while recovering, and every new hit restarts the five-second healing delay.
-- After active combat ends, the player waits eight seconds and then restores 2 health every second. New damage restarts the delay, while death and village respawn still restore full health.
+- After active combat ends, the player waits eight seconds and then restores 2 health every second. New damage restarts the delay, while confirmed village resurrection restores full health independently of regeneration.
 - Recovery values are editable through `HealthRegeneration` on the player and wolf prefabs. Use `Project Genesis > Sprint 010 > Validate Combat Recovery` to verify saved defaults and health boundaries.
 - The selected `Zone_NorthCombat` object shows its enemy-territory boundary as a green Scene gizmo. Use `Project Genesis > Sprint 011 > Validate Enemy Territory` to verify the zone, spawners, and roaming defaults.
 - Each wolf has a 10% chance to drop a visible `Rusty Sword` and a 20% chance to drop a `Minor Healing Potion`; one kill produces at most one regular item. Click the drop to approach it and collect it.
@@ -69,7 +69,7 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - Player position, level, experience, quest state, exact inventory positions, equipped weapon, equipped body armor, and remaining potions are saved automatically. There is intentionally no save button.
 - For the current offline prototype, persistence uses a local JSON file behind a replaceable interface. In the future online version, the authoritative server will store this state and return the character near the last valid position after login.
 - To start a fresh development playthrough, use `Project Genesis > Development > Clear Local Prototype Profile` while outside Play mode.
-- Healing skills, item or quest loss on death, server-authoritative combat, and a real multiplayer backend remain outside the current prototype.
+- Corpse resurrection, resurrection items or skills, item or quest loss on death, server-authoritative combat, and a real multiplayer backend remain outside the current prototype.
 
 ## Documentation Map
 
@@ -113,6 +113,7 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - [37_SPRINT_019.md](37_SPRINT_019.md) - stable item instances, profile migration, explicit inventory selection, and validation sprint.
 - [38_SPRINT_020.md](38_SPRINT_020.md) - persistent inventory positions, drag-and-drop swapping, weapon variety, and validation sprint.
 - [39_SPRINT_021.md](39_SPRINT_021.md) - body equipment, defense bonuses, one healing consumable, persistence, and validation sprint.
+- [40_SPRINT_022.md](40_SPRINT_022.md) - explicit player death state, resurrection choice, input lock, and validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

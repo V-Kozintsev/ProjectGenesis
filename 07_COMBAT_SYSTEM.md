@@ -84,12 +84,14 @@ Enemies should telegraph danger through:
 
 Player death in prototype:
 
-- the current implementation applies its experience penalty and immediately respawns at the village;
-- the next death-state pass keeps the character dead in place, blocks movement and combat, and shows a centered confirmation before village respawn;
+- the current implementation applies its experience penalty once when health reaches zero;
+- the character stays dead at the death position until the player confirms a resurrection choice;
+- movement, combat, skills, NPC interaction, loot pickup, consumables, and regeneration are blocked while dead;
+- the first centered death window offers only `Воскреснуть в деревне`;
 - lose current combat state;
 - no harsh penalty at first.
 
-The first explicit death window offers only `Resurrect in village`. Resurrection at the corpse is a later item, skill, party, or service rule. The experience penalty is applied once on death, never again when the player confirms a destination.
+Resurrection at the corpse is a later item, skill, party, or service rule. The experience penalty is applied once on death, never again when the player confirms a destination.
 
 Enemy death:
 

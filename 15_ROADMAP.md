@@ -2,7 +2,7 @@
 
 ## Current Direction
 
-**Sprint 021: Equipment Slots And First Consumable** is complete after deterministic validation and the user's Play Mode check. **Sprint 022: Death State And Respawn Choice** is the next proposed implementation.
+**Sprint 022: Death State And Respawn Choice** is complete after deterministic validation and the user's Play Mode acceptance. **Sprint 023: Character Equipment View** is the next proposed implementation.
 
 This file preserves completed milestone history and the broad delivery order. The user-facing Russian plan and current dependency decisions live in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md). A future feature listed here is not permission to implement it before its dependencies or current priority.
 
@@ -382,9 +382,17 @@ Sprint 021 exclusions:
 
 - no further equipment slots, two-handed rules, class restrictions, stacks, quickbar consumables, cooldowns, buffs, mana, vendors, currency, selling, trading, crafting, durability, binding, random affixes, final UI art, server, multiplayer, or networked persistence.
 
-Post-Sprint 021 proposed sequence:
+Sprint 022 delivered additions:
 
-- Sprint 022 Death State And Respawn Choice: preserve the corpse state, block gameplay input, show a centered death decision, and respawn at the village only after confirmation;
+- preserve the corpse state until the player confirms resurrection;
+- block movement, combat, skills, NPC interaction, loot pickup, consumables, and regeneration while dead;
+- apply the existing experience penalty once on death;
+- show a centered temporary death window with `Воскреснуть в деревне`;
+- restore full health and move to the configured village spawn point only after confirmation;
+- deterministic validation of one-time penalty, no automatic movement, resurrection, prefab wiring, scene UI, and relevant regressions.
+
+Post-Sprint 022 proposed sequence:
+
 - Sprint 023 Character Equipment View: separate equipped slots from bag storage visually, keep the exact-instance model, and support clear equip state and comparison without final art;
 - Sprint 024 Local Message Feed Foundation: add typed local system, loot, combat, and announcement events with a filterable lower-left log; real player chat remains a later server feature;
 - reusable quest content definitions and a second short quest resume after these cross-system foundations.

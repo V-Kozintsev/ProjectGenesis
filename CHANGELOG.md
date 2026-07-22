@@ -2,6 +2,11 @@
 
 ## 2026-07-22
 
+- Started Sprint 022 Death State And Respawn Choice with documented scope and acceptance criteria.
+- Added PlayerDeathController and DeathRespawnView so death applies the existing penalty once, blocks gameplay, keeps the character at the death position, and resurrects in the village only after confirmation.
+- Stopped pending combat, skill, NPC, loot, movement, consumable, and regeneration actions while dead.
+- Added a deterministic Sprint 022 validator and passed the Sprint 008-022 relevant regression suite.
+- Accepted Sprint 022 after the user's Play Mode check and set Sprint 023 Character Equipment View as the next proposed implementation step.
 - Started Sprint 021 Equipment Slots And First Consumable with documented scope and acceptance criteria.
 - Chose one body-armor slot, a +3 Worn Leather Armor, and a 30-health Minor Healing Potion as the smallest reusable equipment-and-consumable proof.
 - Generalized item data for weapons, armor, and consumables; added body equipment defense and exact-instance consumable removal.

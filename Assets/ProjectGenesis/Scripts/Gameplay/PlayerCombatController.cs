@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using ProjectGenesis.Core;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -12,10 +10,7 @@ namespace ProjectGenesis.Gameplay
     public sealed class PlayerCombatController : MonoBehaviour
     {
         [SerializeField, Min(0.1f)] private float approachPadding = 0.35f;
-        [SerializeField, Min(0f)] private float respawnDelay = 1.25f;
         [SerializeField, Min(1f)] private float maximumTargetDistance = 30f;
-        [SerializeField] private Transform respawnPoint;
-        [SerializeField] private GameObject visualRoot;
 
         private NavMeshAgent agent;
         private Health health;
@@ -27,12 +22,11 @@ namespace ProjectGenesis.Gameplay
         private EnemyBrain target;
         private float nextAttackTime;
         private bool isCombatActive;
-        private bool isRespawning;
 
         public event Action<EnemyBrain> TargetChanged;
 
         public EnemyBrain Target => target;
-        public bool IsInputLocked => isRespawning || health == null || health.IsDead;
+        public bool IsInputLocked => health == null || health.IsDead;
 
         private void Awake()
         {
@@ -44,12 +38,6 @@ namespace ProjectGenesis.Gameplay
             questLog = GetComponent<QuestLog>();
             playerCollider = GetComponent<Collider>();
             health.Died += HandlePlayerDied;
-
-            if (respawnPoint == null)
-            {
-                PlayerSpawnPoint spawn = FindFirstObjectByType<PlayerSpawnPoint>();
-                respawnPoint = spawn != null ? spawn.transform : null;
-            }
         }
 
         private void OnDestroy()
@@ -108,16 +96,6 @@ namespace ProjectGenesis.Gameplay
             }
         }
 
-        public void SetRespawnPoint(Transform spawnPoint)
-        {
-            respawnPoint = spawnPoint;
-        }
-
-        public void SetVisualRoot(GameObject playerVisual)
-        {
-            visualRoot = playerVisual;
-        }
-
         public void HandleEnemyClick(EnemyBrain enemy)
         {
             if (enemy == null || enemy.IsDead || IsInputLocked)
@@ -140,7 +118,8 @@ namespace ProjectGenesis.Gameplay
         {
             bool wasCombatActive = isCombatActive;
             isCombatActive = false;
-            regeneration.SetRegenerationAllowed(true, wasCombatActive);
+            regeneration ??= GetComponent<HealthRegeneration>();
+            regeneration?.SetRegenerationAllowed(true, wasCombatActive);
             StopAgent();
         }
 
@@ -178,7 +157,8 @@ namespace ProjectGenesis.Gameplay
             target.SetSelected(true);
             nextAttackTime = 0f;
             isCombatActive = false;
-            regeneration.SetRegenerationAllowed(true, wasCombatActive);
+            regeneration ??= GetComponent<HealthRegeneration>();
+            regeneration?.SetRegenerationAllowed(true, wasCombatActive);
             TargetChanged?.Invoke(target);
         }
 
@@ -209,7 +189,8 @@ namespace ProjectGenesis.Gameplay
             UnsubscribeFromTarget();
             target = null;
             isCombatActive = false;
-            regeneration.SetRegenerationAllowed(true, wasCombatActive);
+            regeneration ??= GetComponent<HealthRegeneration>();
+            regeneration?.SetRegenerationAllowed(true, wasCombatActive);
 
             if (stopMovement)
             {
@@ -270,51 +251,9 @@ namespace ProjectGenesis.Gameplay
 
         private void HandlePlayerDied(Health _)
         {
-            if (!isRespawning)
-            {
-                progression.ApplyDeathPenalty();
-                StartCoroutine(RespawnAfterDelay());
-            }
-        }
-
-        private IEnumerator RespawnAfterDelay()
-        {
-            isRespawning = true;
             ClearTargetInternal(true);
-            regeneration.SetRegenerationAllowed(false);
-
-            if (visualRoot != null)
-            {
-                visualRoot.SetActive(false);
-            }
-
-            yield return new WaitForSeconds(respawnDelay);
-
-            Vector3 destination = respawnPoint != null ? respawnPoint.position : transform.position;
-            if (NavMesh.SamplePosition(destination, out NavMeshHit hit, 3f, NavMesh.AllAreas))
-            {
-                destination = hit.position;
-            }
-
-            if (agent != null && agent.enabled && agent.isOnNavMesh)
-            {
-                agent.Warp(destination);
-                agent.ResetPath();
-            }
-            else
-            {
-                transform.position = destination;
-            }
-
-            health.RestoreFull();
-            regeneration.SetRegenerationAllowed(true, true);
-
-            if (visualRoot != null)
-            {
-                visualRoot.SetActive(true);
-            }
-
-            isRespawning = false;
+            regeneration ??= GetComponent<HealthRegeneration>();
+            regeneration?.SetRegenerationAllowed(false);
         }
 
         private void StopAgent()

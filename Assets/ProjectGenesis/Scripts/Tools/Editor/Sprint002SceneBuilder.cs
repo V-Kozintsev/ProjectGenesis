@@ -146,6 +146,12 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 022/Rebuild Starter Village Death State")]
+        public static void RebuildStarterVillageDeathState()
+        {
+            RebuildStarterVillage();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -214,7 +220,8 @@ namespace ProjectGenesis.Tools.Editor
             player.AddComponent<QuestLog>();
             PlayerInteractionController interactionController = player.AddComponent<PlayerInteractionController>();
             PlayerCombatController combatController = player.GetComponent<PlayerCombatController>();
-            combatController.SetRespawnPoint(spawnPoint.transform);
+            PlayerDeathController deathController = player.GetComponent<PlayerDeathController>();
+            deathController.SetRespawnPoint(spawnPoint.transform);
 
             GameObject destinationMarker = CreateDestinationMarker(markerMaterial);
             PlayerController playerController = player.GetComponent<PlayerController>();
@@ -499,6 +506,7 @@ namespace ProjectGenesis.Tools.Editor
             PlayerCombatController combatController = player.AddComponent<PlayerCombatController>();
             PlayerSkillController skillController = player.AddComponent<PlayerSkillController>();
             skillController.ConfigureQuickSlots(new[] { heavyStrike });
+            player.AddComponent<PlayerDeathController>();
 
             GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             visual.name = "Visual";
@@ -506,7 +514,6 @@ namespace ProjectGenesis.Tools.Editor
             visual.transform.localPosition = new Vector3(0f, 1f, 0f);
             Object.DestroyImmediate(visual.GetComponent<Collider>());
             visual.GetComponent<Renderer>().sharedMaterial = playerMaterial;
-            combatController.SetVisualRoot(visual);
 
             GameObject savedPrefab = PrefabUtility.SaveAsPrefabAsset(player, PlayerPrefabPath);
             Object.DestroyImmediate(player);
@@ -932,9 +939,60 @@ namespace ProjectGenesis.Tools.Editor
             CreateInventoryUi(canvasObject, player);
             CreateCharacterStatsUi(canvasObject, player);
             CreateSkillHotbar(canvasObject, player.GetComponent<PlayerSkillController>());
+            CreateDeathRespawnUi(canvasObject, player.GetComponent<PlayerDeathController>());
             CreateCharacterEntryUi(canvasObject, player);
 
             return new FirstContactUi(dialogueWindow, promptView);
+        }
+
+        private static void CreateDeathRespawnUi(GameObject canvasObject, PlayerDeathController deathController)
+        {
+            GameObject window = CreatePanel(
+                "DeathRespawnWindow",
+                canvasObject.transform,
+                new Color(0.035f, 0.025f, 0.025f, 0.94f));
+            SetRect(
+                window.GetComponent<RectTransform>(),
+                Vector2.zero,
+                new Vector2(560f, 260f),
+                new Vector2(0.5f, 0.5f));
+
+            Text title = CreateText(
+                "Text_DeathTitle",
+                window.transform,
+                "Вы погибли",
+                36,
+                TextAnchor.UpperCenter);
+            title.color = new Color(1f, 0.72f, 0.62f);
+            SetRect(title.GetComponent<RectTransform>(), new Vector2(24f, -28f), new Vector2(512f, 48f), new Vector2(0f, 1f));
+
+            Text body = CreateText(
+                "Text_DeathBody",
+                window.transform,
+                "Персонаж остаётся на месте смерти. Выберите, где воскреснуть.",
+                22,
+                TextAnchor.UpperCenter);
+            body.color = new Color(0.9f, 0.9f, 0.86f);
+            SetRect(body.GetComponent<RectTransform>(), new Vector2(36f, -86f), new Vector2(488f, 56f), new Vector2(0f, 1f));
+
+            Text loss = CreateText(
+                "Text_DeathExperienceLoss",
+                window.transform,
+                "Потеря опыта: 0",
+                22,
+                TextAnchor.MiddleCenter);
+            loss.color = new Color(1f, 0.86f, 0.45f);
+            SetRect(loss.GetComponent<RectTransform>(), new Vector2(96f, -144f), new Vector2(368f, 34f), new Vector2(0f, 1f));
+
+            Button respawnButton = CreateButton(
+                "Button_RespawnAtVillage",
+                window.transform,
+                "Воскреснуть в деревне");
+            SetRect(respawnButton.GetComponent<RectTransform>(), new Vector2(130f, -192f), new Vector2(300f, 48f), new Vector2(0f, 1f));
+
+            DeathRespawnView view = canvasObject.AddComponent<DeathRespawnView>();
+            view.Initialize(window, loss, respawnButton);
+            deathController.SetDeathView(view);
         }
 
         private static void CreateQuestTracker(
@@ -1742,6 +1800,7 @@ namespace ProjectGenesis.Tools.Editor
                 player.GetComponent<PlayerCombatController>(),
                 player.GetComponent<PlayerSkillController>(),
                 player.GetComponent<PlayerLootController>(),
+                player.GetComponent<PlayerDeathController>(),
                 canvasObject.GetComponent<InventoryView>(),
                 canvasObject.GetComponent<QuestJournalView>(),
                 canvasObject.GetComponent<SkillHotbarView>(),

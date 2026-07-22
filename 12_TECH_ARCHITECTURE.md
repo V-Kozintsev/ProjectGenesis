@@ -88,7 +88,7 @@ Examples:
 
 `EnemyTerritory` owns reusable world-space bounds for hostile AI. `EnemySpawner` assigns the scene territory to each spawned `EnemyBrain`; the brain uses it for detection, leash return, and validated NavMesh roaming without coupling player movement to zone rules.
 
-`PlayerProgression` owns experience arithmetic in both directions, including death penalties and level-boundary changes. `PlayerCombatController` only decides when one penalty is applied, then continues the existing respawn flow.
+`PlayerProgression` owns experience arithmetic in both directions, including death penalties and level-boundary changes. `PlayerDeathController` listens to player `Health.Died`, applies the death penalty once, stops gameplay actions, disables regeneration, shows `DeathRespawnView`, and performs the confirmed village resurrection. `PlayerCombatController` owns only target selection and basic attack state.
 
 `CombatStats` owns attack and defense composition plus damage formulas. Base, class, progression, and equipment attack contributions remain separately readable; base defense and body-armor defense produce one total defense. `PlayerProgression` applies authored class and level growth to `Health` and `CombatStats`; `PlayerEquipment` supplies the exact equipped-weapon and body-armor contributions. `SkillDefinition` stores an attack-power multiplier and player-facing description, and `PlayerSkillController` asks `CombatStats` for the final defense-aware skill damage. `CharacterStatsView` and `SkillTooltipView` only present these runtime values. `DraggableWindow` is a reusable UI adapter attached to window headers and keeps moved prototype windows reachable on screen.
 

@@ -21,6 +21,7 @@ namespace ProjectGenesis.Gameplay
         [SerializeField] private Camera gameplayCamera;
 
         private QuestLog questLog;
+        private Health health;
         private NavMeshAgent agent;
         private Collider playerCollider;
         private NavMeshPath approachPath;
@@ -36,6 +37,7 @@ namespace ProjectGenesis.Gameplay
         private void Awake()
         {
             questLog = GetComponent<QuestLog>();
+            health = GetComponent<Health>();
             if (questLog == null)
             {
                 questLog = gameObject.AddComponent<QuestLog>();
@@ -53,6 +55,13 @@ namespace ProjectGenesis.Gameplay
 
         private void Update()
         {
+            if (health != null && health.IsDead)
+            {
+                CancelPendingInteraction(true);
+                promptView?.Hide();
+                return;
+            }
+
             CancelPendingInteractionOnManualMove();
             nearestNpc = FindNearestNpc();
             ClearSelectionWhenTooFar();
@@ -112,7 +121,7 @@ namespace ProjectGenesis.Gameplay
 
         public void HandleNpcClick(InteractableNpc clickedNpc)
         {
-            if (clickedNpc == null)
+            if (clickedNpc == null || (health != null && health.IsDead))
             {
                 return;
             }

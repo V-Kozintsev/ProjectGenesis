@@ -13,16 +13,24 @@ namespace ProjectGenesis.Gameplay
 
         private NavMeshAgent agent;
         private PlayerInventory inventory;
+        private Health health;
         private WorldLootPickup target;
 
         private void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
             inventory = GetComponent<PlayerInventory>();
+            health = GetComponent<Health>();
         }
 
         private void Update()
         {
+            if (health != null && health.IsDead)
+            {
+                CancelLootAction();
+                return;
+            }
+
             if (target == null)
             {
                 return;
@@ -48,7 +56,7 @@ namespace ProjectGenesis.Gameplay
 
         public void HandleLootClick(WorldLootPickup pickup)
         {
-            if (pickup == null || !pickup.IsCollectible)
+            if (pickup == null || !pickup.IsCollectible || (health != null && health.IsDead))
             {
                 return;
             }
