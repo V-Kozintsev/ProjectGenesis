@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ProjectGenesis.Data;
 using UnityEngine;
 
 namespace ProjectGenesis.Gameplay
@@ -63,6 +64,27 @@ namespace ProjectGenesis.Gameplay
             }
 
             return quests.TryGetValue(questId, out QuestProgressData progress) ? progress : null;
+        }
+
+        public bool TryAcceptQuest(QuestDefinition definition, string questGiverName)
+        {
+            if (definition == null || !definition.IsValid || definition.Objective == null ||
+                definition.Reward == null ||
+                (!string.IsNullOrWhiteSpace(definition.PrerequisiteQuestId) &&
+                 GetQuestState(definition.PrerequisiteQuestId) != QuestState.Completed))
+            {
+                return false;
+            }
+
+            return TryAcceptQuest(
+                definition.QuestId,
+                definition.DisplayName,
+                definition.Description,
+                definition.Objective.DisplayText,
+                questGiverName,
+                definition.Objective.TargetId,
+                definition.Objective.RequiredCount,
+                definition.Reward.Experience);
         }
 
         public bool TryAcceptQuest(
@@ -168,6 +190,7 @@ namespace ProjectGenesis.Gameplay
             }
 
             progress.State = QuestState.Completed;
+            progression ??= GetComponent<PlayerProgression>();
             progression?.AddExperience(progress.RewardExperience);
             Changed?.Invoke(this);
             return true;

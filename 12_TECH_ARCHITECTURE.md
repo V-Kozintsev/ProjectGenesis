@@ -96,6 +96,8 @@ Examples:
 
 Enemy identity, level, and base experience are authored by `EnemyBrain`. `PlayerProgression` owns the configurable level-difference multiplier because it converts an enemy reward into player progression; fixed quest rewards continue to bypass enemy scaling.
 
+`QuestDefinition` is immutable authored content for quest identity, dialogue, an explicit objective type, target, count, and reward. `InteractableNpc` references that content, while `QuestLog` owns any number of simultaneous runtime quest states and copies persistent fields into `QuestProgressData` when each quest is accepted. Objective events update every matching active entry independently. `QuestTrackerView` summarizes active entries from the log instead of depending on one NPC, and existing saves do not need a profile migration.
+
 Enemy prefabs compose the shared `EnemyBrain`, `Health`, `HealthRegeneration`, `CombatStats`, and `NavMeshAgent` behavior with independently authored values. Optional reward components such as `EnemyLootDrop` are attached only when that enemy actually participates in those loot or quest rules.
 
 ## Saving

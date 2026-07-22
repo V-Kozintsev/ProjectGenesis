@@ -2,6 +2,16 @@
 
 ## 2026-07-22
 
+- Started Sprint 025 Reusable Quest Content Definitions with documented scope and acceptance criteria.
+- Added a reusable `QuestDefinition` asset containing stable identity, dialogue, explicit defeat-target objective data, and experience reward data.
+- Moved the Village Elder from concrete serialized wolf-quest fields to one quest-definition reference while preserving self-contained saved progress and the existing field-based regression API.
+- Rebuilt the starter village and passed the deterministic Sprint 008-025 relevant regression suite; the user's Play Mode acceptance remains pending.
+- Accepted Sprint 025 after the user's Play Mode check of the existing Village Elder quest flow.
+- Started Sprint 026 Parallel Quests And Second Quest with documented scope and acceptance criteria.
+- Added a Guard Captain quest giver and the data-driven `Кабанья угроза` quest for defeating two boars and receiving 100 experience.
+- Kept the wolf and boar quests simultaneously active, independently progressed, persisted, and turnable in either order; the compact tracker now summarizes multiple active quests.
+- Restored a bold visible close symbol on the selected-target panel and added deterministic scene coverage for it.
+- Passed the Sprint 008-026 relevant regression suite and accepted Sprint 026 after the user's Play Mode check of simultaneous quests, independent progress, persistence, turn-in, and target-panel close control.
 - Started Sprint 023 Character Equipment View with documented scope and acceptance criteria.
 - Started Sprint 024 Local Message Feed Foundation with documented scope and acceptance criteria.
 - Added a bounded typed session-local stream for system, loot, combat, local-chat, and announcement events without adding message history to character saves.

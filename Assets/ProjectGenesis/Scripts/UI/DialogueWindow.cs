@@ -1,3 +1,4 @@
+using ProjectGenesis.Data;
 using ProjectGenesis.Gameplay;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +16,7 @@ namespace ProjectGenesis.UI
 
         private InteractableNpc currentNpc;
         private QuestLog currentQuestLog;
+        private QuestDefinition currentQuestDefinition;
         private System.Func<InteractableNpc, bool> canInteract;
 
         public void Initialize(
@@ -55,6 +57,7 @@ namespace ProjectGenesis.UI
         {
             currentNpc = npc;
             currentQuestLog = questLog;
+            currentQuestDefinition = npc != null ? npc.ResolveQuestDefinition(questLog) : null;
             canInteract = canInteractWithNpc;
 
             Refresh();
@@ -74,33 +77,29 @@ namespace ProjectGenesis.UI
 
             currentNpc = null;
             currentQuestLog = null;
+            currentQuestDefinition = null;
             canInteract = null;
         }
 
         private void HandleQuestAction()
         {
-            if (currentNpc == null || currentQuestLog == null || !CanStillInteract())
+            if (currentNpc == null || currentQuestLog == null ||
+                currentQuestDefinition == null || !CanStillInteract())
             {
                 Hide();
                 return;
             }
 
-            QuestState state = currentQuestLog.GetQuestState(currentNpc.QuestId);
+            QuestState state = currentQuestLog.GetQuestState(currentQuestDefinition.QuestId);
             if (state == QuestState.NotStarted)
             {
                 currentQuestLog.TryAcceptQuest(
-                    currentNpc.QuestId,
-                    currentNpc.QuestTitle,
-                    currentNpc.QuestDescription,
-                    currentNpc.QuestObjectiveText,
-                    currentNpc.DisplayName,
-                    currentNpc.QuestTargetId,
-                    currentNpc.RequiredObjectiveCount,
-                    currentNpc.RewardExperience);
+                    currentQuestDefinition,
+                    currentNpc.DisplayName);
             }
             else if (state == QuestState.ReadyToTurnIn)
             {
-                currentQuestLog.TryTurnInQuest(currentNpc.QuestId);
+                currentQuestLog.TryTurnInQuest(currentQuestDefinition.QuestId);
             }
 
             Refresh();
@@ -118,9 +117,31 @@ namespace ProjectGenesis.UI
                 return;
             }
 
-            QuestState state = currentQuestLog != null ? currentQuestLog.GetQuestState(currentNpc.QuestId) : QuestState.NotStarted;
+            if (currentQuestDefinition == null)
+            {
+                if (bodyText != null)
+                {
+                    bodyText.text = string.Empty;
+                }
+
+                if (questText != null)
+                {
+                    questText.text = string.Empty;
+                }
+
+                if (acceptQuestButton != null)
+                {
+                    acceptQuestButton.gameObject.SetActive(false);
+                }
+
+                return;
+            }
+
+            QuestState state = currentQuestLog != null
+                ? currentQuestLog.GetQuestState(currentQuestDefinition.QuestId)
+                : QuestState.NotStarted;
             QuestProgressData progress = currentQuestLog != null
-                ? currentQuestLog.GetQuestProgress(currentNpc.QuestId)
+                ? currentQuestLog.GetQuestProgress(currentQuestDefinition.QuestId)
                 : null;
 
             if (speakerText != null)
@@ -132,22 +153,22 @@ namespace ProjectGenesis.UI
             {
                 bodyText.text = state switch
                 {
-                    QuestState.NotStarted => currentNpc.GreetingText,
-                    QuestState.Active => currentNpc.ActiveQuestText,
-                    QuestState.ReadyToTurnIn => currentNpc.ReadyQuestText,
-                    QuestState.Completed => currentNpc.CompletedQuestText,
-                    _ => currentNpc.GreetingText
+                    QuestState.NotStarted => currentQuestDefinition.OfferText,
+                    QuestState.Active => currentQuestDefinition.ActiveText,
+                    QuestState.ReadyToTurnIn => currentQuestDefinition.ReadyText,
+                    QuestState.Completed => currentQuestDefinition.CompletedText,
+                    _ => currentQuestDefinition.OfferText
                 };
             }
 
             if (questText != null)
             {
                 int currentCount = progress != null ? progress.CurrentCount : 0;
-                int requiredCount = progress != null ? progress.RequiredCount : currentNpc.RequiredObjectiveCount;
+                int requiredCount = progress != null ? progress.RequiredCount : currentQuestDefinition.Objective.RequiredCount;
                 questText.text =
-                    $"{currentNpc.QuestTitle}\n" +
-                    $"{currentNpc.QuestObjectiveText} ({currentCount} / {requiredCount})\n" +
-                    $"Награда: {currentNpc.RewardExperience} опыта\n" +
+                    $"{currentQuestDefinition.DisplayName}\n" +
+                    $"{currentQuestDefinition.Objective.DisplayText} ({currentCount} / {requiredCount})\n" +
+                    $"Награда: {currentQuestDefinition.Reward.Experience} опыта\n" +
                     $"Состояние: {GetStateLabel(state)}";
             }
 

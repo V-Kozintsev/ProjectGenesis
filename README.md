@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 024 Local Message Feed Foundation is complete and accepted after the deterministic Sprint 008-024 regression suite and the user's Play Mode check. Gameplay publishes typed session-local system, loot, combat, chat, and announcement events into a movable, filterable, scrollable lower-left feed with focused-input blocking and local prototype chat. Sprint 025 Reusable Quest Content Definitions is the next proposed step; real player chat and server-authenticated global announcements remain later network features.
+Sprint 025 Reusable Quest Content Definitions and Sprint 026 Parallel Quests And Second Quest are complete and accepted after the deterministic Sprint 008-026 regression suite and the user's Play Mode check. The Village Elder keeps Wolf Trophies, while a new Guard Captain offers a data-driven two-boar hunt that can be active at the same time.
 
 The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
 
@@ -61,6 +61,9 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
   - `Click Approach Max Distance` controls how far away an NPC can be clicked for auto-approach.
 - `E` is still available as a temporary fallback while standing near an NPC.
 - Accept the Village Elder's quest, collect five wolf tails beyond the north gate, then return to the elder and choose `Завершить поручение`.
+- Talk to the Guard Captain near the north approach and accept `Кабанья угроза`. It can remain active together with the wolf quest; defeating two boars completes only its own objective.
+- When two quests are active, the compact tracker lists both and the `J` journal keeps their full independent details.
+- The authored content for that quest lives in `Assets/ProjectGenesis/Data/Quests/SO_Quest_WolfTrophies.asset`; the Village Elder references the asset instead of storing a private copy of its texts and numbers.
 - The compact tracker in the upper-right corner shows current tail progress and tells the player when it is time to return to the elder.
 - Press `J` or click `Задания [J]` to open the quest journal. Its active and completed tabs are generated from the quest log rather than being hardcoded for one quest.
 - Select a journal entry to see its description, objective, quest giver, state, and experience reward.
@@ -116,6 +119,9 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - [39_SPRINT_021.md](39_SPRINT_021.md) - body equipment, defense bonuses, one healing consumable, persistence, and validation sprint.
 - [40_SPRINT_022.md](40_SPRINT_022.md) - explicit player death state, resurrection choice, input lock, and validation sprint.
 - [41_SPRINT_023.md](41_SPRINT_023.md) - separate equipment storage, character equipment view, profile migration, and validation sprint.
+- [42_SPRINT_024.md](42_SPRINT_024.md) - typed local message stream, filterable feed, local chat input, and validation sprint.
+- [43_SPRINT_025.md](43_SPRINT_025.md) - reusable quest content definitions, NPC decoupling, save compatibility, and validation sprint.
+- [44_SPRINT_026.md](44_SPRINT_026.md) - second quest giver, parallel active quests, shared tracking, and validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

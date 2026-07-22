@@ -2,7 +2,7 @@
 
 ## Current Direction
 
-**Sprint 024: Local Message Feed Foundation** is complete after deterministic validation and the user's Play Mode acceptance. **Sprint 025: Reusable Quest Content Definitions** is the next proposed implementation.
+**Sprint 025: Reusable Quest Content Definitions** and **Sprint 026: Parallel Quests And Second Quest** are complete and accepted after deterministic Sprint 008-026 validation and the user's Play Mode check.
 
 This file preserves completed milestone history and the broad delivery order. The user-facing Russian plan and current dependency decisions live in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md). A future feature listed here is not permission to implement it before its dependencies or current priority.
 
@@ -403,8 +403,9 @@ Sprint 023 delivered additions:
 
 Post-Sprint 023 proposed sequence:
 
-- Sprint 024 Local Message Feed Foundation: add typed local system, loot, combat, and announcement events with a filterable lower-left log; real player chat remains a later server feature;
-- reusable quest content definitions and a second short quest resume after these cross-system foundations.
+- Sprint 024 Local Message Feed Foundation: completed and accepted;
+- Sprint 025 Reusable Quest Content Definitions: completed and accepted;
+- Sprint 026 Parallel Quests And Second Quest: accepted with a Guard Captain, independent boar objective, simultaneous active states, shared tracking, persistence, and independent turn-in.
 
 Post-Sprint 009 backlog decisions:
 

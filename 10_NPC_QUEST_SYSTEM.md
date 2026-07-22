@@ -5,7 +5,7 @@
 Initial NPCs:
 
 - Village Elder - first quest giver.
-- Guard Captain - combat tutorial and enemy quests.
+- Guard Captain - current boar-hunt quest giver and future combat-oriented quests.
 - Trader - buy/sell later.
 - Healer - future respawn and consumable hook.
 
@@ -61,6 +61,12 @@ Active and ready-to-turn-in quests may be abandoned. Abandoning removes the ques
 The journal is a view over `QuestLog`, not a separate source of quest state. It displays dynamically generated active and completed lists plus persisted title, description, objective, giver, state, and reward metadata.
 
 Objective notifications are event-driven and appear only when progress actually increases. Restoring saved state must not replay old progress notifications.
+
+Authored quest content lives in reusable `QuestDefinition` assets. A definition owns the stable id, presentation, dialogue, explicit objective type and target, required count, and reward data. An `InteractableNpc` references a definition; it does not duplicate a concrete quest's fields.
+
+Accepted progress remains a self-contained `QuestProgressData` snapshot. This keeps existing saves readable and prevents later wording or balance edits to an asset from corrupting the state already stored for a character.
+
+`QuestLog` supports multiple active quests at the same time. Objective events advance every matching active quest independently, turning in one quest does not change another, and the shared tracker summarizes multiple active entries while the journal remains the detailed view.
 
 ## Quest Rule
 

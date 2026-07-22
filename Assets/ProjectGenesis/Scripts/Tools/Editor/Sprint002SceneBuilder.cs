@@ -29,6 +29,7 @@ namespace ProjectGenesis.Tools.Editor
         private const string BoundaryMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Village_Boundary.mat";
         private const string PropMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Village_Prop.mat";
         private const string NpcMaterialPath = "Assets/ProjectGenesis/Materials/MAT_NPC_Village_Elder.mat";
+        private const string GuardMaterialPath = "Assets/ProjectGenesis/Materials/MAT_NPC_GuardCaptain.mat";
         private const string WolfMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Enemy_Wolf.mat";
         private const string BoarMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Enemy_Boar.mat";
         private const string TargetRingMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Combat_TargetRing.mat";
@@ -39,6 +40,8 @@ namespace ProjectGenesis.Tools.Editor
         private const string WornLeatherArmorPath = "Assets/ProjectGenesis/Data/Items/ITM_WornLeatherArmor.asset";
         private const string MinorHealingPotionPath = "Assets/ProjectGenesis/Data/Items/ITM_MinorHealingPotion.asset";
         private const string WolfLootTablePath = "Assets/ProjectGenesis/Data/LootTables/LT_Wolf.asset";
+        private const string WolfTrophiesQuestPath = "Assets/ProjectGenesis/Data/Quests/SO_Quest_WolfTrophies.asset";
+        private const string BoarHuntQuestPath = "Assets/ProjectGenesis/Data/Quests/SO_Quest_BoarHunt.asset";
         private const string BoarLootTablePath = "Assets/ProjectGenesis/Data/LootTables/LT_Boar.asset";
         private const string HeavyStrikePath = "Assets/ProjectGenesis/Data/Skills/SO_Skill_HeavyStrike.asset";
         private const string HumanRacePath = "Assets/ProjectGenesis/Data/Races/SO_Race_Human.asset";
@@ -164,6 +167,84 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 025/Rebuild Starter Village Quest Definitions")]
+        public static void RebuildStarterVillageQuestDefinitions()
+        {
+            RebuildStarterVillage();
+        }
+
+        [MenuItem("Project Genesis/Sprint 025/Apply Quest Definitions To Existing Scene")]
+        public static void ApplyQuestDefinitionsToExistingScene()
+        {
+            EnsureFolders();
+            QuestDefinition wolfTrophiesQuest = CreateWolfTrophiesQuest();
+            Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            InteractableNpc[] npcs =
+                Object.FindObjectsByType<InteractableNpc>(
+                    FindObjectsInactive.Include,
+                    FindObjectsSortMode.None);
+            if (npcs.Length != 1)
+            {
+                throw new System.InvalidOperationException(
+                    "Starter village must contain exactly one quest NPC.");
+            }
+
+            npcs[0].ConfigureQuest(wolfTrophiesQuest);
+            EditorUtility.SetDirty(npcs[0]);
+            EditorSceneManager.SaveScene(scene, ScenePath);
+            AssetDatabase.SaveAssets();
+        }
+
+        [MenuItem("Project Genesis/Sprint 026/Rebuild Starter Village Second Quest")]
+        public static void RebuildStarterVillageSecondQuest()
+        {
+            RebuildStarterVillage();
+        }
+
+        [MenuItem("Project Genesis/Sprint 026/Apply Second Quest To Existing Scene")]
+        public static void ApplySecondQuestToExistingScene()
+        {
+            EnsureFolders();
+            QuestDefinition wolfTrophiesQuest = CreateWolfTrophiesQuest();
+            QuestDefinition boarHuntQuest = CreateBoarHuntQuest();
+            Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            InteractableNpc elder = FindNpc("NPC_VillageElder");
+            if (elder == null)
+            {
+                throw new System.InvalidOperationException(
+                    "Starter village elder was not found.");
+            }
+
+            elder.ConfigureQuest(wolfTrophiesQuest);
+            EditorUtility.SetDirty(elder);
+
+            InteractableNpc guard = FindNpc("NPC_GuardCaptain");
+            if (guard == null)
+            {
+                guard = CreateGuardCaptain(
+                    CreateMaterial(GuardMaterialPath, new Color(0.28f, 0.38f, 0.52f)),
+                    CreateMaterial(TargetRingMaterialPath, new Color(0.85f, 0.16f, 0.12f)),
+                    boarHuntQuest);
+            }
+            else
+            {
+                guard.ConfigureDisplayName("Капитан стражи");
+                guard.ConfigureQuest(boarHuntQuest);
+                EditorUtility.SetDirty(guard);
+            }
+
+            Button clearTargetButton = FindButton("Button_ClearTarget");
+            if (clearTargetButton == null)
+            {
+                throw new System.InvalidOperationException(
+                    "Starter village target close button was not found.");
+            }
+
+            ConfigureClearTargetButton(clearTargetButton);
+            EditorSceneManager.SaveScene(scene, ScenePath);
+            AssetDatabase.SaveAssets();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -192,6 +273,7 @@ namespace ProjectGenesis.Tools.Editor
             SkillDefinition heavyStrike = CreateHeavyStrike();
             CharacterRaceDefinition humanRace = CreateHumanRace();
             CharacterClassDefinition warriorClass = CreateWarriorClass();
+            QuestDefinition wolfTrophiesQuest = CreateWolfTrophiesQuest();
 
             GameObject playerPrefab = CreatePlayerPrefab(
                 playerMaterial,
@@ -244,7 +326,12 @@ namespace ProjectGenesis.Tools.Editor
             playerController.SetCameraTransform(camera.transform);
             interactionController.SetGameplayCamera(camera);
 
-            InteractableNpc villageElder = CreateVillageElder(npcMaterial, targetRingMaterial);
+            InteractableNpc villageElder =
+                CreateVillageElder(npcMaterial, targetRingMaterial, wolfTrophiesQuest);
+            CreateGuardCaptain(
+                CreateMaterial(GuardMaterialPath, new Color(0.28f, 0.38f, 0.52f)),
+                targetRingMaterial,
+                CreateBoarHuntQuest());
             CreateEnemySpawners(wolfPrefab, boarPrefab, player.transform, combatTerritory);
             FirstContactUi ui = CreateFirstContactUi(player, combatController, villageElder);
             interactionController.SetDialogueWindow(ui.DialogueWindow);
@@ -275,6 +362,7 @@ namespace ProjectGenesis.Tools.Editor
                 "Assets/ProjectGenesis/Data/Items",
                 "Assets/ProjectGenesis/Data/LootTables",
                 "Assets/ProjectGenesis/Data/Skills",
+                "Assets/ProjectGenesis/Data/Quests",
                 "Assets/ProjectGenesis/Data/Races",
                 "Assets/ProjectGenesis/Data/Classes"
             };
@@ -417,6 +505,62 @@ namespace ProjectGenesis.Tools.Editor
                 new LootTableEntry(wornLeatherArmor, LootRarity.Common, 0.15f));
             AssetDatabase.CreateAsset(lootTable, BoarLootTablePath);
             return lootTable;
+        }
+
+        private static QuestDefinition CreateWolfTrophiesQuest()
+        {
+            QuestDefinition quest =
+                AssetDatabase.LoadAssetAtPath<QuestDefinition>(WolfTrophiesQuestPath);
+            if (quest == null)
+            {
+                quest = ScriptableObject.CreateInstance<QuestDefinition>();
+                AssetDatabase.CreateAsset(quest, WolfTrophiesQuestPath);
+            }
+
+            quest.Configure(
+                "wolves-near-the-road",
+                "Волчьи трофеи",
+                "Стая у северной дороги угрожает деревне. Принесите старосте доказательства охоты.",
+                "Путник, волков за северными воротами стало слишком много. Принеси мне пять волчьих хвостов.",
+                "Хвост выпадает не с каждого волка. Продолжай охоту за северными воротами.",
+                "Пяти хвостов достаточно. Теперь мы знаем, насколько велика стая.",
+                "Спасибо за помощь. Северная дорога теперь безопаснее.",
+                QuestObjectiveType.DefeatTarget,
+                "wolf_tail",
+                "Волчьи хвосты",
+                "Вернитесь к старосте",
+                5,
+                80);
+            EditorUtility.SetDirty(quest);
+            return quest;
+        }
+
+        private static QuestDefinition CreateBoarHuntQuest()
+        {
+            QuestDefinition quest =
+                AssetDatabase.LoadAssetAtPath<QuestDefinition>(BoarHuntQuestPath);
+            if (quest == null)
+            {
+                quest = ScriptableObject.CreateInstance<QuestDefinition>();
+                AssetDatabase.CreateAsset(quest, BoarHuntQuestPath);
+            }
+
+            quest.Configure(
+                "boars-near-the-road",
+                "Кабанья угроза",
+                "Кабаны у северной дороги осмелели после охоты на волков. Победите двух лесных кабанов.",
+                "С волками стало тише, но кабаны всё чаще выходят к дороге. Одолей двух лесных кабанов.",
+                "Продолжай охоту у северной дороги. Нам нужно отогнать кабанов от деревни.",
+                "Этого достаточно. Кабаны теперь будут держаться дальше от дороги.",
+                "Хорошая работа. Северная дорога стала безопаснее.",
+                QuestObjectiveType.DefeatTarget,
+                "boar",
+                "Побеждено кабанов",
+                "Вернитесь к капитану стражи",
+                2,
+                100);
+            EditorUtility.SetDirty(quest);
+            return quest;
         }
 
         private static SkillDefinition CreateHeavyStrike()
@@ -852,7 +996,10 @@ namespace ProjectGenesis.Tools.Editor
             return camera;
         }
 
-        private static InteractableNpc CreateVillageElder(Material npcMaterial, Material targetRingMaterial)
+        private static InteractableNpc CreateVillageElder(
+            Material npcMaterial,
+            Material targetRingMaterial,
+            QuestDefinition questDefinition)
         {
             GameObject elder = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             elder.name = "NPC_VillageElder";
@@ -860,18 +1007,38 @@ namespace ProjectGenesis.Tools.Editor
             elder.transform.localScale = new Vector3(0.9f, 1f, 0.9f);
             elder.GetComponent<Renderer>().sharedMaterial = npcMaterial;
             InteractableNpc npc = elder.AddComponent<InteractableNpc>();
-            npc.ConfigureQuest(
-                "wolves-near-the-road",
-                "Волчьи трофеи",
-                "Стая у северной дороги угрожает деревне. Принесите старосте доказательства охоты.",
-                "Волчьи хвосты",
-                "wolf_tail",
-                5,
-                80);
+            npc.ConfigureQuest(questDefinition);
 
             GameObject selectionRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             selectionRing.name = "SelectionRing";
             selectionRing.transform.SetParent(elder.transform, false);
+            selectionRing.transform.localPosition = new Vector3(0f, -0.98f, 0f);
+            selectionRing.transform.localScale = new Vector3(0.78f, 0.025f, 0.78f);
+            Object.DestroyImmediate(selectionRing.GetComponent<Collider>());
+            selectionRing.GetComponent<Renderer>().sharedMaterial = targetRingMaterial;
+            npc.SetSelectionRing(selectionRing);
+            return npc;
+        }
+
+        private static InteractableNpc CreateGuardCaptain(
+            Material npcMaterial,
+            Material targetRingMaterial,
+            QuestDefinition questDefinition)
+        {
+            GameObject guard = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            guard.name = "NPC_GuardCaptain";
+            guard.transform.SetPositionAndRotation(
+                new Vector3(2.2f, 1f, 6.2f),
+                Quaternion.Euler(0f, 180f, 0f));
+            guard.transform.localScale = new Vector3(0.9f, 1f, 0.9f);
+            guard.GetComponent<Renderer>().sharedMaterial = npcMaterial;
+            InteractableNpc npc = guard.AddComponent<InteractableNpc>();
+            npc.ConfigureDisplayName("Капитан стражи");
+            npc.ConfigureQuest(questDefinition);
+
+            GameObject selectionRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            selectionRing.name = "SelectionRing";
+            selectionRing.transform.SetParent(guard.transform, false);
             selectionRing.transform.localPosition = new Vector3(0f, -0.98f, 0f);
             selectionRing.transform.localScale = new Vector3(0.78f, 0.025f, 0.78f);
             Object.DestroyImmediate(selectionRing.GetComponent<Collider>());
@@ -2237,6 +2404,7 @@ namespace ProjectGenesis.Tools.Editor
 
             Button clearTargetButton = CreateButton("Button_ClearTarget", targetPanel.transform, "X");
             clearTargetButton.GetComponent<Image>().color = new Color(0.3f, 0.11f, 0.1f, 1f);
+            ConfigureClearTargetButton(clearTargetButton);
             SetRect(
                 clearTargetButton.GetComponent<RectTransform>(),
                 new Vector2(382f, -8f),
@@ -2390,6 +2558,58 @@ namespace ProjectGenesis.Tools.Editor
             labelText.color = Color.white;
             Stretch(labelText.GetComponent<RectTransform>(), 8f, 4f, 8f, 4f);
             return button;
+        }
+
+        private static void ConfigureClearTargetButton(Button button)
+        {
+            Text label = button != null
+                ? button.GetComponentInChildren<Text>(true)
+                : null;
+            if (label == null)
+            {
+                throw new System.InvalidOperationException(
+                    "Target close button label was not found.");
+            }
+
+            label.text = "×";
+            label.fontSize = 26;
+            label.fontStyle = FontStyle.Bold;
+            label.color = new Color(1f, 0.88f, 0.82f, 1f);
+            Stretch(label.GetComponent<RectTransform>(), 0f, 0f, 0f, 0f);
+            EditorUtility.SetDirty(label);
+            EditorUtility.SetDirty(label.GetComponent<RectTransform>());
+        }
+
+        private static Button FindButton(string objectName)
+        {
+            Button[] buttons = Object.FindObjectsByType<Button>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            foreach (Button button in buttons)
+            {
+                if (button.name == objectName)
+                {
+                    return button;
+                }
+            }
+
+            return null;
+        }
+
+        private static InteractableNpc FindNpc(string objectName)
+        {
+            InteractableNpc[] npcs = Object.FindObjectsByType<InteractableNpc>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            foreach (InteractableNpc npc in npcs)
+            {
+                if (npc.name == objectName)
+                {
+                    return npc;
+                }
+            }
+
+            return null;
         }
 
         private static InputField CreateInputField(string name, Transform parent, string placeholderValue)
