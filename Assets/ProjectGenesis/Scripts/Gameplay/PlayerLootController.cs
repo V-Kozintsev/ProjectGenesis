@@ -14,6 +14,7 @@ namespace ProjectGenesis.Gameplay
         private NavMeshAgent agent;
         private PlayerInventory inventory;
         private Health health;
+        private LocalMessageStream messageStream;
         private WorldLootPickup target;
 
         private void Awake()
@@ -21,6 +22,7 @@ namespace ProjectGenesis.Gameplay
             agent = GetComponent<NavMeshAgent>();
             inventory = GetComponent<PlayerInventory>();
             health = GetComponent<Health>();
+            messageStream = GetComponent<LocalMessageStream>();
         }
 
         private void Update()
@@ -45,7 +47,21 @@ namespace ProjectGenesis.Gameplay
 
             if (distance <= pickupDistance)
             {
-                target.TryCollect(inventory);
+                ItemInstance item = target.Instance;
+                bool collected = target.TryCollect(inventory);
+                if (collected)
+                {
+                    messageStream?.Publish(
+                        LocalMessageCategory.Loot,
+                        $"Подобрано: {item.DisplayName}.");
+                }
+                else
+                {
+                    messageStream?.Publish(
+                        LocalMessageCategory.System,
+                        $"Не удалось подобрать {item.DisplayName}: проверьте место в сумке.");
+                }
+
                 target = null;
                 StopAgent();
                 return;

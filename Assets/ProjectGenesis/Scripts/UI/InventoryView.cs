@@ -1,4 +1,5 @@
 using System;
+using ProjectGenesis.Core;
 using ProjectGenesis.Data;
 using ProjectGenesis.Gameplay;
 using UnityEngine;
@@ -191,7 +192,8 @@ namespace ProjectGenesis.UI
         private void Update()
         {
             Keyboard keyboard = Keyboard.current;
-            if (keyboard != null && keyboard.iKey.wasPressedThisFrame)
+            if (!GameplayInputGate.IsTextEntryFocused && keyboard != null &&
+                keyboard.iKey.wasPressedThisFrame)
             {
                 ToggleWindow();
             }

@@ -18,6 +18,7 @@ namespace ProjectGenesis.Gameplay
     {
         private PlayerInventory inventory;
         private Health health;
+        private LocalMessageStream messageStream;
 
         public Health Health => health != null ? health : GetComponent<Health>();
 
@@ -25,6 +26,7 @@ namespace ProjectGenesis.Gameplay
         {
             inventory = GetComponent<PlayerInventory>();
             health = GetComponent<Health>();
+            messageStream = GetComponent<LocalMessageStream>();
         }
 
         public bool TryUse(ItemInstance item, out ItemUseResult result)
@@ -55,12 +57,17 @@ namespace ProjectGenesis.Gameplay
                 return false;
             }
 
+            int healthBeforeUse = health.CurrentHealth;
             if (!health.Heal(item.HealingAmount) || !inventory.TryRemoveInstance(item))
             {
                 result = ItemUseResult.InvalidItem;
                 return false;
             }
 
+            int restoredHealth = health.CurrentHealth - healthBeforeUse;
+            messageStream?.Publish(
+                LocalMessageCategory.System,
+                $"Использовано: {item.DisplayName}. Восстановлено здоровья: {restoredHealth}.");
             result = ItemUseResult.Success;
             return true;
         }
@@ -69,6 +76,7 @@ namespace ProjectGenesis.Gameplay
         {
             inventory ??= GetComponent<PlayerInventory>();
             health ??= GetComponent<Health>();
+            messageStream ??= GetComponent<LocalMessageStream>();
         }
     }
 }

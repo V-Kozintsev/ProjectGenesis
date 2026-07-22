@@ -22,6 +22,7 @@ namespace ProjectGenesis.Gameplay
         private PlayerSkillController skillController;
         private PlayerLootController lootController;
         private PlayerInteractionController interactionController;
+        private LocalMessageStream messageStream;
         private bool isDeathStateActive;
         private int lastExperienceLoss;
         private bool isSubscribed;
@@ -80,6 +81,9 @@ namespace ProjectGenesis.Gameplay
             regeneration.SetRegenerationAllowed(true, true);
             isDeathStateActive = false;
             deathView?.Hide();
+            messageStream?.Publish(
+                LocalMessageCategory.System,
+                "Персонаж воскрешён в деревне.");
         }
 
         private void HandlePlayerDied(Health _)
@@ -95,6 +99,9 @@ namespace ProjectGenesis.Gameplay
             StopGameplayActions();
             regeneration.SetRegenerationAllowed(false);
             deathView?.Show(lastExperienceLoss, RespawnAtVillage);
+            messageStream?.Publish(
+                LocalMessageCategory.Combat,
+                $"Персонаж погиб. Потеря опыта: {lastExperienceLoss}.");
         }
 
         private void StopGameplayActions()
@@ -121,6 +128,7 @@ namespace ProjectGenesis.Gameplay
             skillController ??= GetComponent<PlayerSkillController>();
             lootController ??= GetComponent<PlayerLootController>();
             interactionController ??= GetComponent<PlayerInteractionController>();
+            messageStream ??= GetComponent<LocalMessageStream>();
 
             if (!isSubscribed && health != null)
             {

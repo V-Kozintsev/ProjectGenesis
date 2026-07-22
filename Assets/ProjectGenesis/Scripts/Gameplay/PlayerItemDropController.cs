@@ -14,6 +14,7 @@ namespace ProjectGenesis.Gameplay
 
         private PlayerInventory inventory;
         private Health health;
+        private LocalMessageStream messageStream;
 
         public Material PickupMaterial => pickupMaterial;
 
@@ -44,12 +45,28 @@ namespace ProjectGenesis.Gameplay
             }
 
             pickup = pickupObject.GetComponent<WorldLootPickup>();
-            return pickup != null;
+            if (pickup == null)
+            {
+                return false;
+            }
+
+            messageStream?.Publish(
+                LocalMessageCategory.Loot,
+                $"Выброшено на землю: {item.DisplayName}.");
+            return true;
         }
 
         public bool TryDestroy(ItemInstance item)
         {
-            return CanRemove(item) && inventory.TryRemoveInstance(item);
+            if (!CanRemove(item) || !inventory.TryRemoveInstance(item))
+            {
+                return false;
+            }
+
+            messageStream?.Publish(
+                LocalMessageCategory.System,
+                $"Удалено безвозвратно: {item.DisplayName}.");
+            return true;
         }
 
         private bool CanRemove(ItemInstance item)
@@ -104,6 +121,7 @@ namespace ProjectGenesis.Gameplay
         {
             inventory ??= GetComponent<PlayerInventory>();
             health ??= GetComponent<Health>();
+            messageStream ??= GetComponent<LocalMessageStream>();
         }
 
         private static void DestroyObject(GameObject target)

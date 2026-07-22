@@ -2,7 +2,7 @@
 
 ## Current Direction
 
-**Sprint 023: Character Equipment View** is complete after deterministic validation and the user's Play Mode acceptance. **Sprint 024: Local Message Feed Foundation** is the next proposed implementation.
+**Sprint 024: Local Message Feed Foundation** is complete after deterministic validation and the user's Play Mode acceptance. **Sprint 025: Reusable Quest Content Definitions** is the next proposed implementation.
 
 This file preserves completed milestone history and the broad delivery order. The user-facing Russian plan and current dependency decisions live in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md). A future feature listed here is not permission to implement it before its dependencies or current priority.
 

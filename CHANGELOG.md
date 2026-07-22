@@ -3,6 +3,11 @@
 ## 2026-07-22
 
 - Started Sprint 023 Character Equipment View with documented scope and acceptance criteria.
+- Started Sprint 024 Local Message Feed Foundation with documented scope and acceptance criteria.
+- Added a bounded typed session-local stream for system, loot, combat, local-chat, and announcement events without adding message history to character saves.
+- Published useful pickup, drop, destroy, equipment, consumable, Heavy Strike, ordinary outgoing and incoming damage, death, and respawn results after successful operations.
+- Added a movable lower-left feed with category filters, hide and reopen controls, the new Input System `L` shortcut, a visible draggable scrollbar, and a length-limited local chat input with blinking caret; focused text entry now blocks gameplay and camera controls, while real network player chat remains intentionally absent.
+- Added a deterministic Sprint 024 validator, passed the Sprint 008-024 relevant regression suite, accepted the user's Play Mode check, and set Sprint 025 Reusable Quest Content Definitions as the next proposed step.
 - Separated exact equipped weapon and body-armor instances from the eight bag positions, including safe replacement and full-bag unequip refusal.
 - Combined the eight-slot bag and main-hand/body equipment presentation in the movable inventory window, with selected-item comparison and equip, replace, and unequip feedback.
 - Added exact-instance world dropping plus click-or-drag trash with centered confirmation for permanent selected-item removal; both are blocked while dead.

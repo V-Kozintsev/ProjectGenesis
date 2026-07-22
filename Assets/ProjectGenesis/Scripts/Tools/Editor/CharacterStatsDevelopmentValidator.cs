@@ -166,21 +166,18 @@ namespace ProjectGenesis.Tools.Editor
                 UnityEngine.Object.FindObjectsByType<DraggableWindow>(
                     FindObjectsInactive.Include,
                     FindObjectsSortMode.None);
-            Require(draggableWindows.Length == 3,
-                "Stats, inventory, and quest windows must all be draggable.");
+            Require(draggableWindows.Length >= 3,
+                "Stats, inventory, and quest windows must remain draggable.");
             string[] draggableNames = draggableWindows
                 .Select(draggable => draggable.TargetWindow != null
                     ? draggable.TargetWindow.name
                     : string.Empty)
                 .OrderBy(name => name)
                 .ToArray();
-            Require(draggableNames.SequenceEqual(new[]
-                {
-                    "CharacterStatsWindow",
-                    "InventoryWindow",
-                    "QuestJournalWindow"
-                }),
-                "Draggable window targets are incomplete or unexpected.");
+            Require(draggableNames.Contains("CharacterStatsWindow") &&
+                    draggableNames.Contains("InventoryWindow") &&
+                    draggableNames.Contains("QuestJournalWindow"),
+                "Required draggable window targets are incomplete.");
 
             SkillTooltipView[] tooltips =
                 UnityEngine.Object.FindObjectsByType<SkillTooltipView>(

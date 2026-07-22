@@ -1,3 +1,4 @@
+using ProjectGenesis.Core;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.EventSystems;
@@ -52,16 +53,23 @@ namespace ProjectGenesis.Gameplay
 
         private void Update()
         {
-            TryClearSelection();
+            bool isTextEntryFocused = GameplayInputGate.IsTextEntryFocused;
+            if (!isTextEntryFocused)
+            {
+                TryClearSelection();
+            }
 
             if (agent == null || !agent.enabled || (combatController != null && combatController.IsInputLocked))
             {
                 return;
             }
 
-            TrySetClickDestination();
+            if (!isTextEntryFocused)
+            {
+                TrySetClickDestination();
+            }
 
-            Vector2 moveInput = ReadMoveInput();
+            Vector2 moveInput = isTextEntryFocused ? Vector2.zero : ReadMoveInput();
 
             if (moveInput.sqrMagnitude > 0.001f)
             {

@@ -1,4 +1,5 @@
 using System;
+using ProjectGenesis.Core;
 using ProjectGenesis.UI;
 using UnityEngine;
 using UnityEngine.AI;
@@ -78,7 +79,8 @@ namespace ProjectGenesis.Gameplay
             }
 
             Keyboard keyboard = Keyboard.current;
-            if (nearestNpc != null && keyboard != null && keyboard.eKey.wasPressedThisFrame)
+            if (!GameplayInputGate.IsTextEntryFocused && nearestNpc != null &&
+                keyboard != null && keyboard.eKey.wasPressedThisFrame)
             {
                 nearestNpc.Interact(questLog, dialogueWindow, CanInteractWith);
             }
@@ -243,6 +245,11 @@ namespace ProjectGenesis.Gameplay
 
         private void CancelPendingInteractionOnManualMove()
         {
+            if (GameplayInputGate.IsTextEntryFocused)
+            {
+                return;
+            }
+
             Keyboard keyboard = Keyboard.current;
             if (keyboard == null || pendingInteractionNpc == null)
             {

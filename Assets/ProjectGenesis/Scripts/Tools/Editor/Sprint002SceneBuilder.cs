@@ -158,6 +158,12 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 024/Rebuild Starter Village Message Feed")]
+        public static void RebuildStarterVillageMessageFeed()
+        {
+            RebuildStarterVillage();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -502,6 +508,7 @@ namespace ProjectGenesis.Tools.Editor
             progression.ConfigureGrowth(90, 10, 2);
             progression.ConfigureDeathPenalty(0.1f, 10);
             progression.ConfigureEnemyExperienceScaling(0.25f, 0.1f, 0.1f, 1.5f);
+            player.AddComponent<LocalMessageStream>();
             player.AddComponent<PlayerInventory>();
             player.AddComponent<PlayerEquipment>();
             player.AddComponent<PlayerItemUseController>();
@@ -951,6 +958,7 @@ namespace ProjectGenesis.Tools.Editor
             CreateCharacterStatsUi(canvasObject, player);
             CreateSkillHotbar(canvasObject, player.GetComponent<PlayerSkillController>());
             CreateDeathRespawnUi(canvasObject, player.GetComponent<PlayerDeathController>());
+            CreateLocalMessageFeed(canvasObject, player.GetComponent<LocalMessageStream>());
             CreateCharacterEntryUi(canvasObject, player);
 
             return new FirstContactUi(dialogueWindow, promptView);
@@ -1004,6 +1012,193 @@ namespace ProjectGenesis.Tools.Editor
             DeathRespawnView view = canvasObject.AddComponent<DeathRespawnView>();
             view.Initialize(window, loss, respawnButton);
             deathController.SetDeathView(view);
+        }
+
+        private static void CreateLocalMessageFeed(
+            GameObject canvasObject,
+            LocalMessageStream messageStream)
+        {
+            Button reopenButton = CreateButton(
+                "Button_OpenMessageFeed",
+                canvasObject.transform,
+                "Сообщения [L]");
+            SetRect(
+                reopenButton.GetComponent<RectTransform>(),
+                new Vector2(24f, 24f),
+                new Vector2(210f, 46f),
+                new Vector2(0f, 0f));
+
+            GameObject window = CreatePanel(
+                "LocalMessageFeedWindow",
+                canvasObject.transform,
+                new Color(0.035f, 0.045f, 0.05f, 0.94f));
+            SetRect(
+                window.GetComponent<RectTransform>(),
+                new Vector2(24f, 24f),
+                new Vector2(680f, 370f),
+                new Vector2(0f, 0f));
+
+            Text title = CreateText(
+                "Text_MessageFeedTitle",
+                window.transform,
+                "Сообщения",
+                24,
+                TextAnchor.MiddleLeft);
+            title.color = new Color(0.94f, 0.79f, 0.42f);
+            SetRect(
+                title.GetComponent<RectTransform>(),
+                new Vector2(18f, -10f),
+                new Vector2(530f, 40f),
+                new Vector2(0f, 1f));
+
+            Button closeButton = CreateButton(
+                "Button_CloseMessageFeed",
+                window.transform,
+                "X");
+            SetRect(
+                closeButton.GetComponent<RectTransform>(),
+                new Vector2(-14f, -10f),
+                new Vector2(42f, 40f),
+                new Vector2(1f, 1f));
+
+            Button allButton = CreateButton("Button_MessageFilterAll", window.transform, "Все");
+            Button systemButton = CreateButton("Button_MessageFilterSystem", window.transform, "Система");
+            Button lootButton = CreateButton("Button_MessageFilterLoot", window.transform, "Лут");
+            Button combatButton = CreateButton("Button_MessageFilterCombat", window.transform, "Бой");
+            Button chatButton = CreateButton("Button_MessageFilterChat", window.transform, "Общий");
+            Button announcementButton = CreateButton(
+                "Button_MessageFilterAnnouncement",
+                window.transform,
+                "Важно");
+            Button[] filterButtons =
+            {
+                allButton,
+                systemButton,
+                lootButton,
+                combatButton,
+                chatButton,
+                announcementButton
+            };
+            float[] widths = { 76f, 108f, 76f, 76f, 92f, 100f };
+            float x = 18f;
+            for (int index = 0; index < filterButtons.Length; index++)
+            {
+                SetRect(
+                    filterButtons[index].GetComponent<RectTransform>(),
+                    new Vector2(x, -60f),
+                    new Vector2(widths[index], 38f),
+                    new Vector2(0f, 1f));
+                filterButtons[index].GetComponentInChildren<Text>().fontSize = 17;
+                x += widths[index] + 8f;
+            }
+
+            GameObject scrollRoot = CreatePanel(
+                "MessageScroll",
+                window.transform,
+                new Color(0.02f, 0.025f, 0.028f, 0.6f));
+            SetRect(
+                scrollRoot.GetComponent<RectTransform>(),
+                new Vector2(18f, -112f),
+                new Vector2(604f, 178f),
+                new Vector2(0f, 1f));
+            Mask mask = scrollRoot.AddComponent<Mask>();
+            mask.showMaskGraphic = true;
+            ScrollRect scroll = scrollRoot.AddComponent<ScrollRect>();
+            scroll.horizontal = false;
+            scroll.vertical = true;
+            scroll.movementType = ScrollRect.MovementType.Clamped;
+            scroll.scrollSensitivity = 28f;
+
+            GameObject scrollbarObject = CreatePanel(
+                "Scrollbar_MessageFeed",
+                window.transform,
+                new Color(0.08f, 0.1f, 0.11f, 1f));
+            SetRect(
+                scrollbarObject.GetComponent<RectTransform>(),
+                new Vector2(632f, -112f),
+                new Vector2(12f, 178f),
+                new Vector2(0f, 1f));
+            Scrollbar scrollbar = scrollbarObject.AddComponent<Scrollbar>();
+            scrollbar.direction = Scrollbar.Direction.BottomToTop;
+            GameObject scrollbarHandle = CreatePanel(
+                "Handle",
+                scrollbarObject.transform,
+                new Color(0.42f, 0.55f, 0.6f, 1f));
+            RectTransform handleRect = scrollbarHandle.GetComponent<RectTransform>();
+            Stretch(handleRect, 2f, 2f, 2f, 2f);
+            scrollbar.handleRect = handleRect;
+            scrollbar.targetGraphic = scrollbarHandle.GetComponent<Image>();
+            scroll.verticalScrollbar = scrollbar;
+            scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
+
+            Text messages = CreateText(
+                "Text_LocalMessages",
+                scrollRoot.transform,
+                "Событий пока нет.",
+                18,
+                TextAnchor.UpperLeft);
+            messages.color = new Color(0.9f, 0.91f, 0.9f);
+            messages.supportRichText = true;
+            messages.lineSpacing = 1.08f;
+            messages.verticalOverflow = VerticalWrapMode.Overflow;
+            RectTransform messageRect = messages.GetComponent<RectTransform>();
+            messageRect.anchorMin = new Vector2(0f, 1f);
+            messageRect.anchorMax = new Vector2(1f, 1f);
+            messageRect.pivot = new Vector2(0.5f, 1f);
+            messageRect.anchoredPosition = Vector2.zero;
+            messageRect.sizeDelta = new Vector2(-16f, 0f);
+            ContentSizeFitter fitter = messages.gameObject.AddComponent<ContentSizeFitter>();
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            scroll.viewport = scrollRoot.GetComponent<RectTransform>();
+            scroll.content = messageRect;
+
+            InputField chatInput = CreateInputField(
+                "Input_LocalChat",
+                window.transform,
+                "Локальное сообщение...");
+            chatInput.characterLimit = 160;
+            chatInput.customCaretColor = true;
+            chatInput.caretColor = new Color(1f, 0.82f, 0.38f, 1f);
+            chatInput.caretWidth = 2;
+            chatInput.caretBlinkRate = 0.75f;
+            chatInput.selectionColor = new Color(0.25f, 0.5f, 0.62f, 0.55f);
+            SetRect(
+                chatInput.GetComponent<RectTransform>(),
+                new Vector2(18f, -308f),
+                new Vector2(520f, 44f),
+                new Vector2(0f, 1f));
+            chatInput.textComponent.fontSize = 19;
+            ((Text)chatInput.placeholder).fontSize = 19;
+
+            Button sendButton = CreateButton(
+                "Button_SendLocalChat",
+                window.transform,
+                "Отправить");
+            SetRect(
+                sendButton.GetComponent<RectTransform>(),
+                new Vector2(548f, -308f),
+                new Vector2(114f, 44f),
+                new Vector2(0f, 1f));
+            sendButton.GetComponentInChildren<Text>().fontSize = 17;
+
+            CreateWindowDragHandle(window, 540f);
+            LocalMessageFeedView view = canvasObject.AddComponent<LocalMessageFeedView>();
+            view.Initialize(
+                window,
+                reopenButton,
+                closeButton,
+                allButton,
+                systemButton,
+                lootButton,
+                combatButton,
+                chatButton,
+                announcementButton,
+                messages,
+                scroll,
+                chatInput,
+                sendButton,
+                messageStream);
+            reopenButton.gameObject.SetActive(false);
         }
 
         private static void CreateQuestTracker(
@@ -1944,7 +2139,8 @@ namespace ProjectGenesis.Tools.Editor
                 canvasObject.GetComponent<QuestJournalView>(),
                 canvasObject.GetComponent<SkillHotbarView>(),
                 canvasObject.GetComponent<CharacterStatsView>(),
-                canvasObject.GetComponent<CharacterEquipmentView>()
+                canvasObject.GetComponent<CharacterEquipmentView>(),
+                canvasObject.GetComponent<LocalMessageFeedView>()
             };
 
             CharacterEntryView entryView = canvasObject.AddComponent<CharacterEntryView>();

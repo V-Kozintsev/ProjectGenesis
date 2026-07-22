@@ -19,6 +19,7 @@ namespace ProjectGenesis.Gameplay
         private CombatStats stats;
         private PlayerCombatController combatController;
         private Collider playerCollider;
+        private LocalMessageStream messageStream;
         private int pendingSlotIndex = -1;
 
         public event Action<int, SkillDefinition> SlotChanged;
@@ -34,6 +35,7 @@ namespace ProjectGenesis.Gameplay
             stats = GetComponent<CombatStats>();
             combatController = GetComponent<PlayerCombatController>();
             playerCollider = GetComponent<Collider>();
+            messageStream = GetComponent<LocalMessageStream>();
             EnsureCooldownStorage();
         }
 
@@ -210,13 +212,13 @@ namespace ProjectGenesis.Gameplay
                 return;
             }
 
-            int damage = stats.CalculateScaledDamageAgainst(
+            int calculatedDamage = stats.CalculateScaledDamageAgainst(
                 target.CombatStats,
                 skill.AttackPowerMultiplier);
-            target.ReceiveAttack(combatController, damage);
+            int appliedDamage = target.ReceiveAttack(combatController, calculatedDamage);
             nextReadyTimes[slotIndex] = Time.time + skill.Cooldown;
             CooldownChanged?.Invoke(slotIndex, skill, skill.Cooldown);
-            PublishFeedback($"{skill.DisplayName}: {damage} урона.");
+            PublishFeedback($"{skill.DisplayName}: {appliedDamage} урона.");
             combatController.ResumeCombatAfterSkill();
         }
 
@@ -288,6 +290,8 @@ namespace ProjectGenesis.Gameplay
         private void PublishFeedback(string message)
         {
             Feedback?.Invoke(message);
+            messageStream ??= GetComponent<LocalMessageStream>();
+            messageStream?.Publish(LocalMessageCategory.Combat, message);
         }
     }
 }

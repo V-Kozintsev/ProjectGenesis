@@ -19,6 +19,7 @@ namespace ProjectGenesis.Gameplay
         private PlayerProgression progression;
         private QuestLog questLog;
         private Collider playerCollider;
+        private LocalMessageStream messageStream;
         private EnemyBrain target;
         private float nextAttackTime;
         private bool isCombatActive;
@@ -37,6 +38,7 @@ namespace ProjectGenesis.Gameplay
             progression = GetComponent<PlayerProgression>();
             questLog = GetComponent<QuestLog>();
             playerCollider = GetComponent<Collider>();
+            messageStream = GetComponent<LocalMessageStream>();
             health.Died += HandlePlayerDied;
         }
 
@@ -92,7 +94,16 @@ namespace ProjectGenesis.Gameplay
             if (Time.time >= nextAttackTime)
             {
                 nextAttackTime = Time.time + stats.AttackInterval;
-                target.ReceiveAttack(this, stats.CalculateDamageAgainst(target.CombatStats));
+                EnemyBrain attackedTarget = target;
+                int damage = stats.CalculateDamageAgainst(attackedTarget.CombatStats);
+                int appliedDamage = attackedTarget.ReceiveAttack(this, damage);
+                if (appliedDamage > 0)
+                {
+                    messageStream?.Publish(
+                        LocalMessageCategory.Combat,
+                        $"Вы нанесли {appliedDamage} урона: " +
+                        $"{attackedTarget.DisplayName} (обычная атака).");
+                }
             }
         }
 

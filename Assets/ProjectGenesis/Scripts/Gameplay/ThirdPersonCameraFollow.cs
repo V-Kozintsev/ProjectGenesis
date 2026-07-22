@@ -1,3 +1,4 @@
+using ProjectGenesis.Core;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -68,6 +69,12 @@ namespace ProjectGenesis.Gameplay
 
         private void ReadCameraInput()
         {
+            if (GameplayInputGate.IsTextEntryFocused ||
+                GameplayInputGate.IsPointerOverUi)
+            {
+                return;
+            }
+
             Mouse mouse = Mouse.current;
             if (mouse == null)
             {

@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 023 Character Equipment View is complete and accepted after deterministic validation and the user's Play Mode check: `I` now opens one combined bag-and-equipment window, equipped weapon and body-armor instances no longer occupy bag positions, selected bag items can be dropped or permanently destroyed with confirmation, and profile version 7 preserves the separation while migrating older saves. Sprint 024 Local Message Feed Foundation is the next proposed step.
+Sprint 024 Local Message Feed Foundation is complete and accepted after the deterministic Sprint 008-024 regression suite and the user's Play Mode check. Gameplay publishes typed session-local system, loot, combat, chat, and announcement events into a movable, filterable, scrollable lower-left feed with focused-input blocking and local prototype chat. Sprint 025 Reusable Quest Content Definitions is the next proposed step; real player chat and server-authenticated global announcements remain later network features.
 
 The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
 

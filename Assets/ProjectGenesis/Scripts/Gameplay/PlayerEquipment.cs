@@ -13,6 +13,7 @@ namespace ProjectGenesis.Gameplay
 
         private PlayerInventory inventory;
         private CombatStats combatStats;
+        private LocalMessageStream messageStream;
 
         public event Action<PlayerEquipment> Changed;
 
@@ -52,6 +53,7 @@ namespace ProjectGenesis.Gameplay
             mainHand = item;
             ApplyEquipmentBonuses();
             Changed?.Invoke(this);
+            PublishEquipmentMessage("Экипировано оружие", item, previousItem);
             return true;
         }
 
@@ -71,6 +73,9 @@ namespace ProjectGenesis.Gameplay
             mainHand = null;
             ApplyEquipmentBonuses();
             Changed?.Invoke(this);
+            messageStream?.Publish(
+                LocalMessageCategory.System,
+                $"Снято оружие: {item.DisplayName}.");
             return true;
         }
 
@@ -120,6 +125,7 @@ namespace ProjectGenesis.Gameplay
             body = item;
             ApplyEquipmentBonuses();
             Changed?.Invoke(this);
+            PublishEquipmentMessage("Экипирована броня", item, previousItem);
             return true;
         }
 
@@ -139,6 +145,9 @@ namespace ProjectGenesis.Gameplay
             body = null;
             ApplyEquipmentBonuses();
             Changed?.Invoke(this);
+            messageStream?.Publish(
+                LocalMessageCategory.System,
+                $"Снята броня: {item.DisplayName}.");
             return true;
         }
 
@@ -207,7 +216,22 @@ namespace ProjectGenesis.Gameplay
                 combatStats = GetComponent<CombatStats>();
             }
 
+            messageStream ??= GetComponent<LocalMessageStream>();
+
             return inventory != null && combatStats != null;
+        }
+
+        private void PublishEquipmentMessage(
+            string action,
+            ItemInstance equippedItem,
+            ItemInstance returnedItem)
+        {
+            string suffix = returnedItem != null
+                ? $" {returnedItem.DisplayName} возвращён в сумку."
+                : string.Empty;
+            messageStream?.Publish(
+                LocalMessageCategory.System,
+                $"{action}: {equippedItem.DisplayName}.{suffix}");
         }
     }
 }

@@ -102,6 +102,7 @@ GameObject:
   - component: {fileID: 4704407190682888797}
   - component: {fileID: 5695950783252150108}
   - component: {fileID: 779681520609666833}
+  - component: {fileID: 4733662436894831512}
   - component: {fileID: 743857187644922264}
   - component: {fileID: 7566425608953301210}
   - component: {fileID: 699393789371238091}
@@ -265,6 +266,19 @@ MonoBehaviour:
   minimumEnemyRewardMultiplier: 0.1
   higherLevelBonusPerLevel: 0.1
   maximumEnemyRewardMultiplier: 1.5
+--- !u!114 &4733662436894831512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5875306266831850917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f87d8c2a94f87f488f8b7a730d36d7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  historyCapacity: 50
 --- !u!114 &743857187644922264
 MonoBehaviour:
   m_ObjectHideFlags: 0

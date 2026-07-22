@@ -43,6 +43,7 @@ namespace ProjectGenesis.Gameplay
         private CombatStats stats;
         private Health playerHealth;
         private CombatStats playerStats;
+        private LocalMessageStream playerMessageStream;
         private Collider targetCollider;
         private Collider playerCollider;
         private EnemyTerritory territory;
@@ -196,7 +197,15 @@ namespace ProjectGenesis.Gameplay
             if (Time.time >= nextAttackTime)
             {
                 nextAttackTime = Time.time + stats.AttackInterval;
-                playerHealth.TakeDamage(stats.CalculateDamageAgainst(playerStats));
+                int healthBeforeAttack = playerHealth.CurrentHealth;
+                int damage = stats.CalculateDamageAgainst(playerStats);
+                if (playerHealth.TakeDamage(damage))
+                {
+                    int appliedDamage = healthBeforeAttack - playerHealth.CurrentHealth;
+                    playerMessageStream?.Publish(
+                        LocalMessageCategory.Combat,
+                        $"{DisplayName} наносит вам {appliedDamage} урона.");
+                }
             }
         }
 
@@ -257,11 +266,11 @@ namespace ProjectGenesis.Gameplay
             }
         }
 
-        public void ReceiveAttack(PlayerCombatController attacker, int damage)
+        public int ReceiveAttack(PlayerCombatController attacker, int damage)
         {
             if (IsDead)
             {
-                return;
+                return 0;
             }
 
             if (attacker != null)
@@ -272,13 +281,17 @@ namespace ProjectGenesis.Gameplay
             hasAggro = true;
             StopAgent();
             regeneration.SetRegenerationAllowed(true);
-            health.TakeDamage(damage);
+            int healthBeforeAttack = health.CurrentHealth;
+            return health.TakeDamage(damage)
+                ? healthBeforeAttack - health.CurrentHealth
+                : 0;
         }
 
         private void CachePlayerReferences()
         {
             playerHealth = player != null ? player.GetComponent<Health>() : null;
             playerStats = player != null ? player.GetComponent<CombatStats>() : null;
+            playerMessageStream = player != null ? player.GetComponent<LocalMessageStream>() : null;
             playerCollider = player != null ? player.GetComponent<Collider>() : null;
         }
 
