@@ -15,7 +15,7 @@ namespace ProjectGenesis.Saving
     [Serializable]
     public sealed class PlayerProfileData
     {
-        public const int CurrentVersion = 5;
+        public const int CurrentVersion = 6;
 
         public int Version = CurrentVersion;
         public bool HasCreatedCharacter;
@@ -32,6 +32,7 @@ namespace ProjectGenesis.Saving
         public string MainHandItemId;
         public List<ItemInstanceData> InventoryItems = new();
         public string MainHandInstanceId;
+        public string BodyInstanceId;
         public List<QuestProgressData> Quests = new();
     }
 }

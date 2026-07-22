@@ -27,7 +27,7 @@ Owns:
 - current stats;
 - equipment-derived modifiers.
 
-The current player attack total is composed from base, class, level, and equipped-weapon contributions. Player maximum health is composed from base, class, and level contributions. These values remain runtime state; UI reads them but does not recalculate them independently.
+The current player attack total is composed from base, class, level, and equipped-weapon contributions. Defense combines base defense with equipped-body-armor defense, while player maximum health is composed from base, class, and level contributions. These values remain runtime state; UI reads them but does not recalculate them independently.
 
 Does not own:
 
@@ -58,14 +58,15 @@ Owns:
 - stable identities for collected item instances;
 - inventory capacity, stable slot positions, and concrete-slot selection data exposed to UI;
 - equipment slots;
-- add/remove/equip/unequip rules.
+- add/remove/equip/unequip rules;
+- category-safe consumable use through the player item-use controller.
 
 Does not own:
 
 - visual item icons beyond references;
 - enemy loot table evaluation, except receiving generated items.
 
-`ItemDefinition` is shared authored data. `ItemInstance` represents one physical collected copy and owns its stable instance id. `PlayerInventory` owns eight fixed positions and is the only system that moves or swaps their contents. Equipment references an `ItemInstance`, so moving a slot does not replace or unequip that exact item.
+`ItemDefinition` is shared authored data for weapons, armor, and consumables. `ItemInstance` represents one physical collected copy and owns its stable instance id. `PlayerInventory` owns eight fixed positions and is the only system that moves, swaps, or removes their contents. `PlayerEquipment` references exact main-hand and body instances, so moving a slot does not replace or unequip that item. `PlayerItemUseController` validates health and category rules before asking `Health` to heal and the inventory to remove exactly one successful consumable instance.
 
 ### Quest System
 

@@ -44,6 +44,22 @@ New ideas are recorded here even when they are not ready for implementation. Eac
 - Build a visual-reference board and style guide before replacing blockout art.
 - Plan a modular village, wilderness, character, animation, effects, audio, and UI asset pipeline.
 - During the final inventory UI pass, add item icons, a drag preview that follows the pointer, destination highlighting, and a short move, swap, or snap-back animation.
+- Grow the temporary character equipment view into a full paper-doll layout only after the slot model is stable; keep equipped slots visually separate from bag storage and allow compatible drag-and-drop between them.
+
+## Communication Ideas
+
+- Build one typed message stream with `System`, `Loot`, `Combat`, `LocalChat`, and `Announcement` categories instead of letting gameplay systems write directly into UI text.
+- Let the local prototype publish private messages such as collected items and recovery results before any network chat exists.
+- Add a movable, resizable lower-left log with tabs or filters; keep short urgent errors and maintenance warnings visible even when ordinary chat is filtered.
+- Add real general, nearby, party, clan, and private player chat only with server transport, moderation hooks, rate limits, mute/block/report controls, and persisted user filters.
+- Treat server maintenance and exceptional world events as authenticated server announcements, not player-authored chat messages.
+- Decide rare-item global announcements from rarity and world-economy rules later; avoid broadcasting ordinary loot and exposing private drops by default.
+
+## Death And Resurrection Ideas
+
+- Add later resurrection-in-place options through an explicit item, skill, party action, or service rather than making them free by default.
+- Keep death penalties, respawn destinations, resurrection costs, and protected-zone rules data-driven for future server authority.
+- Do not persist a character as permanently dead when a local session closes; restore at a validated safe point until online death-state ownership exists.
 
 ## Multiplayer Ideas
 

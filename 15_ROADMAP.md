@@ -2,7 +2,7 @@
 
 ## Current Direction
 
-Sprint 020 Inventory Rearrangement And Weapon Variety is complete. **Sprint 021: Equipment Slots And First Consumable** is the next proposed implementation.
+**Sprint 021: Equipment Slots And First Consumable** is complete after deterministic validation and the user's Play Mode check. **Sprint 022: Death State And Respawn Choice** is the next proposed implementation.
 
 This file preserves completed milestone history and the broad delivery order. The user-facing Russian plan and current dependency decisions live in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md). A future feature listed here is not permission to implement it before its dependencies or current priority.
 
@@ -369,6 +369,26 @@ Sprint 020 exclusions:
 - no additional equipment slots, armor, consumables, stacks, sorting buttons, vendors, currency, selling, trading, crafting, or item destruction;
 - no random affixes, durability, binding, item levels, new quests or zones, final UI art, server, multiplayer, or networked persistence.
 
+Sprint 021 delivered additions:
+
+- weapon, body-armor, and consumable item categories in one reusable definition;
+- one persistent body-equipment slot and equipment defense bonus;
+- a +3 Worn Leather Armor and a 30-health Minor Healing Potion;
+- successful-use consumption plus clear refusal without item loss;
+- profile version 6 with body-instance persistence and version-1 through version-5 migration;
+- deterministic validation of data, equipment restrictions, defense, healing, removal, migration, loot, prefabs, and scene wiring.
+
+Sprint 021 exclusions:
+
+- no further equipment slots, two-handed rules, class restrictions, stacks, quickbar consumables, cooldowns, buffs, mana, vendors, currency, selling, trading, crafting, durability, binding, random affixes, final UI art, server, multiplayer, or networked persistence.
+
+Post-Sprint 021 proposed sequence:
+
+- Sprint 022 Death State And Respawn Choice: preserve the corpse state, block gameplay input, show a centered death decision, and respawn at the village only after confirmation;
+- Sprint 023 Character Equipment View: separate equipped slots from bag storage visually, keep the exact-instance model, and support clear equip state and comparison without final art;
+- Sprint 024 Local Message Feed Foundation: add typed local system, loot, combat, and announcement events with a filterable lower-left log; real player chat remains a later server feature;
+- reusable quest content definitions and a second short quest resume after these cross-system foundations.
+
 Post-Sprint 009 backlog decisions:
 
 - add explicit inventory-slot selection when different copies can have meaningfully different properties;
@@ -384,10 +404,13 @@ The exact sprint numbers after Sprint 015 are provisional. Dependencies and test
 1. Skills foundation and the first active class skill.
 2. Character identity data, creation, selection, and readable stats.
 3. Stable item instances, explicit inventory selection, equipment expansion, and one consumable.
-4. Reusable quest content definitions and a second short quest.
-5. A complete starter-region pass with explicit zone rules and one elite encounter.
-6. World-history brief and visual style guide before major content or art production.
-7. Seamless-world technical slice using streamed or additive neighboring areas.
+4. Explicit player-death state and a confirmed respawn choice.
+5. Separate character-equipment presentation from bag storage.
+6. Typed local message-feed foundation before network chat.
+7. Reusable quest content definitions and a second short quest.
+8. A complete starter-region pass with explicit zone rules and one elite encounter.
+9. World-history brief and visual style guide before major content or art production.
+10. Seamless-world technical slice using streamed or additive neighboring areas.
 8. First real cave route and boss only after world-transition, combat, and reward dependencies are ready.
 9. Online account, authoritative persistence, and synchronization after the local vertical slice is stable.
 

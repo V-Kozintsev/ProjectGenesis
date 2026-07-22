@@ -104,6 +104,7 @@ GameObject:
   - component: {fileID: 779681520609666833}
   - component: {fileID: 743857187644922264}
   - component: {fileID: 7566425608953301210}
+  - component: {fileID: 699393789371238091}
   - component: {fileID: 3380113414659367393}
   - component: {fileID: 1151744357416748806}
   - component: {fileID: 4857155830772707276}
@@ -220,6 +221,7 @@ MonoBehaviour:
   classAttackBonus: 0
   equipmentAttackBonus: 0
   progressionAttackBonus: 0
+  equipmentDefenseBonus: 0
 --- !u!114 &5695950783252150108
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -306,6 +308,21 @@ MonoBehaviour:
   mainHand:
     instanceId: 
     definition: {fileID: 0}
+  body:
+    instanceId: 
+    definition: {fileID: 0}
+--- !u!114 &699393789371238091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5875306266831850917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3a760b42423468396ae30145d01f41d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &3380113414659367393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -336,6 +353,8 @@ MonoBehaviour:
   itemCatalog:
   - {fileID: 11400000, guid: af70d6da1d148ba4c84d128117b61d47, type: 2}
   - {fileID: 11400000, guid: 725d23b85eef776439624c5ee23856d2, type: 2}
+  - {fileID: 11400000, guid: 115c7b4fec225c140a4bb7c0607f54e8, type: 2}
+  - {fileID: 11400000, guid: 6ebd1fe651b2aa447aadf43924eca007, type: 2}
   raceCatalog:
   - {fileID: 11400000, guid: b56ed424301d8f24282af072387e2364, type: 2}
   classCatalog:

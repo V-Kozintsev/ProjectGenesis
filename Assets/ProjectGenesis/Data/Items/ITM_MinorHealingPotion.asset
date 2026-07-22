@@ -10,11 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cb66e3ee02b6747428be151d7fb3f49b, type: 3}
-  m_Name: ITM_WornAxe
+  m_Name: ITM_MinorHealingPotion
   m_EditorClassIdentifier: 
-  itemId: weapon.worn_axe
-  displayName: "\u041F\u043E\u0442\u0451\u0440\u0442\u044B\u0439 \u0442\u043E\u043F\u043E\u0440"
-  itemType: 0
-  attackBonus: 7
+  itemId: consumable.minor_healing_potion
+  displayName: "\u041C\u0430\u043B\u043E\u0435 \u043B\u0435\u0447\u0435\u0431\u043D\u043E\u0435
+    \u0437\u0435\u043B\u044C\u0435"
+  itemType: 2
+  attackBonus: 0
   defenseBonus: 0
-  healingAmount: 0
+  healingAmount: 30

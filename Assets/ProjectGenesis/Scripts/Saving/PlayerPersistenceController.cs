@@ -117,6 +117,9 @@ namespace ProjectGenesis.Saving
                 MainHandInstanceId = equipment.MainHand != null
                     ? equipment.MainHand.InstanceId
                     : string.Empty,
+                BodyInstanceId = equipment.Body != null
+                    ? equipment.Body.InstanceId
+                    : string.Empty,
                 Quests = questLog != null ? questLog.CaptureState() : new List<QuestProgressData>()
             };
 
@@ -187,6 +190,7 @@ namespace ProjectGenesis.Saving
             progression.RestoreState(profile.Level, profile.CurrentExperience);
             questLog?.RestoreState(profile.Quests);
             equipment.RestoreMainHand(ResolveMainHandInstanceId(profile, restoredItems));
+            equipment.RestoreBody(ResolveBodyInstanceId(profile, restoredItems));
 
             if (profile.HasPosition)
             {
@@ -360,6 +364,28 @@ namespace ProjectGenesis.Saving
                     {
                         return item.InstanceId;
                     }
+                }
+            }
+
+            return string.Empty;
+        }
+
+        public static string ResolveBodyInstanceId(
+            PlayerProfileData profile,
+            IReadOnlyList<ItemInstance> restoredItems)
+        {
+            if (profile == null || restoredItems == null ||
+                string.IsNullOrWhiteSpace(profile.BodyInstanceId))
+            {
+                return string.Empty;
+            }
+
+            foreach (ItemInstance item in restoredItems)
+            {
+                if (item != null && item.InstanceId == profile.BodyInstanceId &&
+                    item.ItemType == ItemType.Armor)
+                {
+                    return item.InstanceId;
                 }
             }
 

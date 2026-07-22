@@ -90,9 +90,9 @@ Examples:
 
 `PlayerProgression` owns experience arithmetic in both directions, including death penalties and level-boundary changes. `PlayerCombatController` only decides when one penalty is applied, then continues the existing respawn flow.
 
-`CombatStats` owns attack composition and damage formulas. Base, class, progression, and equipment contributions remain separately readable but produce one total attack power. `PlayerProgression` applies authored class and level growth to `Health` and `CombatStats`; `PlayerEquipment` supplies only the equipped-weapon contribution. `SkillDefinition` stores an attack-power multiplier and player-facing description, and `PlayerSkillController` asks `CombatStats` for the final defense-aware skill damage. `CharacterStatsView` and `SkillTooltipView` only present these runtime values. `DraggableWindow` is a reusable UI adapter attached to window headers and keeps moved prototype windows reachable on screen.
+`CombatStats` owns attack and defense composition plus damage formulas. Base, class, progression, and equipment attack contributions remain separately readable; base defense and body-armor defense produce one total defense. `PlayerProgression` applies authored class and level growth to `Health` and `CombatStats`; `PlayerEquipment` supplies the exact equipped-weapon and body-armor contributions. `SkillDefinition` stores an attack-power multiplier and player-facing description, and `PlayerSkillController` asks `CombatStats` for the final defense-aware skill damage. `CharacterStatsView` and `SkillTooltipView` only present these runtime values. `DraggableWindow` is a reusable UI adapter attached to window headers and keeps moved prototype windows reachable on screen.
 
-`ItemDefinition` remains immutable authored content, while each collected `ItemInstance` carries a stable unique id and references its definition. `PlayerInventory` owns instances in eight fixed positions, `PlayerEquipment` references the exact equipped instance, and profile version 5 persists slot index, instance id, and definition id. Versions 1-3 migrate definition-id lists into unique instances; version 4 preserves its instance ids and migrates list order into consecutive positions.
+`ItemDefinition` remains immutable authored content and separates weapon attack, armor defense, and consumable healing values. Each collected `ItemInstance` carries a stable unique id and references its definition. `PlayerInventory` owns instances in eight fixed positions, `PlayerEquipment` references exact main-hand and body instances, and `PlayerItemUseController` coordinates health validation with exact-instance removal. Profile version 6 persists slot index, instance id, definition id, main hand, and body armor. Versions 1-3 migrate definition-id lists into unique instances; version 4 preserves its instance ids; version 5 preserves fixed positions and restores an empty body slot.
 
 Enemy identity, level, and base experience are authored by `EnemyBrain`. `PlayerProgression` owns the configurable level-difference multiplier because it converts an enemy reward into player progression; fixed quest rewards continue to bypass enemy scaling.
 
@@ -105,8 +105,8 @@ Save only stable runtime state:
 - character name, race id, and class id;
 - player position;
 - level and experience;
-- equipped items by id;
-- inventory items by id and quantity;
+- equipped item instance ids by slot;
+- inventory instance ids, definition ids, and slot positions;
 - quest states;
 - world flags later.
 

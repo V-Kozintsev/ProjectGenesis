@@ -99,6 +99,24 @@ namespace ProjectGenesis.Gameplay
             return FindByInstanceId(instanceId) != null;
         }
 
+        public bool TryRemoveInstance(ItemInstance item)
+        {
+            return item != null && TryRemoveInstance(item.InstanceId);
+        }
+
+        public bool TryRemoveInstance(string instanceId)
+        {
+            int slotIndex = GetSlotIndex(instanceId);
+            if (slotIndex < 0)
+            {
+                return false;
+            }
+
+            items[slotIndex] = null;
+            Changed?.Invoke(this);
+            return true;
+        }
+
         public ItemInstance FindByInstanceId(string instanceId)
         {
             if (string.IsNullOrWhiteSpace(instanceId))

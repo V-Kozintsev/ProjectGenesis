@@ -13,6 +13,7 @@ namespace ProjectGenesis.Gameplay
         [SerializeField, Min(0)] private int classAttackBonus;
         [SerializeField, Min(0)] private int equipmentAttackBonus;
         [SerializeField, Min(0)] private int progressionAttackBonus;
+        [SerializeField, Min(0)] private int equipmentDefenseBonus;
 
         public event Action<CombatStats> Changed;
 
@@ -22,7 +23,9 @@ namespace ProjectGenesis.Gameplay
         public int ProgressionAttackBonus => progressionAttackBonus;
         public int AttackPower =>
             attackPower + classAttackBonus + equipmentAttackBonus + progressionAttackBonus;
-        public int Defense => defense;
+        public int BaseDefense => defense;
+        public int EquipmentDefenseBonus => equipmentDefenseBonus;
+        public int Defense => defense + equipmentDefenseBonus;
         public float AttackRange => attackRange;
         public float AttackInterval => attackInterval;
 
@@ -67,6 +70,18 @@ namespace ProjectGenesis.Gameplay
             }
 
             progressionAttackBonus = nextBonus;
+            Changed?.Invoke(this);
+        }
+
+        public void SetEquipmentDefenseBonus(int bonus)
+        {
+            int nextBonus = Mathf.Max(0, bonus);
+            if (equipmentDefenseBonus == nextBonus)
+            {
+                return;
+            }
+
+            equipmentDefenseBonus = nextBonus;
             Changed?.Invoke(this);
         }
 

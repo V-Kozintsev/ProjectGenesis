@@ -246,7 +246,9 @@ namespace ProjectGenesis.UI
 
             if (defenseText != null)
             {
-                defenseText.text = $"Защита: {combatStats.Defense}";
+                defenseText.text =
+                    $"Защита: {combatStats.Defense} · " +
+                    $"база {combatStats.BaseDefense} + броня {combatStats.EquipmentDefenseBonus}";
             }
 
             if (attackTimingText != null)

@@ -79,7 +79,7 @@ namespace ProjectGenesis.Tools.Editor
                 "Worn Axe must be a +7 weapon with stable authored data.");
             Require(boarLoot.TryValidate(out string lootError),
                 $"Boar loot table is invalid: {lootError}");
-            Require(boarLoot.Entries.Count == 1 &&
+            Require(boarLoot.Entries.Count >= 1 &&
                     boarLoot.Entries[0].Item == axe &&
                     Mathf.Approximately(boarLoot.Entries[0].DropChance, 0.2f),
                 "Boar loot must contain the Worn Axe at 20% probability.");
@@ -145,9 +145,9 @@ namespace ProjectGenesis.Tools.Editor
             ItemDefinition sword,
             ItemDefinition axe)
         {
-            Require(PlayerProfileData.CurrentVersion == 5,
-                "Current profile version must be 5.");
-            for (int version = 1; version <= 5; version++)
+            Require(PlayerProfileData.CurrentVersion == 6,
+                "Current profile version must be 6.");
+            for (int version = 1; version <= 6; version++)
             {
                 Require(LocalJsonPlayerPersistence.IsSupportedVersion(version),
                     $"Profile version {version} must remain supported.");
@@ -207,7 +207,7 @@ namespace ProjectGenesis.Tools.Editor
                 player.GetComponent<PlayerPersistenceController>();
             Require(inventory != null && inventory.Capacity == 8,
                 "Player prefab must retain eight fixed inventory positions.");
-            Require(persistence != null && persistence.ItemCatalog.Count == 2 &&
+            Require(persistence != null && persistence.ItemCatalog.Count >= 2 &&
                     persistence.ItemCatalog.Contains(sword) &&
                     persistence.ItemCatalog.Contains(axe),
                 "Persistence catalog must contain both weapon definitions.");

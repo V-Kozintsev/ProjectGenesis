@@ -253,6 +253,7 @@ MonoBehaviour:
   classAttackBonus: 0
   equipmentAttackBonus: 0
   progressionAttackBonus: 0
+  equipmentDefenseBonus: 0
 --- !u!114 &5858290719935994172
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -123,5 +123,12 @@ namespace ProjectGenesis.Data
                 new(item, rarity, chance)
             };
         }
+
+        public void ConfigureEntries(params LootTableEntry[] configuredEntries)
+        {
+            entries = configuredEntries != null
+                ? new List<LootTableEntry>(configuredEntries)
+                : new List<LootTableEntry>();
+        }
     }
 }

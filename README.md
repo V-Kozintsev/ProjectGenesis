@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 020 Inventory Rearrangement And Weapon Variety is complete: inventory positions persist, items move or swap by drag-and-drop, and a contrasting Worn Axe verifies exact-item equipment and stat changes. The next proposed step is Sprint 021 Equipment Slots And First Consumable.
+Sprint 021 Equipment Slots And First Consumable is complete: body armor, defense equipment bonuses, one healing consumable, exact-instance persistence, and the temporary equipped marker are in place. Sprint 022 Death State And Respawn Choice is the next proposed foundation step.
 
 The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
 
@@ -36,7 +36,7 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - After active combat ends, the player waits eight seconds and then restores 2 health every second. New damage restarts the delay, while death and village respawn still restore full health.
 - Recovery values are editable through `HealthRegeneration` on the player and wolf prefabs. Use `Project Genesis > Sprint 010 > Validate Combat Recovery` to verify saved defaults and health boundaries.
 - The selected `Zone_NorthCombat` object shows its enemy-territory boundary as a green Scene gizmo. Use `Project Genesis > Sprint 011 > Validate Enemy Territory` to verify the zone, spawners, and roaming defaults.
-- Each wolf has an independent 10% chance to drop a visible `Rusty Sword`. Click the drop to approach it and collect it.
+- Each wolf has a 10% chance to drop a visible `Rusty Sword` and a 20% chance to drop a `Minor Healing Potion`; one kill produces at most one regular item. Click the drop to approach it and collect it.
 - Regular wolf loot is configured in `Assets/ProjectGenesis/Data/LootTables/LT_Wolf.asset`. Select that asset and edit an entry's `Drop Chance` value in the Inspector; `0.1` means 10%.
 - Rebuilding the starter village preserves edits to an existing loot-table asset. Use `Project Genesis > Sprint 009 > Validate Wolf Loot Table` to check the table and run a fixed-seed 100,000-roll simulation.
 - While the Village Elder's quest is active and incomplete, each wolf also has a 70% chance to add a `Wolf Tail` directly to objective progress. Quest trophies do not appear on the ground or occupy normal inventory slots, and progress stops at `5 / 5`.
@@ -44,6 +44,9 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - Click an occupied inventory slot to select that exact item, then use `Надеть` or `Снять`. Separate copies of the Rusty Sword remain separate entries.
 - Drag an occupied slot onto an empty slot to move it, or onto another occupied slot to swap the two exact item instances. Reordered positions persist after restarting Play Mode.
 - Boars have a 20% chance to drop a `Потёртый топор` with `+7` attack; the Rusty Sword remains `+4` attack.
+- Boars also have a 15% chance to drop `Потёртая кожаная броня`. Select it and click `Надеть` to add `+3` defense in the body slot without replacing the equipped weapon.
+- Select `Малое лечебное зелье` and click `Использовать` to restore 30 health. It is consumed only when healing succeeds; full health and death show a refusal and preserve the item.
+- During Sprint 021 Play Mode testing, use `Project Genesis > Sprint 021 > Prepare Play Mode Test` to add the armor and two separate potions and safely remove 25 health.
 - During Sprint 020 Play Mode testing, use `Project Genesis > Sprint 020 > Add Sword And Axe In Play Mode` to add both contrasting weapons immediately.
 - During Sprint 019 Play Mode testing, use `Project Genesis > Sprint 019 > Add Two Rusty Swords In Play Mode` to create two distinct copies without waiting for random drops.
 - The inventory header shows the current prototype identity: `Путник`, `Человек`, and `Воин`.
@@ -63,10 +66,10 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - An active or ready-to-turn-in quest can be abandoned with a two-step confirmation. Its tracker disappears immediately, and accepting it again starts objective progress from zero.
 - Real objective progress briefly appears as a notification near the top of the screen. Loading an existing profile does not replay old notifications.
 - Defeating the wolf grants 20 experience. Turning in the quest grants another 80 experience, raises the player to level 2, increases maximum health to 110, and increases base attack power by 2.
-- Player position, level, experience, quest state, inventory, and equipped weapon are saved automatically. There is intentionally no save button.
+- Player position, level, experience, quest state, exact inventory positions, equipped weapon, equipped body armor, and remaining potions are saved automatically. There is intentionally no save button.
 - For the current offline prototype, persistence uses a local JSON file behind a replaceable interface. In the future online version, the authoritative server will store this state and return the character near the last valid position after login.
 - To start a fresh development playthrough, use `Project Genesis > Development > Clear Local Prototype Profile` while outside Play mode.
-- Healing items and skills, item or quest loss on death, server-authoritative combat, and a real multiplayer backend remain outside the current prototype.
+- Healing skills, item or quest loss on death, server-authoritative combat, and a real multiplayer backend remain outside the current prototype.
 
 ## Documentation Map
 
@@ -109,6 +112,7 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - [36_SPRINT_018.md](36_SPRINT_018.md) - unified character stats, warrior bonuses, weapon-scaled Heavy Strike, stats UI, and validation sprint.
 - [37_SPRINT_019.md](37_SPRINT_019.md) - stable item instances, profile migration, explicit inventory selection, and validation sprint.
 - [38_SPRINT_020.md](38_SPRINT_020.md) - persistent inventory positions, drag-and-drop swapping, weapon variety, and validation sprint.
+- [39_SPRINT_021.md](39_SPRINT_021.md) - body equipment, defense bonuses, one healing consumable, persistence, and validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

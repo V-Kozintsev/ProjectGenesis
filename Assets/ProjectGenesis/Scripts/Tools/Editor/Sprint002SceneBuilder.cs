@@ -36,6 +36,8 @@ namespace ProjectGenesis.Tools.Editor
         private const string LootMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Loot_Weapon.mat";
         private const string RustySwordPath = "Assets/ProjectGenesis/Data/Items/ITM_RustySword.asset";
         private const string WornAxePath = "Assets/ProjectGenesis/Data/Items/ITM_WornAxe.asset";
+        private const string WornLeatherArmorPath = "Assets/ProjectGenesis/Data/Items/ITM_WornLeatherArmor.asset";
+        private const string MinorHealingPotionPath = "Assets/ProjectGenesis/Data/Items/ITM_MinorHealingPotion.asset";
         private const string WolfLootTablePath = "Assets/ProjectGenesis/Data/LootTables/LT_Wolf.asset";
         private const string BoarLootTablePath = "Assets/ProjectGenesis/Data/LootTables/LT_Boar.asset";
         private const string HeavyStrikePath = "Assets/ProjectGenesis/Data/Skills/SO_Skill_HeavyStrike.asset";
@@ -138,6 +140,12 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 021/Rebuild Starter Village Equipment And Consumable")]
+        public static void RebuildStarterVillageEquipmentAndConsumable()
+        {
+            RebuildStarterVillage();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -157,8 +165,12 @@ namespace ProjectGenesis.Tools.Editor
             Material lootMaterial = CreateMaterial(LootMaterialPath, new Color(0.92f, 0.62f, 0.16f));
             ItemDefinition rustySword = CreateRustySword();
             ItemDefinition wornAxe = CreateWornAxe();
-            LootTableDefinition wolfLootTable = CreateWolfLootTable(rustySword);
-            LootTableDefinition boarLootTable = CreateBoarLootTable(wornAxe);
+            ItemDefinition wornLeatherArmor = CreateWornLeatherArmor();
+            ItemDefinition minorHealingPotion = CreateMinorHealingPotion();
+            LootTableDefinition wolfLootTable =
+                CreateWolfLootTable(rustySword, minorHealingPotion);
+            LootTableDefinition boarLootTable =
+                CreateBoarLootTable(wornAxe, wornLeatherArmor);
             SkillDefinition heavyStrike = CreateHeavyStrike();
             CharacterRaceDefinition humanRace = CreateHumanRace();
             CharacterClassDefinition warriorClass = CreateWarriorClass();
@@ -167,6 +179,8 @@ namespace ProjectGenesis.Tools.Editor
                 playerMaterial,
                 rustySword,
                 wornAxe,
+                wornLeatherArmor,
+                minorHealingPotion,
                 heavyStrike,
                 humanRace,
                 warriorClass);
@@ -310,7 +324,47 @@ namespace ProjectGenesis.Tools.Editor
             return item;
         }
 
-        private static LootTableDefinition CreateWolfLootTable(ItemDefinition rustySword)
+        private static ItemDefinition CreateWornLeatherArmor()
+        {
+            ItemDefinition item =
+                AssetDatabase.LoadAssetAtPath<ItemDefinition>(WornLeatherArmorPath);
+            if (item == null)
+            {
+                item = ScriptableObject.CreateInstance<ItemDefinition>();
+                AssetDatabase.CreateAsset(item, WornLeatherArmorPath);
+            }
+
+            item.Configure(
+                "armor.worn_leather",
+                "Потёртая кожаная броня",
+                ItemType.Armor,
+                defense: 3);
+            EditorUtility.SetDirty(item);
+            return item;
+        }
+
+        private static ItemDefinition CreateMinorHealingPotion()
+        {
+            ItemDefinition item =
+                AssetDatabase.LoadAssetAtPath<ItemDefinition>(MinorHealingPotionPath);
+            if (item == null)
+            {
+                item = ScriptableObject.CreateInstance<ItemDefinition>();
+                AssetDatabase.CreateAsset(item, MinorHealingPotionPath);
+            }
+
+            item.Configure(
+                "consumable.minor_healing_potion",
+                "Малое лечебное зелье",
+                ItemType.Consumable,
+                healing: 30);
+            EditorUtility.SetDirty(item);
+            return item;
+        }
+
+        private static LootTableDefinition CreateWolfLootTable(
+            ItemDefinition rustySword,
+            ItemDefinition minorHealingPotion)
         {
             LootTableDefinition lootTable = AssetDatabase.LoadAssetAtPath<LootTableDefinition>(WolfLootTablePath);
             if (lootTable != null)
@@ -319,12 +373,16 @@ namespace ProjectGenesis.Tools.Editor
             }
 
             lootTable = ScriptableObject.CreateInstance<LootTableDefinition>();
-            lootTable.ConfigureSingleItem(rustySword, 0.1f, LootRarity.Common);
+            lootTable.ConfigureEntries(
+                new LootTableEntry(rustySword, LootRarity.Common, 0.1f),
+                new LootTableEntry(minorHealingPotion, LootRarity.Common, 0.2f));
             AssetDatabase.CreateAsset(lootTable, WolfLootTablePath);
             return lootTable;
         }
 
-        private static LootTableDefinition CreateBoarLootTable(ItemDefinition wornAxe)
+        private static LootTableDefinition CreateBoarLootTable(
+            ItemDefinition wornAxe,
+            ItemDefinition wornLeatherArmor)
         {
             LootTableDefinition lootTable =
                 AssetDatabase.LoadAssetAtPath<LootTableDefinition>(BoarLootTablePath);
@@ -334,7 +392,9 @@ namespace ProjectGenesis.Tools.Editor
             }
 
             lootTable = ScriptableObject.CreateInstance<LootTableDefinition>();
-            lootTable.ConfigureSingleItem(wornAxe, 0.2f, LootRarity.Uncommon);
+            lootTable.ConfigureEntries(
+                new LootTableEntry(wornAxe, LootRarity.Uncommon, 0.2f),
+                new LootTableEntry(wornLeatherArmor, LootRarity.Common, 0.15f));
             AssetDatabase.CreateAsset(lootTable, BoarLootTablePath);
             return lootTable;
         }
@@ -395,6 +455,8 @@ namespace ProjectGenesis.Tools.Editor
             Material playerMaterial,
             ItemDefinition rustySword,
             ItemDefinition wornAxe,
+            ItemDefinition wornLeatherArmor,
+            ItemDefinition minorHealingPotion,
             SkillDefinition heavyStrike,
             CharacterRaceDefinition humanRace,
             CharacterClassDefinition warriorClass)
@@ -427,10 +489,11 @@ namespace ProjectGenesis.Tools.Editor
             progression.ConfigureEnemyExperienceScaling(0.25f, 0.1f, 0.1f, 1.5f);
             player.AddComponent<PlayerInventory>();
             player.AddComponent<PlayerEquipment>();
+            player.AddComponent<PlayerItemUseController>();
             player.AddComponent<PlayerLootController>();
             PlayerPersistenceController persistence = player.AddComponent<PlayerPersistenceController>();
             persistence.Configure(
-                new[] { rustySword, wornAxe },
+                new[] { rustySword, wornAxe, wornLeatherArmor, minorHealingPotion },
                 new[] { humanRace },
                 new[] { warriorClass });
             PlayerCombatController combatController = player.AddComponent<PlayerCombatController>();
@@ -1128,9 +1191,14 @@ namespace ProjectGenesis.Tools.Editor
             attackText.color = new Color(1f, 0.72f, 0.48f);
             SetRect(attackText.GetComponent<RectTransform>(), new Vector2(272f, -158f), new Vector2(220f, 30f), new Vector2(0f, 1f));
 
-            Text mainHandText = CreateText("Text_MainHand", window.transform, "Оружие: не экипировано", 21, TextAnchor.UpperLeft);
+            Text mainHandText = CreateText(
+                "Text_MainHand",
+                window.transform,
+                "Оружие: не экипировано · Броня: не экипирована",
+                18,
+                TextAnchor.UpperLeft);
             mainHandText.color = new Color(0.72f, 0.9f, 1f);
-            SetRect(mainHandText.GetComponent<RectTransform>(), new Vector2(24f, -202f), new Vector2(468f, 34f), new Vector2(0f, 1f));
+            SetRect(mainHandText.GetComponent<RectTransform>(), new Vector2(24f, -202f), new Vector2(468f, 44f), new Vector2(0f, 1f));
 
             GameObject divider = CreatePanel("Divider", window.transform, new Color(0.28f, 0.32f, 0.34f, 1f));
             divider.GetComponent<Image>().raycastTarget = false;
@@ -1181,9 +1249,18 @@ namespace ProjectGenesis.Tools.Editor
             Text actionText = actionButton.GetComponentInChildren<Text>();
             actionText.fontSize = 18;
 
-            Text hintText = CreateText("Text_InventoryHint", window.transform, "Перетащите предмет · I закрыть", 18, TextAnchor.LowerRight);
-            hintText.color = new Color(0.62f, 0.68f, 0.7f);
-            SetRect(hintText.GetComponent<RectTransform>(), new Vector2(-24f, 16f), new Vector2(240f, 28f), new Vector2(1f, 0f));
+            Text feedbackText = CreateText(
+                "Text_ItemFeedback",
+                window.transform,
+                string.Empty,
+                16,
+                TextAnchor.MiddleRight);
+            feedbackText.color = new Color(0.78f, 0.86f, 0.72f);
+            SetRect(
+                feedbackText.GetComponent<RectTransform>(),
+                new Vector2(-24f, 12f),
+                new Vector2(276f, 34f),
+                new Vector2(1f, 0f));
 
             InventoryView inventoryView = canvasObject.AddComponent<InventoryView>();
             inventoryView.Initialize(
@@ -1199,8 +1276,10 @@ namespace ProjectGenesis.Tools.Editor
                 itemNameText,
                 itemDetailsText,
                 actionText,
+                feedbackText,
                 player.GetComponent<PlayerInventory>(),
                 player.GetComponent<PlayerEquipment>(),
+                player.GetComponent<PlayerItemUseController>(),
                 player.GetComponent<CombatStats>());
 
             for (int index = 0; index < slotButtons.Length; index++)

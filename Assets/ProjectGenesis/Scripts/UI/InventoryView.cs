@@ -21,14 +21,19 @@ namespace ProjectGenesis.UI
         [SerializeField] private Text itemNameText;
         [SerializeField] private Text itemDetailsText;
         [SerializeField] private Text itemActionText;
+        [SerializeField] private Text itemFeedbackText;
         [SerializeField] private PlayerInventory inventory;
         [SerializeField] private PlayerEquipment equipment;
+        [SerializeField] private PlayerItemUseController itemUseController;
         [SerializeField] private CombatStats combatStats;
         [SerializeField] private string selectedInstanceId;
+
+        private string actionFeedback;
 
         public GameObject WindowRoot => windowRoot;
         public int SlotCount => slotButtons != null ? slotButtons.Length : 0;
         public string SelectedInstanceId => selectedInstanceId;
+        public PlayerItemUseController ItemUseController => itemUseController;
 
         public bool CanDragSlot(int slotIndex)
         {
@@ -54,8 +59,10 @@ namespace ProjectGenesis.UI
             Text itemNameLabel,
             Text itemDetailsLabel,
             Text actionLabel,
+            Text feedbackLabel,
             PlayerInventory playerInventory,
             PlayerEquipment playerEquipment,
+            PlayerItemUseController playerItemUseController,
             CombatStats playerCombatStats)
         {
             windowRoot = inventoryWindow;
@@ -70,8 +77,10 @@ namespace ProjectGenesis.UI
             itemNameText = itemNameLabel;
             itemDetailsText = itemDetailsLabel;
             itemActionText = actionLabel;
+            itemFeedbackText = feedbackLabel;
             inventory = playerInventory;
             equipment = playerEquipment;
+            itemUseController = playerItemUseController;
             combatStats = playerCombatStats;
         }
 
@@ -189,20 +198,27 @@ namespace ProjectGenesis.UI
         private void HandleItemAction()
         {
             ItemInstance item = GetSelectedItem();
-            if (item == null || equipment == null)
+            if (item == null)
             {
                 return;
             }
 
-            if (equipment.MainHand != null &&
-                equipment.MainHand.InstanceId == item.InstanceId)
+            bool succeeded = item.ItemType switch
             {
-                equipment.UnequipMainHand();
-            }
-            else
+                ItemType.Weapon => HandleWeaponAction(item),
+                ItemType.Armor => HandleArmorAction(item),
+                ItemType.Consumable => HandleConsumableAction(item),
+                _ => false
+            };
+
+            if (item.ItemType != ItemType.Consumable)
             {
-                equipment.EquipMainHand(item);
+                actionFeedback = succeeded
+                    ? "Экипировка обновлена."
+                    : "Этот предмет нельзя использовать здесь.";
             }
+
+            Refresh();
         }
 
         private void HandleSlotSelected(int slotIndex)
@@ -219,6 +235,7 @@ namespace ProjectGenesis.UI
             }
 
             selectedInstanceId = item != null ? item.InstanceId : string.Empty;
+            actionFeedback = string.Empty;
             Refresh();
         }
 
@@ -256,9 +273,13 @@ namespace ProjectGenesis.UI
 
             if (mainHandText != null)
             {
-                mainHandText.text = equipment.MainHand != null
-                    ? $"Оружие: {equipment.MainHand.DisplayName}"
-                    : "Оружие: не экипировано";
+                string weaponName = equipment.MainHand != null
+                    ? equipment.MainHand.DisplayName
+                    : "не экипировано";
+                string armorName = equipment.Body != null
+                    ? equipment.Body.DisplayName
+                    : "не экипирована";
+                mainHandText.text = $"Оружие: {weaponName} · Броня: {armorName}";
             }
 
             ItemInstance item = ResolveSelectedItem();
@@ -274,8 +295,8 @@ namespace ProjectGenesis.UI
             if (itemDetailsText != null)
             {
                 itemDetailsText.text = hasItem
-                    ? $"Оружие, +{item.AttackBonus} к силе атаки"
-                    : "Победите волка и подберите выпавший предмет.";
+                    ? GetItemDetails(item)
+                    : "Побеждайте врагов и подбирайте выпавшие предметы.";
             }
 
             if (itemActionButton != null)
@@ -285,10 +306,14 @@ namespace ProjectGenesis.UI
 
             if (itemActionText != null && hasItem)
             {
-                itemActionText.text = equipment.MainHand != null &&
-                                      equipment.MainHand.InstanceId == item.InstanceId
-                    ? "Снять"
-                    : "Надеть";
+                itemActionText.text = item.ItemType == ItemType.Consumable
+                    ? "Использовать"
+                    : equipment.IsEquipped(item) ? "Снять" : "Надеть";
+            }
+
+            if (itemFeedbackText != null)
+            {
+                itemFeedbackText.text = actionFeedback;
             }
         }
 
@@ -327,13 +352,12 @@ namespace ProjectGenesis.UI
                 ItemInstance item = inventory != null ? inventory.GetItemAt(index) : null;
                 bool isSelected = item != null && selected != null &&
                                   item.InstanceId == selected.InstanceId;
-                bool isEquipped = item != null && equipment.MainHand != null &&
-                                  item.InstanceId == equipment.MainHand.InstanceId;
+                bool isEquipped = item != null && equipment.IsEquipped(item);
 
                 if (label != null)
                 {
                     label.text = item != null
-                        ? $"{index + 1}. {item.DisplayName}{(isEquipped ? "  [Надето]" : string.Empty)}"
+                        ? $"{index + 1}. {(isEquipped ? "[Надето] " : string.Empty)}{item.DisplayName}"
                         : $"{index + 1}. Пусто";
                     label.color = item != null
                         ? Color.white
@@ -374,6 +398,73 @@ namespace ProjectGenesis.UI
             }
 
             return null;
+        }
+
+        private bool HandleWeaponAction(ItemInstance item)
+        {
+            if (equipment == null)
+            {
+                return false;
+            }
+
+            if (equipment.MainHand != null &&
+                equipment.MainHand.InstanceId == item.InstanceId)
+            {
+                equipment.UnequipMainHand();
+                return true;
+            }
+
+            return equipment.EquipMainHand(item);
+        }
+
+        private bool HandleArmorAction(ItemInstance item)
+        {
+            if (equipment == null)
+            {
+                return false;
+            }
+
+            if (equipment.Body != null && equipment.Body.InstanceId == item.InstanceId)
+            {
+                equipment.UnequipBody();
+                return true;
+            }
+
+            return equipment.EquipBody(item);
+        }
+
+        private bool HandleConsumableAction(ItemInstance item)
+        {
+            if (itemUseController == null)
+            {
+                actionFeedback = "Предмет сейчас использовать нельзя.";
+                return false;
+            }
+
+            if (!itemUseController.TryUse(item, out ItemUseResult result))
+            {
+                actionFeedback = result switch
+                {
+                    ItemUseResult.FullHealth => "Здоровье уже полное.",
+                    ItemUseResult.Dead => "Нельзя использовать после смерти.",
+                    _ => "Предмет сейчас использовать нельзя."
+                };
+                return false;
+            }
+
+            actionFeedback = $"Восстановлено до {itemUseController.Health.CurrentHealth} здоровья.";
+            return true;
+        }
+
+        private static string GetItemDetails(ItemInstance item)
+        {
+            return item.ItemType switch
+            {
+                ItemType.Weapon => $"Оружие · +{item.AttackBonus} к силе атаки",
+                ItemType.Armor => $"Броня · +{item.DefenseBonus} к защите",
+                ItemType.Consumable => $"Расходник · восстанавливает {item.HealingAmount} здоровья",
+                _ => "Неизвестный предмет"
+            };
         }
     }
 }

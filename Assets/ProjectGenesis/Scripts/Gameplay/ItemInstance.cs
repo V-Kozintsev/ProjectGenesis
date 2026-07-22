@@ -22,6 +22,8 @@ namespace ProjectGenesis.Gameplay
         public string DisplayName => definition != null ? definition.DisplayName : "Unknown Item";
         public ItemType ItemType => definition != null ? definition.ItemType : ItemType.Weapon;
         public int AttackBonus => definition != null ? definition.AttackBonus : 0;
+        public int DefenseBonus => definition != null ? definition.DefenseBonus : 0;
+        public int HealingAmount => definition != null ? definition.HealingAmount : 0;
         public bool IsValid => definition != null && !string.IsNullOrWhiteSpace(instanceId);
 
         public static ItemInstance Create(ItemDefinition definition, string stableInstanceId = null)

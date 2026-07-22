@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-07-22
+
+- Started Sprint 021 Equipment Slots And First Consumable with documented scope and acceptance criteria.
+- Chose one body-armor slot, a +3 Worn Leather Armor, and a 30-health Minor Healing Potion as the smallest reusable equipment-and-consumable proof.
+- Generalized item data for weapons, armor, and consumables; added body equipment defense and exact-instance consumable removal.
+- Added profile version 6 with body-instance persistence while retaining version-1 through version-5 migration.
+- Added armor and potion loot to existing enemies, temporary inventory feedback, builder wiring, a deterministic Sprint 021 validator, and a Play Mode preparation command.
+- Passed the Sprint 008-021 relevant regression suite, including the fixed-seed wolf sword result of 9.86%.
+- Passed the user's main Sprint 021 Play Mode check and moved the equipped marker before long item names so armor state remains visible in narrow temporary slots.
+- Accepted Sprint 021 after the user's visual check and set Sprint 022 Death State And Respawn Choice as the next implementation step.
+- Set explicit death and respawn choice, separate equipment presentation, and a typed local message feed as the next proposed foundation sequence; real player chat and global announcements remain server-owned later work.
+
 ## 2026-07-21
 
 - Started Sprint 020 Inventory Rearrangement And Weapon Variety with documented scope and acceptance criteria.

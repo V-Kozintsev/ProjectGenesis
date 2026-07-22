@@ -17,14 +17,24 @@ namespace ProjectGenesis.Tools.Editor
             LootTableDefinition lootTable = AssetDatabase.LoadAssetAtPath<LootTableDefinition>(WolfLootTablePath);
             Require(lootTable != null, $"Missing asset at {WolfLootTablePath}.");
             Require(lootTable.TryValidate(out string validationError), validationError);
-            Require(lootTable.Entries.Count == 1, "The prototype wolf table should contain one item.");
+            Require(lootTable.Entries.Count == 2,
+                "The prototype wolf table should contain the sword and healing potion.");
 
             LootTableEntry swordEntry = lootTable.Entries[0];
+            LootTableEntry potionEntry = lootTable.Entries[1];
             Require(swordEntry.Item.ItemId == "weapon.rusty_sword", "Wolf table does not contain the rusty sword.");
             Require(Mathf.Approximately(swordEntry.DropChance, 0.1f), "Rusty sword chance is not 10%.");
-            Require(Mathf.Approximately(lootTable.TotalDropChance, 0.1f), "Wolf total regular-loot chance is not 10%.");
+            Require(potionEntry.Item.ItemId == "consumable.minor_healing_potion" &&
+                    Mathf.Approximately(potionEntry.DropChance, 0.2f),
+                "Wolf table does not contain the healing potion at 20%.");
+            Require(Mathf.Approximately(lootTable.TotalDropChance, 0.3f),
+                "Wolf total regular-loot chance is not 30%.");
             Require(lootTable.TryRoll(0f, out LootTableEntry lowRoll) && lowRoll == swordEntry, "A low roll did not drop the sword.");
-            Require(!lootTable.TryRoll(0.1f, out _), "The no-drop range does not begin at 10%.");
+            Require(lootTable.TryRoll(0.1f, out LootTableEntry potionRoll) &&
+                    potionRoll == potionEntry,
+                "The potion range does not begin at 10%.");
+            Require(!lootTable.TryRoll(0.3f, out _),
+                "The no-drop range does not begin at 30%.");
             Require(!lootTable.TryRoll(0.999f, out _), "A high roll unexpectedly produced loot.");
             ValidateGuaranteedTestRoll(swordEntry.Item);
 
@@ -32,7 +42,9 @@ namespace ProjectGenesis.Tools.Editor
             int drops = 0;
             for (int index = 0; index < SimulationRolls; index++)
             {
-                if (lootTable.TryRoll((float)random.NextDouble(), out _))
+                if (lootTable.TryRoll(
+                        (float)random.NextDouble(),
+                        out LootTableEntry rolledEntry) && rolledEntry == swordEntry)
                 {
                     drops++;
                 }
