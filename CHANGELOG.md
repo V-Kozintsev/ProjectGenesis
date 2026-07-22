@@ -2,6 +2,14 @@
 
 ## 2026-07-22
 
+- Started Sprint 023 Character Equipment View with documented scope and acceptance criteria.
+- Separated exact equipped weapon and body-armor instances from the eight bag positions, including safe replacement and full-bag unequip refusal.
+- Combined the eight-slot bag and main-hand/body equipment presentation in the movable inventory window, with selected-item comparison and equip, replace, and unequip feedback.
+- Added exact-instance world dropping plus click-or-drag trash with centered confirmation for permanent selected-item removal; both are blocked while dead.
+- Added explicit independent unequip buttons for main-hand and body slots so a selected replacement item cannot hide the remove action.
+- Added profile version 7 with separate equipment records and version-1 through version-6 compatibility.
+- Added a deterministic Sprint 023 validator and passed the Sprint 008-023 relevant regression suite.
+- Accepted Sprint 023 after the user's Play Mode check and set Sprint 024 Local Message Feed Foundation as the next proposed implementation step.
 - Started Sprint 022 Death State And Respawn Choice with documented scope and acceptance criteria.
 - Added PlayerDeathController and DeathRespawnView so death applies the existing penalty once, blocks gameplay, keeps the character at the death position, and resurrects in the village only after confirmation.
 - Stopped pending combat, skill, NPC, loot, movement, consumable, and regeneration actions while dead.

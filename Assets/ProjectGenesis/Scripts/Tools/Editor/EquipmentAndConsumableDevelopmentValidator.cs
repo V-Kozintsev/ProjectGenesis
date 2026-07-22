@@ -177,9 +177,9 @@ namespace ProjectGenesis.Tools.Editor
                         stats.BaseDefense == 3 &&
                         stats.EquipmentDefenseBonus == 3 && stats.Defense == 6,
                     "Body armor must apply exactly +3 equipment defense.");
-                Require(inventory.TryMoveOrSwap(0, 7) &&
+                Require(!inventory.Contains(armorInstance) &&
                         equipment.Body == armorInstance && stats.Defense == 6,
-                    "Moving equipped armor must preserve the exact body instance.");
+                    "Equipped armor must leave the bag and preserve the exact body instance.");
 
                 Require(!itemUse.TryUse(firstPotion, out ItemUseResult fullResult) &&
                         fullResult == ItemUseResult.FullHealth &&
@@ -219,15 +219,15 @@ namespace ProjectGenesis.Tools.Editor
             ItemDefinition armor,
             ItemDefinition potion)
         {
-            Require(PlayerProfileData.CurrentVersion == 6,
-                "Current profile version must be 6.");
-            for (int version = 1; version <= 6; version++)
+            Require(PlayerProfileData.CurrentVersion == 7,
+                "Current profile version must be 7.");
+            for (int version = 1; version <= 7; version++)
             {
                 Require(LocalJsonPlayerPersistence.IsSupportedVersion(version),
                     $"Profile version {version} must remain supported.");
             }
 
-            Require(!LocalJsonPlayerPersistence.IsSupportedVersion(7),
+            Require(!LocalJsonPlayerPersistence.IsSupportedVersion(8),
                 "Unknown future profile versions must be rejected.");
 
             PlayerProfileData versionFive = new()

@@ -7,6 +7,7 @@ namespace ProjectGenesis.Gameplay
     public sealed class WorldLootPickup : MonoBehaviour
     {
         [SerializeField] private ItemDefinition item;
+        [SerializeField] private ItemInstance instance;
         [SerializeField] private float bobHeight = 0.08f;
         [SerializeField] private float bobSpeed = 2.5f;
         [SerializeField] private float rotationSpeed = 70f;
@@ -15,7 +16,8 @@ namespace ProjectGenesis.Gameplay
         private bool isCollected;
 
         public ItemDefinition Item => item;
-        public bool IsCollectible => item != null;
+        public ItemInstance Instance => instance;
+        public bool IsCollectible => item != null && instance != null && instance.IsValid;
 
         private void Awake()
         {
@@ -32,20 +34,35 @@ namespace ProjectGenesis.Gameplay
 
         public void Initialize(ItemDefinition itemDefinition)
         {
-            item = itemDefinition;
+            Initialize(ItemInstance.Create(itemDefinition));
+        }
+
+        public void Initialize(ItemInstance itemInstance)
+        {
+            instance = itemInstance != null && itemInstance.IsValid ? itemInstance : null;
+            item = instance != null ? instance.Definition : null;
             baseHeight = transform.position.y;
             name = item != null ? $"Loot_{item.DisplayName}" : "Loot_Unknown";
         }
 
         public bool TryCollect(PlayerInventory inventory)
         {
-            if (isCollected || item == null || inventory == null || !inventory.TryAdd(item))
+            if (isCollected || !IsCollectible || inventory == null ||
+                !inventory.TryAddInstance(instance))
             {
                 return false;
             }
 
             isCollected = true;
-            Destroy(gameObject);
+            if (Application.isPlaying)
+            {
+                Destroy(gameObject);
+            }
+            else
+            {
+                DestroyImmediate(gameObject);
+            }
+
             return true;
         }
     }

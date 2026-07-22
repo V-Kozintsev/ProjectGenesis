@@ -120,6 +120,8 @@ namespace ProjectGenesis.Saving
                 BodyInstanceId = equipment.Body != null
                     ? equipment.Body.InstanceId
                     : string.Empty,
+                MainHandItem = CaptureEquippedItem(equipment.MainHand),
+                BodyItem = CaptureEquippedItem(equipment.Body),
                 Quests = questLog != null ? questLog.CaptureState() : new List<QuestProgressData>()
             };
 
@@ -189,8 +191,22 @@ namespace ProjectGenesis.Saving
             inventory.RestoreSlots(restoredItems);
             progression.RestoreState(profile.Level, profile.CurrentExperience);
             questLog?.RestoreState(profile.Quests);
-            equipment.RestoreMainHand(ResolveMainHandInstanceId(profile, restoredItems));
-            equipment.RestoreBody(ResolveBodyInstanceId(profile, restoredItems));
+            if (profile.Version >= 7)
+            {
+                equipment.RestoreMainHand(BuildEquippedInstance(
+                    profile.MainHandItem,
+                    FindItem,
+                    ItemType.Weapon));
+                equipment.RestoreBody(BuildEquippedInstance(
+                    profile.BodyItem,
+                    FindItem,
+                    ItemType.Armor));
+            }
+            else
+            {
+                equipment.RestoreMainHand(ResolveMainHandInstanceId(profile, restoredItems));
+                equipment.RestoreBody(ResolveBodyInstanceId(profile, restoredItems));
+            }
 
             if (profile.HasPosition)
             {
@@ -390,6 +406,38 @@ namespace ProjectGenesis.Saving
             }
 
             return string.Empty;
+        }
+
+        public static ItemInstance BuildEquippedInstance(
+            ItemInstanceData savedItem,
+            Func<string, ItemDefinition> itemResolver,
+            ItemType expectedType)
+        {
+            if (savedItem == null || itemResolver == null ||
+                string.IsNullOrWhiteSpace(savedItem.InstanceId))
+            {
+                return null;
+            }
+
+            ItemDefinition definition = itemResolver(savedItem.ItemId);
+            if (definition == null || definition.ItemType != expectedType)
+            {
+                return null;
+            }
+
+            return ItemInstance.Create(definition, savedItem.InstanceId);
+        }
+
+        private static ItemInstanceData CaptureEquippedItem(ItemInstance item)
+        {
+            return item != null && item.IsValid
+                ? new ItemInstanceData
+                {
+                    InstanceId = item.InstanceId,
+                    ItemId = item.ItemId,
+                    SlotIndex = -1
+                }
+                : null;
         }
 
         private CharacterRaceDefinition FindRace(string raceId)

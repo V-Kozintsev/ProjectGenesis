@@ -152,6 +152,12 @@ namespace ProjectGenesis.Tools.Editor
             RebuildStarterVillage();
         }
 
+        [MenuItem("Project Genesis/Sprint 023/Rebuild Starter Village Character Equipment")]
+        public static void RebuildStarterVillageCharacterEquipment()
+        {
+            RebuildStarterVillage();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -183,6 +189,7 @@ namespace ProjectGenesis.Tools.Editor
 
             GameObject playerPrefab = CreatePlayerPrefab(
                 playerMaterial,
+                lootMaterial,
                 rustySword,
                 wornAxe,
                 wornLeatherArmor,
@@ -460,6 +467,7 @@ namespace ProjectGenesis.Tools.Editor
 
         private static GameObject CreatePlayerPrefab(
             Material playerMaterial,
+            Material lootMaterial,
             ItemDefinition rustySword,
             ItemDefinition wornAxe,
             ItemDefinition wornLeatherArmor,
@@ -497,6 +505,9 @@ namespace ProjectGenesis.Tools.Editor
             player.AddComponent<PlayerInventory>();
             player.AddComponent<PlayerEquipment>();
             player.AddComponent<PlayerItemUseController>();
+            PlayerItemDropController itemDropController =
+                player.AddComponent<PlayerItemDropController>();
+            itemDropController.Configure(lootMaterial);
             player.AddComponent<PlayerLootController>();
             PlayerPersistenceController persistence = player.AddComponent<PlayerPersistenceController>();
             persistence.Configure(
@@ -1203,9 +1214,9 @@ namespace ProjectGenesis.Tools.Editor
             SetRect(
                 window.GetComponent<RectTransform>(),
                 new Vector2(-28f, 0f),
-                new Vector2(520f, 640f),
+                new Vector2(880f, 570f),
                 new Vector2(1f, 0.5f));
-            CreateWindowDragHandle(window, 450f);
+            CreateWindowDragHandle(window, 810f);
 
             Text title = CreateText("Text_InventoryTitle", window.transform, "Инвентарь", 30, TextAnchor.UpperLeft);
             title.color = new Color(1f, 0.84f, 0.48f);
@@ -1215,56 +1226,17 @@ namespace ProjectGenesis.Tools.Editor
             closeButton.GetComponent<Image>().color = new Color(0.28f, 0.1f, 0.09f, 1f);
             SetRect(closeButton.GetComponent<RectTransform>(), new Vector2(-18f, -18f), new Vector2(38f, 36f), new Vector2(1f, 1f));
 
-            Text characterNameText = CreateText(
-                "Text_CharacterName",
-                window.transform,
-                PlayerIdentity.DefaultCharacterName,
-                24,
-                TextAnchor.UpperLeft);
-            characterNameText.color = new Color(0.95f, 0.95f, 0.92f);
-            SetRect(
-                characterNameText.GetComponent<RectTransform>(),
-                new Vector2(24f, -76f),
-                new Vector2(468f, 34f),
-                new Vector2(0f, 1f));
-
-            Text identityDetailsText = CreateText(
-                "Text_CharacterIdentity",
-                window.transform,
-                "Человек · Воин",
-                19,
-                TextAnchor.UpperLeft);
-            identityDetailsText.color = new Color(0.72f, 0.82f, 0.88f);
-            SetRect(
-                identityDetailsText.GetComponent<RectTransform>(),
-                new Vector2(24f, -112f),
-                new Vector2(468f, 30f),
-                new Vector2(0f, 1f));
-
             Text capacityText = CreateText("Text_InventoryCapacity", window.transform, "Ячейки: 0 / 8", 21, TextAnchor.UpperLeft);
             capacityText.color = new Color(0.82f, 0.88f, 0.92f);
-            SetRect(capacityText.GetComponent<RectTransform>(), new Vector2(24f, -158f), new Vector2(220f, 30f), new Vector2(0f, 1f));
-
-            Text attackText = CreateText("Text_AttackPower", window.transform, "Сила атаки: 14", 21, TextAnchor.UpperLeft);
-            attackText.color = new Color(1f, 0.72f, 0.48f);
-            SetRect(attackText.GetComponent<RectTransform>(), new Vector2(272f, -158f), new Vector2(220f, 30f), new Vector2(0f, 1f));
-
-            Text mainHandText = CreateText(
-                "Text_MainHand",
-                window.transform,
-                "Оружие: не экипировано · Броня: не экипирована",
-                18,
-                TextAnchor.UpperLeft);
-            mainHandText.color = new Color(0.72f, 0.9f, 1f);
-            SetRect(mainHandText.GetComponent<RectTransform>(), new Vector2(24f, -202f), new Vector2(468f, 44f), new Vector2(0f, 1f));
+            SetRect(capacityText.GetComponent<RectTransform>(), new Vector2(24f, -78f), new Vector2(468f, 30f), new Vector2(0f, 1f));
 
             GameObject divider = CreatePanel("Divider", window.transform, new Color(0.28f, 0.32f, 0.34f, 1f));
             divider.GetComponent<Image>().raycastTarget = false;
-            SetRect(divider.GetComponent<RectTransform>(), new Vector2(24f, -250f), new Vector2(468f, 2f), new Vector2(0f, 1f));
+            SetRect(divider.GetComponent<RectTransform>(), new Vector2(24f, -120f), new Vector2(468f, 2f), new Vector2(0f, 1f));
 
-            Text contentsTitle = CreateText("Text_ContentsTitle", window.transform, "Содержимое", 22, TextAnchor.UpperLeft);
+            Text contentsTitle = CreateText("Text_ContentsTitle", window.transform, "Содержимое сумки", 22, TextAnchor.UpperLeft);
             contentsTitle.color = new Color(0.9f, 0.92f, 0.94f);
-            SetRect(contentsTitle.GetComponent<RectTransform>(), new Vector2(24f, -274f), new Vector2(468f, 32f), new Vector2(0f, 1f));
+            SetRect(contentsTitle.GetComponent<RectTransform>(), new Vector2(24f, -144f), new Vector2(468f, 32f), new Vector2(0f, 1f));
 
             Button[] slotButtons = new Button[8];
             Text[] slotTexts = new Text[8];
@@ -1278,7 +1250,7 @@ namespace ProjectGenesis.Tools.Editor
                     $"{index + 1}. Пусто");
                 SetRect(
                     slotButton.GetComponent<RectTransform>(),
-                    new Vector2(24f + column * 238f, -312f - row * 48f),
+                    new Vector2(24f + column * 238f, -182f - row * 48f),
                     new Vector2(230f, 40f),
                     new Vector2(0f, 1f));
                 Text slotText = slotButton.GetComponentInChildren<Text>();
@@ -1290,7 +1262,7 @@ namespace ProjectGenesis.Tools.Editor
 
             Text itemNameText = CreateText("Text_ItemName", window.transform, "Инвентарь пуст", 24, TextAnchor.UpperLeft);
             itemNameText.color = new Color(1f, 0.82f, 0.42f);
-            SetRect(itemNameText.GetComponent<RectTransform>(), new Vector2(24f, -510f), new Vector2(468f, 32f), new Vector2(0f, 1f));
+            SetRect(itemNameText.GetComponent<RectTransform>(), new Vector2(24f, -380f), new Vector2(468f, 32f), new Vector2(0f, 1f));
 
             Text itemDetailsText = CreateText(
                 "Text_ItemDetails",
@@ -1300,12 +1272,23 @@ namespace ProjectGenesis.Tools.Editor
                 TextAnchor.UpperLeft);
             itemDetailsText.color = new Color(0.82f, 0.84f, 0.82f);
             itemDetailsText.lineSpacing = 1.1f;
-            SetRect(itemDetailsText.GetComponent<RectTransform>(), new Vector2(24f, -548f), new Vector2(468f, 40f), new Vector2(0f, 1f));
+            SetRect(itemDetailsText.GetComponent<RectTransform>(), new Vector2(24f, -418f), new Vector2(468f, 40f), new Vector2(0f, 1f));
 
             Button actionButton = CreateButton("Button_ItemAction", window.transform, "Надеть");
-            SetRect(actionButton.GetComponent<RectTransform>(), new Vector2(24f, 8f), new Vector2(180f, 42f), new Vector2(0f, 0f));
+            SetRect(actionButton.GetComponent<RectTransform>(), new Vector2(24f, 8f), new Vector2(140f, 42f), new Vector2(0f, 0f));
             Text actionText = actionButton.GetComponentInChildren<Text>();
             actionText.fontSize = 18;
+
+            Button dropButton = CreateButton("Button_DropItem", window.transform, "Выбросить");
+            SetRect(dropButton.GetComponent<RectTransform>(), new Vector2(174f, 8f), new Vector2(140f, 42f), new Vector2(0f, 0f));
+            Text dropText = dropButton.GetComponentInChildren<Text>();
+            dropText.fontSize = 17;
+
+            Button destroyButton = CreateButton("Button_DestroyItem", window.transform, "Корзина");
+            destroyButton.GetComponent<Image>().color = new Color(0.28f, 0.1f, 0.09f, 1f);
+            SetRect(destroyButton.GetComponent<RectTransform>(), new Vector2(324f, 8f), new Vector2(140f, 42f), new Vector2(0f, 0f));
+            Text destroyText = destroyButton.GetComponentInChildren<Text>();
+            destroyText.fontSize = 17;
 
             Text feedbackText = CreateText(
                 "Text_ItemFeedback",
@@ -1316,9 +1299,50 @@ namespace ProjectGenesis.Tools.Editor
             feedbackText.color = new Color(0.78f, 0.86f, 0.72f);
             SetRect(
                 feedbackText.GetComponent<RectTransform>(),
-                new Vector2(-24f, 12f),
-                new Vector2(276f, 34f),
-                new Vector2(1f, 0f));
+                new Vector2(24f, 56f),
+                new Vector2(440f, 34f),
+                new Vector2(0f, 0f));
+
+            GameObject destroyConfirmation = CreatePanel(
+                "InventoryDestroyConfirmation",
+                canvasObject.transform,
+                new Color(0.035f, 0.025f, 0.025f, 0.98f));
+            SetRect(
+                destroyConfirmation.GetComponent<RectTransform>(),
+                Vector2.zero,
+                new Vector2(540f, 260f),
+                new Vector2(0.5f, 0.5f));
+
+            Text confirmationTitle = CreateText(
+                "Text_DestroyConfirmationTitle",
+                destroyConfirmation.transform,
+                "Удаление предмета",
+                30,
+                TextAnchor.UpperCenter);
+            confirmationTitle.color = new Color(1f, 0.72f, 0.62f);
+            SetRect(confirmationTitle.GetComponent<RectTransform>(), new Vector2(24f, -28f), new Vector2(492f, 42f), new Vector2(0f, 1f));
+
+            Text confirmationText = CreateText(
+                "Text_DestroyConfirmation",
+                destroyConfirmation.transform,
+                string.Empty,
+                20,
+                TextAnchor.MiddleCenter);
+            confirmationText.color = new Color(0.9f, 0.9f, 0.88f);
+            SetRect(confirmationText.GetComponent<RectTransform>(), new Vector2(34f, -82f), new Vector2(472f, 78f), new Vector2(0f, 1f));
+
+            Button confirmDestroyButton = CreateButton(
+                "Button_ConfirmDestroyItem",
+                destroyConfirmation.transform,
+                "Удалить");
+            confirmDestroyButton.GetComponent<Image>().color = new Color(0.38f, 0.1f, 0.09f, 1f);
+            SetRect(confirmDestroyButton.GetComponent<RectTransform>(), new Vector2(54f, 30f), new Vector2(190f, 48f), new Vector2(0f, 0f));
+
+            Button cancelDestroyButton = CreateButton(
+                "Button_CancelDestroyItem",
+                destroyConfirmation.transform,
+                "Отмена");
+            SetRect(cancelDestroyButton.GetComponent<RectTransform>(), new Vector2(-54f, 30f), new Vector2(190f, 48f), new Vector2(1f, 0f));
 
             InventoryView inventoryView = canvasObject.AddComponent<InventoryView>();
             inventoryView.Initialize(
@@ -1326,19 +1350,28 @@ namespace ProjectGenesis.Tools.Editor
                 openButton,
                 closeButton,
                 actionButton,
+                dropButton,
+                destroyButton,
                 slotButtons,
                 slotTexts,
                 capacityText,
-                attackText,
-                mainHandText,
                 itemNameText,
                 itemDetailsText,
                 actionText,
+                destroyText,
                 feedbackText,
+                destroyConfirmation,
+                confirmationText,
+                confirmDestroyButton,
+                cancelDestroyButton,
                 player.GetComponent<PlayerInventory>(),
                 player.GetComponent<PlayerEquipment>(),
                 player.GetComponent<PlayerItemUseController>(),
-                player.GetComponent<CombatStats>());
+                player.GetComponent<PlayerItemDropController>());
+
+            InventoryTrashDropTarget trashDropTarget =
+                destroyButton.gameObject.AddComponent<InventoryTrashDropTarget>();
+            trashDropTarget.Initialize(inventoryView);
 
             for (int index = 0; index < slotButtons.Length; index++)
             {
@@ -1347,12 +1380,112 @@ namespace ProjectGenesis.Tools.Editor
                 dragHandler.Initialize(inventoryView, index);
             }
 
-            CharacterIdentityView identityView = canvasObject.AddComponent<CharacterIdentityView>();
-            identityView.Initialize(
-                characterNameText,
-                identityDetailsText,
-                player.GetComponent<PlayerIdentity>());
+            CreateCharacterEquipmentUi(canvasObject, window, player, inventoryView);
+            destroyConfirmation.SetActive(false);
             window.SetActive(false);
+        }
+
+        private static void CreateCharacterEquipmentUi(
+            GameObject canvasObject,
+            GameObject window,
+            GameObject player,
+            InventoryView inventoryView)
+        {
+            GameObject equipmentDivider = CreatePanel(
+                "Divider_CharacterEquipment",
+                window.transform,
+                new Color(0.28f, 0.32f, 0.34f, 1f));
+            equipmentDivider.GetComponent<Image>().raycastTarget = false;
+            SetRect(
+                equipmentDivider.GetComponent<RectTransform>(),
+                new Vector2(500f, -76f),
+                new Vector2(2f, 466f),
+                new Vector2(0f, 1f));
+
+            Text equipmentTitle = CreateText(
+                "Text_EquipmentTitle",
+                window.transform,
+                "Экипировка",
+                24,
+                TextAnchor.UpperLeft);
+            equipmentTitle.color = new Color(0.9f, 0.92f, 0.94f);
+            SetRect(equipmentTitle.GetComponent<RectTransform>(), new Vector2(530f, -82f), new Vector2(320f, 34f), new Vector2(0f, 1f));
+
+            Button mainHandSlot = CreateButton(
+                "Button_Equipment_MainHand",
+                window.transform,
+                "Правая рука\nПусто");
+            SetRect(mainHandSlot.GetComponent<RectTransform>(), new Vector2(530f, -130f), new Vector2(230f, 86f), new Vector2(0f, 1f));
+            Text mainHandSlotText = mainHandSlot.GetComponentInChildren<Text>();
+            mainHandSlotText.fontSize = 18;
+            mainHandSlotText.alignment = TextAnchor.MiddleLeft;
+
+            Button mainHandUnequip = CreateButton(
+                "Button_Unequip_MainHand",
+                window.transform,
+                "Снять");
+            SetRect(mainHandUnequip.GetComponent<RectTransform>(), new Vector2(770f, -130f), new Vector2(80f, 86f), new Vector2(0f, 1f));
+            mainHandUnequip.GetComponentInChildren<Text>().fontSize = 16;
+
+            Button bodySlot = CreateButton(
+                "Button_Equipment_Body",
+                window.transform,
+                "Тело\nПусто");
+            SetRect(bodySlot.GetComponent<RectTransform>(), new Vector2(530f, -230f), new Vector2(230f, 86f), new Vector2(0f, 1f));
+            Text bodySlotText = bodySlot.GetComponentInChildren<Text>();
+            bodySlotText.fontSize = 18;
+            bodySlotText.alignment = TextAnchor.MiddleLeft;
+
+            Button bodyUnequip = CreateButton(
+                "Button_Unequip_Body",
+                window.transform,
+                "Снять");
+            SetRect(bodyUnequip.GetComponent<RectTransform>(), new Vector2(770f, -230f), new Vector2(80f, 86f), new Vector2(0f, 1f));
+            bodyUnequip.GetComponentInChildren<Text>().fontSize = 16;
+
+            Text comparison = CreateText(
+                "Text_EquipmentComparison",
+                window.transform,
+                "Слот пуст.",
+                18,
+                TextAnchor.UpperLeft);
+            comparison.color = new Color(0.78f, 0.84f, 0.88f);
+            comparison.lineSpacing = 1.1f;
+            SetRect(comparison.GetComponent<RectTransform>(), new Vector2(530f, -342f), new Vector2(320f, 94f), new Vector2(0f, 1f));
+
+            Button equipmentAction = CreateButton(
+                "Button_EquipmentAction",
+                window.transform,
+                "Снять");
+            SetRect(equipmentAction.GetComponent<RectTransform>(), new Vector2(530f, -458f), new Vector2(200f, 44f), new Vector2(0f, 1f));
+            Text equipmentActionText = equipmentAction.GetComponentInChildren<Text>();
+            equipmentActionText.fontSize = 18;
+
+            Text equipmentFeedback = CreateText(
+                "Text_EquipmentFeedback",
+                window.transform,
+                string.Empty,
+                16,
+                TextAnchor.UpperLeft);
+            equipmentFeedback.color = new Color(0.78f, 0.86f, 0.72f);
+            SetRect(equipmentFeedback.GetComponent<RectTransform>(), new Vector2(530f, -518f), new Vector2(320f, 40f), new Vector2(0f, 1f));
+
+            CharacterEquipmentView equipmentView = canvasObject.AddComponent<CharacterEquipmentView>();
+            equipmentView.Initialize(
+                window,
+                mainHandSlot,
+                bodySlot,
+                mainHandUnequip,
+                bodyUnequip,
+                mainHandSlotText,
+                bodySlotText,
+                comparison,
+                equipmentAction,
+                equipmentActionText,
+                equipmentFeedback,
+                inventoryView,
+                player.GetComponent<PlayerInventory>(),
+                player.GetComponent<PlayerEquipment>());
         }
 
         private static void CreateCharacterStatsUi(GameObject canvasObject, GameObject player)
@@ -1530,6 +1663,12 @@ namespace ProjectGenesis.Tools.Editor
                 player.GetComponent<CombatStats>(),
                 player.GetComponent<PlayerCombatController>(),
                 player.GetComponent<PlayerSkillController>());
+
+            CharacterIdentityView identityView = canvasObject.AddComponent<CharacterIdentityView>();
+            identityView.Initialize(
+                characterName,
+                null,
+                player.GetComponent<PlayerIdentity>());
             window.SetActive(false);
         }
 
@@ -1804,7 +1943,8 @@ namespace ProjectGenesis.Tools.Editor
                 canvasObject.GetComponent<InventoryView>(),
                 canvasObject.GetComponent<QuestJournalView>(),
                 canvasObject.GetComponent<SkillHotbarView>(),
-                canvasObject.GetComponent<CharacterStatsView>()
+                canvasObject.GetComponent<CharacterStatsView>(),
+                canvasObject.GetComponent<CharacterEquipmentView>()
             };
 
             CharacterEntryView entryView = canvasObject.AddComponent<CharacterEntryView>();

@@ -32,16 +32,7 @@ namespace ProjectGenesis.Gameplay
                 body = null;
             }
 
-            inventory.Changed += HandleInventoryChanged;
             ApplyEquipmentBonuses();
-        }
-
-        private void OnDestroy()
-        {
-            if (inventory != null)
-            {
-                inventory.Changed -= HandleInventoryChanged;
-            }
         }
 
         public bool EquipMainHand(ItemInstance item)
@@ -52,22 +43,35 @@ namespace ProjectGenesis.Gameplay
                 return false;
             }
 
+            ItemInstance previousItem = MainHand;
+            if (!inventory.TryReplaceInstance(item, previousItem))
+            {
+                return false;
+            }
+
             mainHand = item;
             ApplyEquipmentBonuses();
             Changed?.Invoke(this);
             return true;
         }
 
-        public void UnequipMainHand()
+        public bool UnequipMainHand()
         {
-            if (mainHand == null)
+            ItemInstance item = MainHand;
+            if (item == null)
             {
-                return;
+                return false;
+            }
+
+            if (!inventory.TryAddInstance(item))
+            {
+                return false;
             }
 
             mainHand = null;
             ApplyEquipmentBonuses();
             Changed?.Invoke(this);
+            return true;
         }
 
         public void RestoreMainHand(string instanceId)
@@ -79,7 +83,20 @@ namespace ProjectGenesis.Gameplay
             }
 
             ItemInstance item = inventory.FindByInstanceId(instanceId);
-            mainHand = item != null && item.ItemType == ItemType.Weapon
+            mainHand = null;
+            if (item != null && item.ItemType == ItemType.Weapon)
+            {
+                inventory.TryReplaceInstance(item, null);
+                mainHand = item;
+            }
+
+            ApplyEquipmentBonuses();
+            Changed?.Invoke(this);
+        }
+
+        public void RestoreMainHand(ItemInstance item)
+        {
+            mainHand = item != null && item.IsValid && item.ItemType == ItemType.Weapon
                 ? item
                 : null;
             ApplyEquipmentBonuses();
@@ -94,22 +111,35 @@ namespace ProjectGenesis.Gameplay
                 return false;
             }
 
+            ItemInstance previousItem = Body;
+            if (!inventory.TryReplaceInstance(item, previousItem))
+            {
+                return false;
+            }
+
             body = item;
             ApplyEquipmentBonuses();
             Changed?.Invoke(this);
             return true;
         }
 
-        public void UnequipBody()
+        public bool UnequipBody()
         {
-            if (body == null)
+            ItemInstance item = Body;
+            if (item == null)
             {
-                return;
+                return false;
+            }
+
+            if (!inventory.TryAddInstance(item))
+            {
+                return false;
             }
 
             body = null;
             ApplyEquipmentBonuses();
             Changed?.Invoke(this);
+            return true;
         }
 
         public void RestoreBody(string instanceId)
@@ -121,7 +151,20 @@ namespace ProjectGenesis.Gameplay
             }
 
             ItemInstance item = inventory.FindByInstanceId(instanceId);
-            body = item != null && item.ItemType == ItemType.Armor
+            body = null;
+            if (item != null && item.ItemType == ItemType.Armor)
+            {
+                inventory.TryReplaceInstance(item, null);
+                body = item;
+            }
+
+            ApplyEquipmentBonuses();
+            Changed?.Invoke(this);
+        }
+
+        public void RestoreBody(ItemInstance item)
+        {
+            body = item != null && item.IsValid && item.ItemType == ItemType.Armor
                 ? item
                 : null;
             ApplyEquipmentBonuses();
@@ -137,30 +180,6 @@ namespace ProjectGenesis.Gameplay
 
             return MainHand != null && MainHand.InstanceId == item.InstanceId ||
                    Body != null && Body.InstanceId == item.InstanceId;
-        }
-
-        private void HandleInventoryChanged(PlayerInventory _)
-        {
-            bool changed = false;
-            if (mainHand != null && !inventory.Contains(mainHand))
-            {
-                mainHand = null;
-                changed = true;
-            }
-
-            if (body != null && !inventory.Contains(body))
-            {
-                body = null;
-                changed = true;
-            }
-
-            if (!changed)
-            {
-                return;
-            }
-
-            ApplyEquipmentBonuses();
-            Changed?.Invoke(this);
         }
 
         private void ApplyEquipmentBonuses()

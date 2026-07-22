@@ -2,7 +2,7 @@
 
 ## Current Direction
 
-**Sprint 022: Death State And Respawn Choice** is complete after deterministic validation and the user's Play Mode acceptance. **Sprint 023: Character Equipment View** is the next proposed implementation.
+**Sprint 023: Character Equipment View** is complete after deterministic validation and the user's Play Mode acceptance. **Sprint 024: Local Message Feed Foundation** is the next proposed implementation.
 
 This file preserves completed milestone history and the broad delivery order. The user-facing Russian plan and current dependency decisions live in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md). A future feature listed here is not permission to implement it before its dependencies or current priority.
 
@@ -391,9 +391,18 @@ Sprint 022 delivered additions:
 - restore full health and move to the configured village spawn point only after confirmation;
 - deterministic validation of one-time penalty, no automatic movement, resurrection, prefab wiring, scene UI, and relevant regressions.
 
-Post-Sprint 022 proposed sequence:
+Sprint 023 delivered additions:
 
-- Sprint 023 Character Equipment View: separate equipped slots from bag storage visually, keep the exact-instance model, and support clear equip state and comparison without final art;
+- equipped weapon and body armor are exact instances stored outside the eight bag positions;
+- safe equip replacement returns the previous item to the released bag position;
+- unequip returns an item only when the bag has space and otherwise preserves equipment;
+- one movable inventory window presents the bag, main-hand and body slots, and a simple selected-item comparison;
+- selected bag items can be dropped into the world as the same exact instance or dragged onto the trash target for centered permanent-removal confirmation;
+- profile version 7 separates bag and equipment records while migrating version-1 through version-6 profiles;
+- deterministic validation covers transfers, replacement, full-bag refusal, exact-instance drop and collection, permanent removal, migration, scene wiring, and relevant regressions.
+
+Post-Sprint 023 proposed sequence:
+
 - Sprint 024 Local Message Feed Foundation: add typed local system, loot, combat, and announcement events with a filterable lower-left log; real player chat remains a later server feature;
 - reusable quest content definitions and a second short quest resume after these cross-system foundations.
 

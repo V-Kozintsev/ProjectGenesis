@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 022 Death State And Respawn Choice is complete and accepted after deterministic validation and the user's Play Mode check: player death now enters an explicit dead state, blocks gameplay input, keeps the character at the death position, and returns to the village only after the temporary resurrection button is pressed. Sprint 023 Character Equipment View is the next proposed foundation step.
+Sprint 023 Character Equipment View is complete and accepted after deterministic validation and the user's Play Mode check: `I` now opens one combined bag-and-equipment window, equipped weapon and body-armor instances no longer occupy bag positions, selected bag items can be dropped or permanently destroyed with confirmation, and profile version 7 preserves the separation while migrating older saves. Sprint 024 Local Message Feed Foundation is the next proposed step.
 
 The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
 
@@ -40,17 +40,18 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - Regular wolf loot is configured in `Assets/ProjectGenesis/Data/LootTables/LT_Wolf.asset`. Select that asset and edit an entry's `Drop Chance` value in the Inspector; `0.1` means 10%.
 - Rebuilding the starter village preserves edits to an existing loot-table asset. Use `Project Genesis > Sprint 009 > Validate Wolf Loot Table` to check the table and run a fixed-seed 100,000-roll simulation.
 - While the Village Elder's quest is active and incomplete, each wolf also has a 70% chance to add a `Wolf Tail` directly to objective progress. Quest trophies do not appear on the ground or occupy normal inventory slots, and progress stops at `5 / 5`.
-- Press `I` or click `Инвентарь [I]` to open the eight-slot inventory.
-- Click an occupied inventory slot to select that exact item, then use `Надеть` or `Снять`. Separate copies of the Rusty Sword remain separate entries.
+- Press `I` or click `Инвентарь [I]` to open one movable window containing the eight-slot bag plus separate `Правая рука` and `Тело` equipment slots.
+- Click an occupied inventory slot to select that exact item. `Надеть` transfers a weapon or armor from the bag into its character slot; the equipped item no longer occupies one of the eight bag positions.
 - Drag an occupied slot onto an empty slot to move it, or onto another occupied slot to swap the two exact item instances. Reordered positions persist after restarting Play Mode.
 - Boars have a 20% chance to drop a `Потёртый топор` with `+7` attack; the Rusty Sword remains `+4` attack.
-- Boars also have a 15% chance to drop `Потёртая кожаная броня`. Select it and click `Надеть` to add `+3` defense in the body slot without replacing the equipped weapon.
+- Boars also have a 15% chance to drop `Потёртая кожаная броня`. Select it and click `Надеть` to transfer it into the body slot and add `+3` defense without replacing the equipped weapon.
 - Select `Малое лечебное зелье` and click `Использовать` to restore 30 health. It is consumed only when healing succeeds; full health and death show a refusal and preserve the item.
-- During Sprint 021 Play Mode testing, use `Project Genesis > Sprint 021 > Prepare Play Mode Test` to add the armor and two separate potions and safely remove 25 health.
+- During Sprint 023 Play Mode testing, use `Project Genesis > Sprint 023 > Prepare Play Mode Test` to add a sword, axe, and armor without waiting for random drops.
+- Select a weapon or armor in the bag, then select the compatible equipment slot on the right to see its bonus comparison. Use `Надеть`, `Заменить`, or `Снять`; a removed item returns to the bag, and a full bag refuses removal without losing it.
+- `Выбросить` transfers the selected exact item to a collectible object beside the character. Click `Корзина` or drag a bag slot onto it to open a centered confirmation; `Удалить` permanently removes only that item and `Отмена` preserves it.
 - During Sprint 020 Play Mode testing, use `Project Genesis > Sprint 020 > Add Sword And Axe In Play Mode` to add both contrasting weapons immediately.
 - During Sprint 019 Play Mode testing, use `Project Genesis > Sprint 019 > Add Two Rusty Swords In Play Mode` to create two distinct copies without waiting for random drops.
-- The inventory header shows the current prototype identity: `Путник`, `Человек`, and `Воин`.
-- Click `Надеть` to equip the sword in the main-hand slot and increase attack power from 14 to 18. Click `Снять` to remove the bonus without deleting the item.
+- Equipping the sword in the main-hand slot increases attack power from 14 to 18. Removing it from the equipment side of the inventory returns the exact item to the bag and removes the bonus.
 - The camera shortens its distance when a wall or prop blocks the view, then returns to the requested zoom when clear.
 - Click the Village Elder once to select him and show his target panel.
 - Click the selected Village Elder again at any time to talk; a quick double-click performs both steps. If the player is far away, the character runs closer and opens dialogue only when almost touching the NPC.
@@ -114,6 +115,7 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - [38_SPRINT_020.md](38_SPRINT_020.md) - persistent inventory positions, drag-and-drop swapping, weapon variety, and validation sprint.
 - [39_SPRINT_021.md](39_SPRINT_021.md) - body equipment, defense bonuses, one healing consumable, persistence, and validation sprint.
 - [40_SPRINT_022.md](40_SPRINT_022.md) - explicit player death state, resurrection choice, input lock, and validation sprint.
+- [41_SPRINT_023.md](41_SPRINT_023.md) - separate equipment storage, character equipment view, profile migration, and validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

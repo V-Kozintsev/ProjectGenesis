@@ -14,6 +14,7 @@ namespace ProjectGenesis.Gameplay
         public event Action<PlayerInventory> Changed;
 
         public int Capacity => capacity;
+        public bool HasFreeSlot => FindFirstEmptySlot() >= 0;
         public int Count
         {
             get
@@ -113,6 +114,22 @@ namespace ProjectGenesis.Gameplay
             }
 
             items[slotIndex] = null;
+            Changed?.Invoke(this);
+            return true;
+        }
+
+        public bool TryReplaceInstance(ItemInstance currentItem, ItemInstance replacementItem)
+        {
+            int slotIndex = currentItem != null
+                ? GetSlotIndex(currentItem.InstanceId)
+                : -1;
+            if (slotIndex < 0 || replacementItem != null &&
+                (!replacementItem.IsValid || ContainsInstanceId(replacementItem.InstanceId)))
+            {
+                return false;
+            }
+
+            items[slotIndex] = replacementItem;
             Changed?.Invoke(this);
             return true;
         }

@@ -93,6 +93,8 @@ namespace ProjectGenesis.Tools.Editor
                     "The selected second sword must be equippable.");
                 Require(equipment.MainHand == second,
                     "Equipment must retain the exact selected instance.");
+                Require(!inventory.Contains(second) && inventory.Count == 1,
+                    "The equipped instance must leave bag storage.");
                 Require(stats.EquipmentAttackBonus == sword.AttackBonus,
                     "The exact equipped instance must apply its definition bonus.");
             }
@@ -104,15 +106,15 @@ namespace ProjectGenesis.Tools.Editor
 
         private static void ValidateProfileMigration(ItemDefinition sword)
         {
-            Require(PlayerProfileData.CurrentVersion == 6,
-                "Current local profile version must be 6.");
-            for (int version = 1; version <= 6; version++)
+            Require(PlayerProfileData.CurrentVersion == 7,
+                "Current local profile version must be 7.");
+            for (int version = 1; version <= 7; version++)
             {
                 Require(LocalJsonPlayerPersistence.IsSupportedVersion(version),
                     $"Profile version {version} must remain supported.");
             }
 
-            Require(!LocalJsonPlayerPersistence.IsSupportedVersion(7),
+            Require(!LocalJsonPlayerPersistence.IsSupportedVersion(8),
                 "Unknown future profile versions must be rejected.");
 
             PlayerProfileData legacy = new()

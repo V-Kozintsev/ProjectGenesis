@@ -105,6 +105,7 @@ GameObject:
   - component: {fileID: 743857187644922264}
   - component: {fileID: 7566425608953301210}
   - component: {fileID: 699393789371238091}
+  - component: {fileID: 7211900686248132053}
   - component: {fileID: 3380113414659367393}
   - component: {fileID: 1151744357416748806}
   - component: {fileID: 4857155830772707276}
@@ -324,6 +325,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3a760b42423468396ae30145d01f41d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7211900686248132053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5875306266831850917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1a922d848f247bc843e3980a5d53341, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pickupMaterial: {fileID: 2100000, guid: 38cf18dcf7f68d241917c7df2b035395, type: 2}
+  dropDistance: 1.25
+  pickupHeight: 0.32
 --- !u!114 &3380113414659367393
 MonoBehaviour:
   m_ObjectHideFlags: 0

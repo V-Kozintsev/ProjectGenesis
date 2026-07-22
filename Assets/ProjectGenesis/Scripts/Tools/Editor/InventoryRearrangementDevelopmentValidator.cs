@@ -116,20 +116,22 @@ namespace ProjectGenesis.Tools.Editor
                     "Moving must preserve the exact instance and occupied count.");
 
                 Require(equipment.EquipMainHand(axeInstance) &&
-                        stats.EquipmentAttackBonus == 7,
-                    "Worn Axe must apply its +7 attack bonus.");
-                Require(inventory.TryMoveOrSwap(1, 6),
-                    "Two occupied slots must swap.");
+                        stats.EquipmentAttackBonus == 7 &&
+                        !inventory.Contains(axeInstance),
+                    "Worn Axe must leave the bag and apply its +7 attack bonus.");
+                Require(inventory.TryMoveOrSwap(6, 1),
+                    "The remaining sword must move into the released slot.");
                 Require(inventory.GetItemAt(1) == swordInstance &&
-                        inventory.GetItemAt(6) == axeInstance,
-                    "Swap must exchange the exact sword and axe instances.");
+                        inventory.GetItemAt(6) == null,
+                    "Moving after equipping must preserve the exact sword instance.");
                 Require(equipment.MainHand == axeInstance &&
                         stats.EquipmentAttackBonus == 7,
-                    "Moving an equipped axe must preserve equipment and its bonus.");
+                    "Bag movement must preserve separate equipment and its bonus.");
 
                 Require(equipment.EquipMainHand(swordInstance) &&
-                        stats.EquipmentAttackBonus == 4,
-                    "Selecting the sword must replace the axe bonus with +4.");
+                        stats.EquipmentAttackBonus == 4 &&
+                        inventory.GetItemAt(1) == axeInstance,
+                    "Replacing the weapon must return the exact axe to the released slot.");
                 Require(!inventory.TryMoveOrSwap(0, 3) &&
                         !inventory.TryMoveOrSwap(-1, 3) &&
                         !inventory.TryMoveOrSwap(1, 1),
@@ -145,9 +147,9 @@ namespace ProjectGenesis.Tools.Editor
             ItemDefinition sword,
             ItemDefinition axe)
         {
-            Require(PlayerProfileData.CurrentVersion == 6,
-                "Current profile version must be 6.");
-            for (int version = 1; version <= 6; version++)
+            Require(PlayerProfileData.CurrentVersion == 7,
+                "Current profile version must be 7.");
+            for (int version = 1; version <= 7; version++)
             {
                 Require(LocalJsonPlayerPersistence.IsSupportedVersion(version),
                     $"Profile version {version} must remain supported.");

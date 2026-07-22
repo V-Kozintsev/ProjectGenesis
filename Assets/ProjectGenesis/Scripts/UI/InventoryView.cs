@@ -13,27 +13,37 @@ namespace ProjectGenesis.UI
         [SerializeField] private Button openButton;
         [SerializeField] private Button closeButton;
         [SerializeField] private Button itemActionButton;
+        [SerializeField] private Button dropButton;
+        [SerializeField] private Button destroyButton;
         [SerializeField] private Button[] slotButtons;
         [SerializeField] private Text[] slotTexts;
         [SerializeField] private Text capacityText;
-        [SerializeField] private Text attackPowerText;
-        [SerializeField] private Text mainHandText;
         [SerializeField] private Text itemNameText;
         [SerializeField] private Text itemDetailsText;
         [SerializeField] private Text itemActionText;
+        [SerializeField] private Text destroyActionText;
         [SerializeField] private Text itemFeedbackText;
+        [SerializeField] private GameObject destroyConfirmationRoot;
+        [SerializeField] private Text destroyConfirmationText;
+        [SerializeField] private Button confirmDestroyButton;
+        [SerializeField] private Button cancelDestroyButton;
         [SerializeField] private PlayerInventory inventory;
         [SerializeField] private PlayerEquipment equipment;
         [SerializeField] private PlayerItemUseController itemUseController;
-        [SerializeField] private CombatStats combatStats;
+        [SerializeField] private PlayerItemDropController itemDropController;
         [SerializeField] private string selectedInstanceId;
 
         private string actionFeedback;
+        private string pendingDestroyInstanceId;
+
+        public event Action<InventoryView> SelectionChanged;
 
         public GameObject WindowRoot => windowRoot;
         public int SlotCount => slotButtons != null ? slotButtons.Length : 0;
         public string SelectedInstanceId => selectedInstanceId;
+        public ItemInstance SelectedItem => GetSelectedItem();
         public PlayerItemUseController ItemUseController => itemUseController;
+        public PlayerItemDropController ItemDropController => itemDropController;
 
         public bool CanDragSlot(int slotIndex)
         {
@@ -51,37 +61,47 @@ namespace ProjectGenesis.UI
             Button inventoryOpenButton,
             Button inventoryCloseButton,
             Button actionButton,
+            Button itemDropButton,
+            Button itemDestroyButton,
             Button[] inventorySlotButtons,
             Text[] inventorySlotTexts,
             Text capacityLabel,
-            Text attackPowerLabel,
-            Text mainHandLabel,
             Text itemNameLabel,
             Text itemDetailsLabel,
             Text actionLabel,
+            Text destroyLabel,
             Text feedbackLabel,
+            GameObject confirmationRoot,
+            Text confirmationLabel,
+            Button confirmationButton,
+            Button cancellationButton,
             PlayerInventory playerInventory,
             PlayerEquipment playerEquipment,
             PlayerItemUseController playerItemUseController,
-            CombatStats playerCombatStats)
+            PlayerItemDropController playerItemDropController)
         {
             windowRoot = inventoryWindow;
             openButton = inventoryOpenButton;
             closeButton = inventoryCloseButton;
             itemActionButton = actionButton;
+            dropButton = itemDropButton;
+            destroyButton = itemDestroyButton;
             slotButtons = inventorySlotButtons ?? Array.Empty<Button>();
             slotTexts = inventorySlotTexts ?? Array.Empty<Text>();
             capacityText = capacityLabel;
-            attackPowerText = attackPowerLabel;
-            mainHandText = mainHandLabel;
             itemNameText = itemNameLabel;
             itemDetailsText = itemDetailsLabel;
             itemActionText = actionLabel;
+            destroyActionText = destroyLabel;
             itemFeedbackText = feedbackLabel;
+            destroyConfirmationRoot = confirmationRoot;
+            destroyConfirmationText = confirmationLabel;
+            confirmDestroyButton = confirmationButton;
+            cancelDestroyButton = cancellationButton;
             inventory = playerInventory;
             equipment = playerEquipment;
             itemUseController = playerItemUseController;
-            combatStats = playerCombatStats;
+            itemDropController = playerItemDropController;
         }
 
         private void Awake()
@@ -101,6 +121,11 @@ namespace ProjectGenesis.UI
                 itemActionButton.onClick.AddListener(HandleItemAction);
             }
 
+            dropButton?.onClick.AddListener(HandleDropAction);
+            destroyButton?.onClick.AddListener(HandleDestroyAction);
+            confirmDestroyButton?.onClick.AddListener(ConfirmDestroyAction);
+            cancelDestroyButton?.onClick.AddListener(CancelDestroyAction);
+
             for (int index = 0; index < slotButtons.Length; index++)
             {
                 int slotIndex = index;
@@ -115,11 +140,6 @@ namespace ProjectGenesis.UI
             if (equipment != null)
             {
                 equipment.Changed += HandleEquipmentChanged;
-            }
-
-            if (combatStats != null)
-            {
-                combatStats.Changed += HandleCombatStatsChanged;
             }
 
             CloseWindow();
@@ -143,6 +163,11 @@ namespace ProjectGenesis.UI
                 itemActionButton.onClick.RemoveListener(HandleItemAction);
             }
 
+            dropButton?.onClick.RemoveListener(HandleDropAction);
+            destroyButton?.onClick.RemoveListener(HandleDestroyAction);
+            confirmDestroyButton?.onClick.RemoveListener(ConfirmDestroyAction);
+            cancelDestroyButton?.onClick.RemoveListener(CancelDestroyAction);
+
             if (slotButtons != null)
             {
                 foreach (Button slotButton in slotButtons)
@@ -161,10 +186,6 @@ namespace ProjectGenesis.UI
                 equipment.Changed -= HandleEquipmentChanged;
             }
 
-            if (combatStats != null)
-            {
-                combatStats.Changed -= HandleCombatStatsChanged;
-            }
         }
 
         private void Update()
@@ -184,6 +205,11 @@ namespace ProjectGenesis.UI
             }
 
             windowRoot.SetActive(!windowRoot.activeSelf);
+            if (!windowRoot.activeSelf)
+            {
+                ResetDestroyConfirmation();
+            }
+
             Refresh();
         }
 
@@ -193,6 +219,8 @@ namespace ProjectGenesis.UI
             {
                 windowRoot.SetActive(false);
             }
+
+            ResetDestroyConfirmation();
         }
 
         private void HandleItemAction()
@@ -236,12 +264,20 @@ namespace ProjectGenesis.UI
 
             selectedInstanceId = item != null ? item.InstanceId : string.Empty;
             actionFeedback = string.Empty;
+            ResetDestroyConfirmation();
             Refresh();
+            SelectionChanged?.Invoke(this);
         }
 
         private void HandleInventoryChanged(PlayerInventory _)
         {
+            string previousSelection = selectedInstanceId;
             Refresh();
+            if (previousSelection != selectedInstanceId)
+            {
+                ResetDestroyConfirmation();
+                SelectionChanged?.Invoke(this);
+            }
         }
 
         private void HandleEquipmentChanged(PlayerEquipment _)
@@ -249,14 +285,9 @@ namespace ProjectGenesis.UI
             Refresh();
         }
 
-        private void HandleCombatStatsChanged(CombatStats _)
-        {
-            Refresh();
-        }
-
         private void Refresh()
         {
-            if (inventory == null || equipment == null || combatStats == null)
+            if (inventory == null || equipment == null)
             {
                 return;
             }
@@ -264,22 +295,6 @@ namespace ProjectGenesis.UI
             if (capacityText != null)
             {
                 capacityText.text = $"Ячейки: {inventory.Count} / {inventory.Capacity}";
-            }
-
-            if (attackPowerText != null)
-            {
-                attackPowerText.text = $"Сила атаки: {combatStats.AttackPower}";
-            }
-
-            if (mainHandText != null)
-            {
-                string weaponName = equipment.MainHand != null
-                    ? equipment.MainHand.DisplayName
-                    : "не экипировано";
-                string armorName = equipment.Body != null
-                    ? equipment.Body.DisplayName
-                    : "не экипирована";
-                mainHandText.text = $"Оружие: {weaponName} · Броня: {armorName}";
             }
 
             ItemInstance item = ResolveSelectedItem();
@@ -304,17 +319,119 @@ namespace ProjectGenesis.UI
                 itemActionButton.gameObject.SetActive(hasItem);
             }
 
+            dropButton?.gameObject.SetActive(hasItem);
+            destroyButton?.gameObject.SetActive(hasItem);
+
             if (itemActionText != null && hasItem)
             {
                 itemActionText.text = item.ItemType == ItemType.Consumable
                     ? "Использовать"
-                    : equipment.IsEquipped(item) ? "Снять" : "Надеть";
+                    : "Надеть";
             }
 
             if (itemFeedbackText != null)
             {
                 itemFeedbackText.text = actionFeedback;
             }
+
+            if (!hasItem)
+            {
+                ResetDestroyConfirmation();
+            }
+        }
+
+        private void HandleDropAction()
+        {
+            ItemInstance item = GetSelectedItem();
+            if (item == null || itemDropController == null)
+            {
+                return;
+            }
+
+            bool dropped = itemDropController.TryDrop(item, out _);
+            actionFeedback = dropped
+                ? $"Выброшено: {item.DisplayName}."
+                : "Предмет сейчас выбросить нельзя.";
+            ResetDestroyConfirmation();
+            Refresh();
+        }
+
+        private void HandleDestroyAction()
+        {
+            ItemInstance item = GetSelectedItem();
+            if (item == null || itemDropController == null)
+            {
+                return;
+            }
+
+            RequestDestroy(item);
+        }
+
+        public void RequestDestroySlot(int slotIndex)
+        {
+            ItemInstance item = inventory != null ? inventory.GetItemAt(slotIndex) : null;
+            if (item == null)
+            {
+                return;
+            }
+
+            selectedInstanceId = item.InstanceId;
+            actionFeedback = string.Empty;
+            SelectionChanged?.Invoke(this);
+            RequestDestroy(item);
+            Refresh();
+        }
+
+        private void RequestDestroy(ItemInstance item)
+        {
+            pendingDestroyInstanceId = item.InstanceId;
+            if (destroyConfirmationText != null)
+            {
+                destroyConfirmationText.text =
+                    $"Удалить {item.DisplayName} навсегда?\nЭто действие нельзя отменить.";
+            }
+
+            if (destroyConfirmationRoot != null)
+            {
+                destroyConfirmationRoot.SetActive(true);
+                destroyConfirmationRoot.transform.SetAsLastSibling();
+            }
+        }
+
+        private void ConfirmDestroyAction()
+        {
+            ItemInstance item = inventory != null
+                ? inventory.FindByInstanceId(pendingDestroyInstanceId)
+                : null;
+            if (item == null || itemDropController == null)
+            {
+                ResetDestroyConfirmation();
+                return;
+            }
+
+            bool destroyed = itemDropController.TryDestroy(item);
+            actionFeedback = destroyed
+                ? $"Удалено: {item.DisplayName}."
+                : "Предмет сейчас удалить нельзя.";
+            ResetDestroyConfirmation();
+            Refresh();
+        }
+
+        private void CancelDestroyAction()
+        {
+            ResetDestroyConfirmation();
+            Refresh();
+        }
+
+        private void ResetDestroyConfirmation()
+        {
+            pendingDestroyInstanceId = string.Empty;
+            if (destroyActionText != null)
+            {
+                destroyActionText.text = "Корзина";
+            }
+
+            destroyConfirmationRoot?.SetActive(false);
         }
 
         private ItemInstance ResolveSelectedItem()
@@ -352,12 +469,10 @@ namespace ProjectGenesis.UI
                 ItemInstance item = inventory != null ? inventory.GetItemAt(index) : null;
                 bool isSelected = item != null && selected != null &&
                                   item.InstanceId == selected.InstanceId;
-                bool isEquipped = item != null && equipment.IsEquipped(item);
-
                 if (label != null)
                 {
                     label.text = item != null
-                        ? $"{index + 1}. {(isEquipped ? "[Надето] " : string.Empty)}{item.DisplayName}"
+                        ? $"{index + 1}. {item.DisplayName}"
                         : $"{index + 1}. Пусто";
                     label.color = item != null
                         ? Color.white
@@ -407,13 +522,6 @@ namespace ProjectGenesis.UI
                 return false;
             }
 
-            if (equipment.MainHand != null &&
-                equipment.MainHand.InstanceId == item.InstanceId)
-            {
-                equipment.UnequipMainHand();
-                return true;
-            }
-
             return equipment.EquipMainHand(item);
         }
 
@@ -422,12 +530,6 @@ namespace ProjectGenesis.UI
             if (equipment == null)
             {
                 return false;
-            }
-
-            if (equipment.Body != null && equipment.Body.InstanceId == item.InstanceId)
-            {
-                equipment.UnequipBody();
-                return true;
             }
 
             return equipment.EquipBody(item);
