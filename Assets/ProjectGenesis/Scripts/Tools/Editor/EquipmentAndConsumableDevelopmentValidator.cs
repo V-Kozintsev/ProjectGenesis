@@ -303,8 +303,8 @@ namespace ProjectGenesis.Tools.Editor
             Require(view.WindowRoot.transform.Find("Text_ItemFeedback") != null,
                 "Inventory view must contain action feedback text.");
             Require(UnityEngine.Object.FindObjectsByType<EnemySpawner>(
-                    FindObjectsSortMode.None).Length == 3,
-                "Starter scene must preserve all enemy spawners.");
+                    FindObjectsSortMode.None).Length >= 3,
+                "Starter scene must preserve its three regular enemy spawners.");
         }
 
         private static bool HasEntry(

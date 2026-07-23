@@ -238,8 +238,8 @@ namespace ProjectGenesis.Tools.Editor
                     dragHandlers.All(handler => handler.SlotIndex >= 0 && handler.SlotIndex < 8),
                 "Inventory drag handlers must reference one view and unique slot indices.");
             Require(UnityEngine.Object.FindObjectsByType<EnemySpawner>(
-                    FindObjectsSortMode.None).Length == 3,
-                "Starter scene must preserve all three enemy spawners.");
+                    FindObjectsSortMode.None).Length >= 3,
+                "Starter scene must preserve its three regular enemy spawners.");
         }
 
         private static ItemDefinition ResolveItem(

@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 025, Sprint 026, and Sprint 027 Zone Rules Foundation are complete and accepted after the deterministic Sprint 008-027 regression suite and the user's Play Mode check. The village is now an authored peaceful zone, while the northern wilderness explicitly allows combat.
+Sprint 028 First Elite Encounter is in implementation after the accepted Sprint 027 Zone Rules Foundation. The connected north wilderness is gaining a separate side clearing, a level-3 Wolf Alpha, one readable avoidable attack, and a guaranteed useful reward.
 
 The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
 
@@ -19,10 +19,12 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - WASD or arrow keys are optional fallback controls and cancel the current click destination.
 - The starter village is a peaceful zone. Enemies can still be selected there, but normal attacks and Heavy Strike are refused with a system message and do not start cooldowns.
 - Crossing the north gate enters `Северные окрестности`, where combat works normally. Returning to the village stops active combat, makes pursuing enemies return, and announces the peaceful zone in the local feed.
-- Leave the village through the north gate to reach the first combat area. Its three wolves are spread across the zone and return home before they can chase the player back into the village.
+- Leave the village through the north gate to reach the first combat area. Its two wolves and forest boar are spread across the zone and return home before they can chase the player back into the village.
 - Idle wolves alternate between short pauses and small NavMesh walks around their spawn points. Their roaming radius and pause range are editable on the wolf prefab.
 - Click a grey wolf once to select it. Click the selected wolf again at any time to run into range and attack automatically; a quick double-click performs both steps.
 - Click `Heavy Strike` on the temporary hotbar to use the first warrior skill on the selected enemy. If the enemy is out of skill range, the character approaches automatically; after the skill, basic autoattacks continue against the same living target. The button shows cooldown seconds while unavailable.
+- The east side of the north combat area leads into the Wolf Alpha clearing. The larger, darker level-3 `Вожак стаи` is marked `Элита` in the target panel and returns to its own territory instead of following the player toward the village.
+- When the Wolf Alpha turns orange and prepares `Мощный укус`, move outside its short hit range before the warning ends to avoid the special damage. The local combat feed reports the warning, hit, or successful avoidance.
 - Press `C` or click `Характеристики [C]` to inspect health, attack, defense, experience, attack timing, and Heavy Strike power. Equipping the Rusty Sword raises level-1 attack from 14 to 18 and Heavy Strike damage against the current wolf from 22 to 29. Hover Heavy Strike for its description, damage, range, and cooldown.
 - Drag the title area of the character-stats, inventory, or quest-journal window to move it; the window is kept within reachable screen bounds.
 - Clicking the ground or using WASD stops the current approach or attack but keeps the selected target.
@@ -125,6 +127,7 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - [43_SPRINT_025.md](43_SPRINT_025.md) - reusable quest content definitions, NPC decoupling, save compatibility, and validation sprint.
 - [44_SPRINT_026.md](44_SPRINT_026.md) - second quest giver, parallel active quests, shared tracking, and validation sprint.
 - [45_SPRINT_027.md](45_SPRINT_027.md) - reusable peaceful and combat zone rules, transition feedback, safe resurrection, and validation sprint.
+- [46_SPRINT_028.md](46_SPRINT_028.md) - first elite rank, Wolf Alpha encounter, readable special attack, side clearing, reward, and validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

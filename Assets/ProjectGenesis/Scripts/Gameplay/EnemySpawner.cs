@@ -13,11 +13,13 @@ namespace ProjectGenesis.Gameplay
         [SerializeField, Min(1f)] private float respawnDelay = 12f;
 
         private EnemyBrain currentEnemy;
-        private Coroutine respawnRoutine;
+        private float respawnReadyTime = -1f;
 
         public float RespawnDelay => respawnDelay;
         public EnemyTerritory Territory => territory;
         public GameObject EnemyPrefab => enemyPrefab;
+        public EnemyBrain CurrentEnemy => currentEnemy;
+        public bool IsRespawnPending => respawnReadyTime >= 0f;
 
         public void Configure(
             GameObject prefab,
@@ -31,10 +33,25 @@ namespace ProjectGenesis.Gameplay
             territory = enemyTerritory;
         }
 
-        private IEnumerator Start()
+        public void TickRespawn(float currentTime)
         {
-            yield return null;
+            if (respawnReadyTime < 0f || currentTime < respawnReadyTime)
+            {
+                return;
+            }
+
+            respawnReadyTime = -1f;
             SpawnEnemy();
+        }
+
+        private void Start()
+        {
+            SpawnEnemy();
+        }
+
+        private void Update()
+        {
+            TickRespawn(Time.time);
         }
 
         private void OnDestroy()
@@ -65,7 +82,15 @@ namespace ProjectGenesis.Gameplay
             currentEnemy.SetPlayer(player);
             currentEnemy.SetTerritory(territory);
             currentEnemy.Died += HandleEnemyDied;
-            StartCoroutine(EnableAgentAfterNavMeshReady(currentEnemy));
+
+            if (Application.isPlaying)
+            {
+                StartCoroutine(EnableAgentAfterNavMeshReady(currentEnemy));
+            }
+            else
+            {
+                PlaceAgentOnNavMesh(currentEnemy);
+            }
         }
 
         private void HandleEnemyDied(EnemyBrain enemy)
@@ -78,40 +103,33 @@ namespace ProjectGenesis.Gameplay
             currentEnemy.Died -= HandleEnemyDied;
             currentEnemy = null;
 
-            if (respawnRoutine != null)
-            {
-                StopCoroutine(respawnRoutine);
-            }
-
-            respawnRoutine = StartCoroutine(RespawnAfterDelay());
-        }
-
-        private IEnumerator RespawnAfterDelay()
-        {
-            yield return new WaitForSeconds(respawnDelay);
-            respawnRoutine = null;
-            SpawnEnemy();
+            respawnReadyTime = Time.time + respawnDelay;
         }
 
         private static IEnumerator EnableAgentAfterNavMeshReady(EnemyBrain enemy)
         {
             yield return null;
 
+            PlaceAgentOnNavMesh(enemy);
+        }
+
+        private static void PlaceAgentOnNavMesh(EnemyBrain enemy)
+        {
             if (enemy == null)
             {
-                yield break;
+                return;
             }
 
             NavMeshAgent agent = enemy.GetComponent<NavMeshAgent>();
             if (agent == null)
             {
-                yield break;
+                return;
             }
 
             if (agent.enabled)
             {
                 enemy.SetHomePosition(agent.transform.position);
-                yield break;
+                return;
             }
 
             if (NavMesh.SamplePosition(agent.transform.position, out NavMeshHit hit, 3f, NavMesh.AllAreas))

@@ -66,8 +66,8 @@ namespace ProjectGenesis.Tools.Editor
 
             EnemySpawner[] spawners =
                 UnityEngine.Object.FindObjectsByType<EnemySpawner>(FindObjectsSortMode.None);
-            Require(spawners.Length == 3, "Starter combat area must keep exactly three spawners.");
-            Require(spawners.Count(spawner => spawner.EnemyPrefab != null) == 3,
+            Require(spawners.Length >= 3, "Starter combat area must keep its three regular spawners.");
+            Require(spawners.Count(spawner => spawner.EnemyPrefab != null) == spawners.Length,
                 "All enemy spawners must keep valid enemy prefabs.");
         }
 

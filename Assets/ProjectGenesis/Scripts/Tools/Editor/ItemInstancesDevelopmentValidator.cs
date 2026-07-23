@@ -200,8 +200,8 @@ namespace ProjectGenesis.Tools.Editor
                     FindObjectsSortMode.None).Length == 0,
                 "The authored scene must not contain stale runtime loot pickups.");
             Require(UnityEngine.Object.FindObjectsByType<EnemySpawner>(
-                    FindObjectsSortMode.None).Length == 3,
-                "Starter scene must preserve all three enemy spawners.");
+                    FindObjectsSortMode.None).Length >= 3,
+                "Starter scene must preserve its three regular enemy spawners.");
         }
 
         private static Transform FindChild(Transform parent, string childName)

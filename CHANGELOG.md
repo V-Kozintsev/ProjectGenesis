@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-23
+
+- Started Sprint 028 First Elite Encounter with documented scope and acceptance criteria.
+- Added explicit common, elite, and boss enemy ranks without coupling rank to authored balance values.
+- Added a reusable telegraphed enemy attack with warning feedback, defense-aware damage, and movement-based avoidance.
+- Added a level-3 Wolf Alpha prefab, its guaranteed existing-item loot table, a connected east-side clearing, separate territory, and slower respawn.
+- Extended deterministic validation for attack resolution, avoidance, elite data, loot, scene wiring, and older zone and enemy-variety regressions.
+
 ## 2026-07-22
 
 - Started Sprint 025 Reusable Quest Content Definitions with documented scope and acceptance criteria.

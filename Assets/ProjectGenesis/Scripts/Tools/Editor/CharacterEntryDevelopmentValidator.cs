@@ -122,8 +122,8 @@ namespace ProjectGenesis.Tools.Editor
                     FindObjectsSortMode.None).Length == 1,
                 "Starter scene must preserve the Sprint 015 skill hotbar.");
             Require(UnityEngine.Object.FindObjectsByType<EnemySpawner>(
-                    FindObjectsSortMode.None).Length == 3,
-                "Starter scene must preserve all three enemy spawners.");
+                    FindObjectsSortMode.None).Length >= 3,
+                "Starter scene must preserve its three regular enemy spawners.");
         }
 
         private static Transform FindChild(Transform parent, string childName)

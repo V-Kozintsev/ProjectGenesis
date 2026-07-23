@@ -25,14 +25,18 @@ Behavior:
 
 ### Elite
 
-Stronger enemies with better rewards.
+Stronger enemies with better rewards. The first implementation is the level-3 `Вожак стаи` in its own connected clearing. It is visibly larger and darker, has an explicit Elite rank, 160 health, and a slower 45-second respawn.
+
+Its optional `TelegraphedEnemyAttack` adds `Мощный укус`: the enemy pauses, changes to a warning color for 1.25 seconds, then deals a defense-aware 2x attack-power hit only if the player remains in range. Moving away during the warning avoids all special damage. The same component can later be authored on other elite or boss prefabs without adding special cases to the common enemy state machine.
+
+The Wolf Alpha has its own bounded territory and cannot be dragged into the village. Its data-driven loot table always selects one existing useful reward and intentionally does not advance the current wolf or boar quests.
 
 Behavior additions:
 
 - larger aggro range;
 - more health;
 - stronger damage;
-- simple special attack later.
+- one readable special attack where authored.
 
 ### Boss
 

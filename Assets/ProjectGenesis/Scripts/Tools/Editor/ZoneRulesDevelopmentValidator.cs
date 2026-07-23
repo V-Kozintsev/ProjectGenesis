@@ -149,15 +149,23 @@ namespace ProjectGenesis.Tools.Editor
                 UnityEngine.Object.FindObjectsByType<WorldZoneVolume>(
                     FindObjectsInactive.Include,
                     FindObjectsSortMode.None);
-            Require(volumes.Length == 2,
-                "Starter scene must contain exactly two authored zone volumes.");
+            Require(volumes.Length >= 2,
+                "Starter scene must contain its peaceful volume and at least one combat volume.");
 
-            WorldZoneVolume safeVolume = Array.Find(
+            WorldZoneVolume[] safeVolumes = Array.FindAll(
                 volumes,
                 volume => volume.Definition == villageZone);
-            WorldZoneVolume combatVolume = Array.Find(
+            WorldZoneVolume[] combatVolumes = Array.FindAll(
                 volumes,
                 volume => volume.Definition == northWildsZone);
+            Require(safeVolumes.Length == 1,
+                "Starter scene must contain exactly one village safe volume.");
+            Require(combatVolumes.Length >= 1,
+                "Starter scene must contain at least one north-wilds combat volume.");
+            WorldZoneVolume safeVolume = safeVolumes[0];
+            WorldZoneVolume combatVolume = Array.Find(
+                combatVolumes,
+                volume => volume.name == "Zone_NorthCombat");
             Require(safeVolume != null && safeVolume.name == "Zone_StarterVillageSafe" &&
                     safeVolume.Priority > (combatVolume != null ? combatVolume.Priority : int.MaxValue),
                 "Starter village safe volume must exist with the higher priority.");
@@ -169,18 +177,21 @@ namespace ProjectGenesis.Tools.Editor
                 UnityEngine.Object.FindFirstObjectByType<PlayerSpawnPoint>();
             Require(spawnPoint != null && safeVolume.Contains(spawnPoint.transform.position),
                 "Village respawn point must remain inside the peaceful volume.");
-            Require(!combatVolume.Contains(spawnPoint.transform.position),
-                "Village respawn point must not be inside the north combat volume.");
+            Require(Array.TrueForAll(
+                    combatVolumes,
+                    volume => !volume.Contains(spawnPoint.transform.position)),
+                "Village respawn point must not be inside a north-wilds combat volume.");
 
             PlayerZoneController sceneController =
                 UnityEngine.Object.FindFirstObjectByType<PlayerZoneController>(
                     FindObjectsInactive.Include);
             Require(sceneController != null &&
                     sceneController.DefaultZone == northWildsZone &&
-                    sceneController.ZoneVolumes.Length == 2 &&
-                    Array.IndexOf(sceneController.ZoneVolumes, safeVolume) >= 0 &&
-                    Array.IndexOf(sceneController.ZoneVolumes, combatVolume) >= 0,
-                "Scene player must reference both volumes and a combat fallback.");
+                    sceneController.ZoneVolumes.Length == volumes.Length &&
+                    Array.TrueForAll(
+                        volumes,
+                        volume => Array.IndexOf(sceneController.ZoneVolumes, volume) >= 0),
+                "Scene player must reference every authored volume and a combat fallback.");
 
             PlayerDeathController deathController =
                 sceneController.GetComponent<PlayerDeathController>();

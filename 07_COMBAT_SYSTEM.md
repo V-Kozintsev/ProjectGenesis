@@ -52,6 +52,15 @@ Later additions:
 - armor type;
 - resistances.
 
+## Telegraphed Enemy Attacks
+
+Special enemy attacks are optional authored behavior layered on top of the shared enemy state machine.
+
+- windup, cooldown, range, multiplier, warning color, and affected renderers are Inspector data;
+- the enemy stops and faces the player during the warning;
+- damage resolves through `CombatStats`, so target defense remains authoritative;
+- leaving the hit range before resolution avoids the attack completely and produces combat feedback.
+
 ## Skills
 
 Warrior first skills:

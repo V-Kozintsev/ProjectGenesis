@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eedd7105f9592fa4db8444f50a740871, type: 3}
+  m_Name: LT_WolfAlpha
+  m_EditorClassIdentifier: 
+  entries:
+  - item: {fileID: 11400000, guid: 725d23b85eef776439624c5ee23856d2, type: 2}
+    rarity: 1
+    dropChance: 0.5
+  - item: {fileID: 11400000, guid: 115c7b4fec225c140a4bb7c0607f54e8, type: 2}
+    rarity: 1
+    dropChance: 0.3
+  - item: {fileID: 11400000, guid: 6ebd1fe651b2aa447aadf43924eca007, type: 2}
+    rarity: 0
+    dropChance: 0.2

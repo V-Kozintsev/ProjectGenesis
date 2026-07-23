@@ -18,10 +18,19 @@ namespace ProjectGenesis.Tools.Editor
 
             EnemyTerritory[] territories =
                 Object.FindObjectsByType<EnemyTerritory>(FindObjectsSortMode.None);
-            Require(territories.Length == 1, "Starter Village must contain exactly one enemy territory.");
+            Require(territories.Length >= 1, "Starter Village must contain its northern enemy territory.");
 
-            EnemyTerritory territory = territories[0];
-            Require(territory.name == "Zone_NorthCombat", "The combat territory has an unexpected name.");
+            EnemyTerritory territory = null;
+            foreach (EnemyTerritory candidate in territories)
+            {
+                if (candidate.name == "Zone_NorthCombat")
+                {
+                    territory = candidate;
+                    break;
+                }
+            }
+
+            Require(territory != null, "The northern combat territory is missing.");
             Require(Approximately(territory.Size, new Vector2(15.6f, 9.2f)),
                 "The combat territory has unexpected dimensions.");
             Require(Mathf.Approximately(territory.EdgePadding, 0.2f),
@@ -33,10 +42,17 @@ namespace ProjectGenesis.Tools.Editor
 
             EnemySpawner[] spawners =
                 Object.FindObjectsByType<EnemySpawner>(FindObjectsSortMode.None);
-            Require(spawners.Length == 3, "Starter Village must contain exactly three enemy spawners.");
+            Require(spawners.Length >= 3, "Starter Village must preserve its regular enemy spawners.");
 
+            int regularSpawnerCount = 0;
             foreach (EnemySpawner spawner in spawners)
             {
+                if (spawner.Territory != territory)
+                {
+                    continue;
+                }
+
+                regularSpawnerCount++;
                 Require(spawner.Territory == territory,
                     $"Spawner '{spawner.name}' is not assigned to the northern combat territory.");
                 Require(territory.Contains(spawner.transform.position),
@@ -44,6 +60,8 @@ namespace ProjectGenesis.Tools.Editor
                 Require(Mathf.Approximately(spawner.RespawnDelay, 12f),
                     $"Spawner '{spawner.name}' has an unexpected respawn delay.");
             }
+            Require(regularSpawnerCount == 3,
+                "Northern combat territory must contain exactly three regular spawners.");
 
             Debug.Log("Sprint 011 enemy territory validation passed.");
         }

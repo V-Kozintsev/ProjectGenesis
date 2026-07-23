@@ -4,6 +4,13 @@ using UnityEngine.AI;
 
 namespace ProjectGenesis.Gameplay
 {
+    public enum EnemyRank
+    {
+        Common,
+        Elite,
+        Boss
+    }
+
     public enum EnemyState
     {
         Idle,
@@ -26,6 +33,7 @@ namespace ProjectGenesis.Gameplay
         [SerializeField, Min(1)] private int experienceReward = 20;
         [SerializeField, Min(0f)] private float corpseLifetime = 6f;
         [SerializeField] private string questTargetId = "wolf";
+        [SerializeField] private EnemyRank enemyRank;
 
         [Header("Roaming")]
         [SerializeField, Min(0f)] private float roamingRadius = 1.4f;
@@ -48,6 +56,7 @@ namespace ProjectGenesis.Gameplay
         private Collider targetCollider;
         private Collider playerCollider;
         private EnemyTerritory territory;
+        private TelegraphedEnemyAttack specialAttack;
         private NavMeshPath roamingPath;
         private Vector3 homePosition;
         private Quaternion livingVisualRotation;
@@ -63,6 +72,7 @@ namespace ProjectGenesis.Gameplay
         public int EnemyLevel => enemyLevel;
         public int ExperienceReward => experienceReward;
         public string QuestTargetId => questTargetId;
+        public EnemyRank Rank => enemyRank;
         public Health Health => health;
         public CombatStats CombatStats => stats;
         public Collider TargetCollider => targetCollider;
@@ -82,6 +92,7 @@ namespace ProjectGenesis.Gameplay
             regeneration = GetComponent<HealthRegeneration>();
             stats = GetComponent<CombatStats>();
             targetCollider = GetComponent<Collider>();
+            specialAttack = GetComponent<TelegraphedEnemyAttack>();
             roamingPath = new NavMeshPath();
             homePosition = transform.position;
             livingVisualRotation = visualRoot != null ? visualRoot.transform.localRotation : Quaternion.identity;
@@ -135,6 +146,7 @@ namespace ProjectGenesis.Gameplay
 
             if (playerHealth.IsDead)
             {
+                specialAttack?.CancelAndReset(Time.time);
                 if (State == EnemyState.Return)
                 {
                     UpdateReturn();
@@ -202,6 +214,22 @@ namespace ProjectGenesis.Gameplay
             hasAggro = true;
             regeneration.SetRegenerationAllowed(true);
 
+            if (specialAttack != null &&
+                specialAttack.UpdateAttack(
+                    Time.time,
+                    playerDistance,
+                    playerHealth,
+                    playerStats,
+                    playerMessageStream,
+                    DisplayName))
+            {
+                SetState(EnemyState.Attack);
+                StopAgent();
+                FacePlayer();
+                nextAttackTime = Time.time + stats.AttackInterval;
+                return;
+            }
+
             if (playerDistance > stats.AttackRange)
             {
                 SetState(EnemyState.Chase);
@@ -238,7 +266,8 @@ namespace ProjectGenesis.Gameplay
             float minimumIdleDelay = 1.5f,
             float maximumIdleDelay = 4f,
             int level = 1,
-            string enemyName = "Молодой волк")
+            string enemyName = "Молодой волк",
+            EnemyRank rank = EnemyRank.Common)
         {
             displayName = string.IsNullOrWhiteSpace(enemyName) ? "Противник" : enemyName;
             enemyLevel = Mathf.Max(1, level);
@@ -250,6 +279,7 @@ namespace ProjectGenesis.Gameplay
             roamingRadius = Mathf.Clamp(roamDistance, 0f, leashRadius);
             this.minimumIdleDelay = Mathf.Max(0f, minimumIdleDelay);
             this.maximumIdleDelay = Mathf.Max(this.minimumIdleDelay, maximumIdleDelay);
+            enemyRank = rank;
         }
 
         public void SetPlayer(Transform playerTransform)
@@ -332,6 +362,7 @@ namespace ProjectGenesis.Gameplay
 
         private void BeginReturn()
         {
+            specialAttack?.CancelAndReset(Time.time);
             hasAggro = false;
             regeneration.SetRegenerationAllowed(false);
             SetState(EnemyState.Return);
@@ -470,6 +501,7 @@ namespace ProjectGenesis.Gameplay
 
         private void HandleDeath(Health _)
         {
+            specialAttack?.CancelAndReset(Time.time);
             hasAggro = false;
             regeneration.SetRegenerationAllowed(false);
             SetState(EnemyState.Dead);

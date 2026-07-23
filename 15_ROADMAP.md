@@ -2,7 +2,7 @@
 
 ## Current Direction
 
-**Sprint 025**, **Sprint 026**, and **Sprint 027: Zone Rules Foundation** are complete and accepted after deterministic Sprint 008-027 validation and the user's Play Mode check.
+**Sprint 027: Zone Rules Foundation** is complete and accepted. **Sprint 028: First Elite Encounter** is in implementation with a connected side clearing, explicit elite rank, readable avoidable attack, and existing-item reward.
 
 This file preserves completed milestone history and the broad delivery order. The user-facing Russian plan and current dependency decisions live in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md). A future feature listed here is not permission to implement it before its dependencies or current priority.
 
@@ -407,6 +407,7 @@ Post-Sprint 023 proposed sequence:
 - Sprint 025 Reusable Quest Content Definitions: completed and accepted;
 - Sprint 026 Parallel Quests And Second Quest: completed and accepted;
 - Sprint 027 Zone Rules Foundation: completed and accepted with authored peaceful/combat definitions, prioritized volumes, shared combat authorization, transition feedback, and safe resurrection wiring.
+- Sprint 028 First Elite Encounter: in implementation with one level-3 Wolf Alpha, separate clearing territory, telegraphed powerful bite, guaranteed existing-item reward, and deterministic validation.
 
 Post-Sprint 009 backlog decisions:
 

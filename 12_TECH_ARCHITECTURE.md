@@ -102,6 +102,8 @@ Enemy identity, level, and base experience are authored by `EnemyBrain`. `Player
 
 Enemy prefabs compose the shared `EnemyBrain`, `Health`, `HealthRegeneration`, `CombatStats`, and `NavMeshAgent` behavior with independently authored values. Optional reward components such as `EnemyLootDrop` are attached only when that enemy actually participates in those loot or quest rules.
 
+`EnemyRank` is explicit identity metadata and does not infer balance values. `TelegraphedEnemyAttack` is an optional enemy-prefab component that owns one readable windup/cooldown/damage cycle; `EnemyBrain` only yields movement and normal attacks while that cycle is active. This keeps common enemies unchanged and allows future elites to author special attacks without subclassing the shared AI.
+
 ## Saving
 
 Save only stable runtime state:

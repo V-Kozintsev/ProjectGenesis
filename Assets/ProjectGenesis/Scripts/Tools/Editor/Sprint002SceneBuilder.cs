@@ -21,6 +21,7 @@ namespace ProjectGenesis.Tools.Editor
         private const string PlayerPrefabPath = "Assets/ProjectGenesis/Prefabs/Characters/PF_Player_Prototype.prefab";
         private const string WolfPrefabPath = "Assets/ProjectGenesis/Prefabs/Enemies/PF_Enemy_Wolf.prefab";
         private const string BoarPrefabPath = "Assets/ProjectGenesis/Prefabs/Enemies/PF_Enemy_Boar.prefab";
+        private const string WolfAlphaPrefabPath = "Assets/ProjectGenesis/Prefabs/Enemies/PF_Enemy_WolfAlpha.prefab";
         private const string GroundMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Starter_Ground.mat";
         private const string PlayerMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Player_Prototype.mat";
         private const string MarkerMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Move_Target.mat";
@@ -32,6 +33,7 @@ namespace ProjectGenesis.Tools.Editor
         private const string GuardMaterialPath = "Assets/ProjectGenesis/Materials/MAT_NPC_GuardCaptain.mat";
         private const string WolfMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Enemy_Wolf.mat";
         private const string BoarMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Enemy_Boar.mat";
+        private const string WolfAlphaMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Enemy_WolfAlpha.mat";
         private const string TargetRingMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Combat_TargetRing.mat";
         private const string CombatAreaMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Combat_Area.mat";
         private const string LootMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Loot_Weapon.mat";
@@ -43,6 +45,7 @@ namespace ProjectGenesis.Tools.Editor
         private const string WolfTrophiesQuestPath = "Assets/ProjectGenesis/Data/Quests/SO_Quest_WolfTrophies.asset";
         private const string BoarHuntQuestPath = "Assets/ProjectGenesis/Data/Quests/SO_Quest_BoarHunt.asset";
         private const string BoarLootTablePath = "Assets/ProjectGenesis/Data/LootTables/LT_Boar.asset";
+        private const string WolfAlphaLootTablePath = "Assets/ProjectGenesis/Data/LootTables/LT_WolfAlpha.asset";
         private const string HeavyStrikePath = "Assets/ProjectGenesis/Data/Skills/SO_Skill_HeavyStrike.asset";
         private const string HumanRacePath = "Assets/ProjectGenesis/Data/Races/SO_Race_Human.asset";
         private const string WarriorClassPath = "Assets/ProjectGenesis/Data/Classes/SO_Class_Warrior.asset";
@@ -315,6 +318,87 @@ namespace ProjectGenesis.Tools.Editor
             AssetDatabase.SaveAssets();
         }
 
+        [MenuItem("Project Genesis/Sprint 028/Rebuild Starter Village Elite Encounter")]
+        public static void RebuildStarterVillageEliteEncounter()
+        {
+            RebuildStarterVillage();
+        }
+
+        [MenuItem("Project Genesis/Sprint 028/Apply Elite Encounter To Existing Scene")]
+        public static void ApplyEliteEncounterToExistingScene()
+        {
+            EnsureFolders();
+            Material alphaMaterial = CreateMaterial(
+                WolfAlphaMaterialPath,
+                new Color(0.18f, 0.12f, 0.16f));
+            Material targetRingMaterial = CreateMaterial(
+                TargetRingMaterialPath,
+                new Color(0.85f, 0.16f, 0.12f));
+            Material combatAreaMaterial = CreateMaterial(
+                CombatAreaMaterialPath,
+                new Color(0.22f, 0.32f, 0.24f));
+            Material boundaryMaterial = CreateMaterial(
+                BoundaryMaterialPath,
+                new Color(0.36f, 0.28f, 0.18f));
+            Material propMaterial = CreateMaterial(
+                PropMaterialPath,
+                new Color(0.48f, 0.32f, 0.18f));
+            Material lootMaterial = CreateMaterial(
+                LootMaterialPath,
+                new Color(0.92f, 0.62f, 0.16f));
+            ItemDefinition wornAxe = CreateWornAxe();
+            ItemDefinition wornLeatherArmor = CreateWornLeatherArmor();
+            ItemDefinition minorHealingPotion = CreateMinorHealingPotion();
+            LootTableDefinition alphaLootTable = CreateWolfAlphaLootTable(
+                wornAxe,
+                wornLeatherArmor,
+                minorHealingPotion);
+            GameObject alphaPrefab = CreateWolfAlphaPrefab(
+                alphaMaterial,
+                targetRingMaterial,
+                alphaLootTable,
+                lootMaterial);
+            WorldZoneDefinition northWildsZone = CreateNorthWildsZone();
+
+            Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            ConfigureNorthCombatEastOpening(boundaryMaterial);
+            GameObject existingClearing = GameObject.Find("EliteClearing");
+            if (existingClearing != null)
+            {
+                Object.DestroyImmediate(existingClearing);
+            }
+
+            GameObject clearingRoot = CreateEliteClearing(
+                combatAreaMaterial,
+                boundaryMaterial,
+                propMaterial,
+                northWildsZone,
+                out EnemyTerritory eliteTerritory,
+                out WorldZoneVolume eliteZoneVolume);
+            GameObject player = GameObject.Find("Player");
+            if (player == null)
+            {
+                throw new System.InvalidOperationException("Starter village player was not found.");
+            }
+
+            PlayerZoneController zoneController = player.GetComponent<PlayerZoneController>();
+            WorldZoneVolume[] volumes = Object.FindObjectsByType<WorldZoneVolume>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            zoneController.Configure(northWildsZone, volumes);
+            CreateEnemySpawner(
+                "WolfAlphaSpawn_Clearing",
+                new Vector3(14.2f, 0.05f, 14.2f),
+                alphaPrefab,
+                player.transform,
+                eliteTerritory,
+                45f,
+                clearingRoot.transform);
+            EditorUtility.SetDirty(zoneController);
+            EditorSceneManager.SaveScene(scene, ScenePath);
+            AssetDatabase.SaveAssets();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -329,6 +413,7 @@ namespace ProjectGenesis.Tools.Editor
             Material npcMaterial = CreateMaterial(NpcMaterialPath, new Color(0.72f, 0.64f, 0.42f));
             Material wolfMaterial = CreateMaterial(WolfMaterialPath, new Color(0.28f, 0.3f, 0.34f));
             Material boarMaterial = CreateMaterial(BoarMaterialPath, new Color(0.4f, 0.22f, 0.12f));
+            Material alphaMaterial = CreateMaterial(WolfAlphaMaterialPath, new Color(0.18f, 0.12f, 0.16f));
             Material targetRingMaterial = CreateMaterial(TargetRingMaterialPath, new Color(0.85f, 0.16f, 0.12f));
             Material combatAreaMaterial = CreateMaterial(CombatAreaMaterialPath, new Color(0.22f, 0.32f, 0.24f));
             Material lootMaterial = CreateMaterial(LootMaterialPath, new Color(0.92f, 0.62f, 0.16f));
@@ -340,6 +425,8 @@ namespace ProjectGenesis.Tools.Editor
                 CreateWolfLootTable(rustySword, minorHealingPotion);
             LootTableDefinition boarLootTable =
                 CreateBoarLootTable(wornAxe, wornLeatherArmor);
+            LootTableDefinition alphaLootTable =
+                CreateWolfAlphaLootTable(wornAxe, wornLeatherArmor, minorHealingPotion);
             SkillDefinition heavyStrike = CreateHeavyStrike();
             CharacterRaceDefinition humanRace = CreateHumanRace();
             CharacterClassDefinition warriorClass = CreateWarriorClass();
@@ -368,6 +455,11 @@ namespace ProjectGenesis.Tools.Editor
                 targetRingMaterial,
                 boarLootTable,
                 lootMaterial);
+            GameObject alphaPrefab = CreateWolfAlphaPrefab(
+                alphaMaterial,
+                targetRingMaterial,
+                alphaLootTable,
+                lootMaterial);
 
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             scene.name = "StarterVillage";
@@ -386,6 +478,13 @@ namespace ProjectGenesis.Tools.Editor
                 100);
             EnemyTerritory combatTerritory =
                 CreateNorthCombatArea(combatAreaMaterial, boundaryMaterial, propMaterial, northWildsZone, out WorldZoneVolume combatZoneVolume);
+            GameObject clearingRoot = CreateEliteClearing(
+                combatAreaMaterial,
+                boundaryMaterial,
+                propMaterial,
+                northWildsZone,
+                out EnemyTerritory eliteTerritory,
+                out WorldZoneVolume eliteZoneVolume);
 
             GameObject spawnPoint = CreateSpawnPoint();
             GameObject player = (GameObject)PrefabUtility.InstantiatePrefab(playerPrefab);
@@ -399,7 +498,7 @@ namespace ProjectGenesis.Tools.Editor
             PlayerZoneController zoneController = player.GetComponent<PlayerZoneController>();
             zoneController.Configure(
                 northWildsZone,
-                new[] { villageZoneVolume, combatZoneVolume });
+                new[] { villageZoneVolume, combatZoneVolume, eliteZoneVolume });
 
             GameObject destinationMarker = CreateDestinationMarker(markerMaterial);
             PlayerController playerController = player.GetComponent<PlayerController>();
@@ -415,7 +514,14 @@ namespace ProjectGenesis.Tools.Editor
                 CreateMaterial(GuardMaterialPath, new Color(0.28f, 0.38f, 0.52f)),
                 targetRingMaterial,
                 CreateBoarHuntQuest());
-            CreateEnemySpawners(wolfPrefab, boarPrefab, player.transform, combatTerritory);
+            CreateEnemySpawners(
+                wolfPrefab,
+                boarPrefab,
+                alphaPrefab,
+                player.transform,
+                combatTerritory,
+                eliteTerritory,
+                clearingRoot.transform);
             FirstContactUi ui = CreateFirstContactUi(player, combatController, villageElder);
             interactionController.SetDialogueWindow(ui.DialogueWindow);
             interactionController.SetPromptView(ui.PromptView);
@@ -588,6 +694,27 @@ namespace ProjectGenesis.Tools.Editor
                 new LootTableEntry(wornAxe, LootRarity.Uncommon, 0.2f),
                 new LootTableEntry(wornLeatherArmor, LootRarity.Common, 0.15f));
             AssetDatabase.CreateAsset(lootTable, BoarLootTablePath);
+            return lootTable;
+        }
+
+        private static LootTableDefinition CreateWolfAlphaLootTable(
+            ItemDefinition wornAxe,
+            ItemDefinition wornLeatherArmor,
+            ItemDefinition minorHealingPotion)
+        {
+            LootTableDefinition lootTable =
+                AssetDatabase.LoadAssetAtPath<LootTableDefinition>(WolfAlphaLootTablePath);
+            if (lootTable != null)
+            {
+                return lootTable;
+            }
+
+            lootTable = ScriptableObject.CreateInstance<LootTableDefinition>();
+            lootTable.ConfigureEntries(
+                new LootTableEntry(wornAxe, LootRarity.Uncommon, 0.5f),
+                new LootTableEntry(wornLeatherArmor, LootRarity.Uncommon, 0.3f),
+                new LootTableEntry(minorHealingPotion, LootRarity.Common, 0.2f));
+            AssetDatabase.CreateAsset(lootTable, WolfAlphaLootTablePath);
             return lootTable;
         }
 
@@ -993,7 +1120,114 @@ namespace ProjectGenesis.Tools.Editor
             return savedPrefab;
         }
 
-        private static void CreateEnemyPart(
+        private static GameObject CreateWolfAlphaPrefab(
+            Material alphaMaterial,
+            Material targetRingMaterial,
+            LootTableDefinition lootTable,
+            Material lootMaterial)
+        {
+            GameObject alpha = new("PF_Enemy_WolfAlpha");
+
+            NavMeshAgent agent = alpha.AddComponent<NavMeshAgent>();
+            agent.height = 1.7f;
+            agent.radius = 0.52f;
+            agent.baseOffset = 0f;
+            agent.speed = 3.6f;
+            agent.angularSpeed = 500f;
+            agent.acceleration = 18f;
+            agent.stoppingDistance = 0.9f;
+            agent.enabled = false;
+
+            BoxCollider targetCollider = alpha.AddComponent<BoxCollider>();
+            targetCollider.center = new Vector3(0f, 0.82f, 0.3f);
+            targetCollider.size = new Vector3(1.45f, 1.7f, 2.8f);
+
+            Health health = alpha.AddComponent<Health>();
+            health.Configure(160);
+            HealthRegeneration regeneration = alpha.AddComponent<HealthRegeneration>();
+            regeneration.Configure(8f, 6, 1.2f, false);
+            CombatStats stats = alpha.AddComponent<CombatStats>();
+            stats.Configure(13, 4, 1.2f, 1.35f);
+            EnemyBrain brain = alpha.AddComponent<EnemyBrain>();
+            brain.Configure(
+                3.5f,
+                4.8f,
+                90,
+                8f,
+                "wolf_alpha",
+                1f,
+                1.5f,
+                3f,
+                3,
+                "Вожак стаи",
+                EnemyRank.Elite);
+            EnemyLootDrop lootDrop = alpha.AddComponent<EnemyLootDrop>();
+            lootDrop.Configure(lootTable, lootMaterial, string.Empty, 0f);
+
+            GameObject visualRoot = new("Visual");
+            visualRoot.transform.SetParent(alpha.transform, false);
+
+            Renderer body = CreateEnemyPart(
+                "Body",
+                visualRoot.transform,
+                new Vector3(0f, 0.82f, 0f),
+                new Vector3(1.2f, 0.95f, 1.95f),
+                alphaMaterial);
+            Renderer head = CreateEnemyPart(
+                "Head",
+                visualRoot.transform,
+                new Vector3(0f, 1.05f, 1.18f),
+                new Vector3(0.92f, 0.82f, 0.82f),
+                alphaMaterial);
+            Renderer leftEar = CreateEnemyPart(
+                "Ear_Left",
+                visualRoot.transform,
+                new Vector3(-0.3f, 1.55f, 1.28f),
+                new Vector3(0.22f, 0.46f, 0.22f),
+                alphaMaterial);
+            Renderer rightEar = CreateEnemyPart(
+                "Ear_Right",
+                visualRoot.transform,
+                new Vector3(0.3f, 1.55f, 1.28f),
+                new Vector3(0.22f, 0.46f, 0.22f),
+                alphaMaterial);
+            CreateEnemyPart(
+                "EliteMarker",
+                visualRoot.transform,
+                new Vector3(0f, 2.05f, 0.2f),
+                new Vector3(0.38f, 0.18f, 0.38f),
+                lootMaterial);
+
+            TelegraphedEnemyAttack specialAttack =
+                alpha.AddComponent<TelegraphedEnemyAttack>();
+            specialAttack.Configure(
+                "Мощный укус",
+                2.5f,
+                6f,
+                1.25f,
+                1.65f,
+                2f,
+                new Color(1f, 0.24f, 0.05f, 1f),
+                new[] { body, head, leftEar, rightEar });
+
+            GameObject selectionRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            selectionRing.name = "SelectionRing";
+            selectionRing.transform.SetParent(alpha.transform, false);
+            selectionRing.transform.localPosition = new Vector3(0f, 0.025f, 0f);
+            selectionRing.transform.localScale = new Vector3(1.08f, 0.025f, 1.08f);
+            Object.DestroyImmediate(selectionRing.GetComponent<Collider>());
+            selectionRing.GetComponent<Renderer>().sharedMaterial = targetRingMaterial;
+            selectionRing.SetActive(false);
+
+            brain.SetVisuals(visualRoot, selectionRing);
+
+            GameObject savedPrefab =
+                PrefabUtility.SaveAsPrefabAsset(alpha, WolfAlphaPrefabPath);
+            Object.DestroyImmediate(alpha);
+            return savedPrefab;
+        }
+
+        private static Renderer CreateEnemyPart(
             string name,
             Transform parent,
             Vector3 localPosition,
@@ -1006,7 +1240,9 @@ namespace ProjectGenesis.Tools.Editor
             part.transform.localPosition = localPosition;
             part.transform.localScale = localScale;
             Object.DestroyImmediate(part.GetComponent<Collider>());
-            part.GetComponent<Renderer>().sharedMaterial = material;
+            Renderer partRenderer = part.GetComponent<Renderer>();
+            partRenderer.sharedMaterial = material;
+            return partRenderer;
         }
 
         private static void CreateGround(Transform parent, Material groundMaterial)
@@ -1018,10 +1254,20 @@ namespace ProjectGenesis.Tools.Editor
             ground.GetComponent<Renderer>().sharedMaterial = groundMaterial;
         }
 
-        private static void CreateRoad(string name, Vector3 position, Vector3 scale, Material roadMaterial)
+        private static void CreateRoad(
+            string name,
+            Vector3 position,
+            Vector3 scale,
+            Material roadMaterial,
+            Transform parent = null)
         {
             GameObject road = GameObject.CreatePrimitive(PrimitiveType.Cube);
             road.name = name;
+            if (parent != null)
+            {
+                road.transform.SetParent(parent, true);
+            }
+
             road.transform.SetPositionAndRotation(position, Quaternion.identity);
             road.transform.localScale = scale;
             road.GetComponent<Renderer>().sharedMaterial = roadMaterial;
@@ -1060,7 +1306,8 @@ namespace ProjectGenesis.Tools.Editor
                 combatAreaMaterial);
 
             CreateBoundary("Boundary_CombatNorth", new Vector3(0f, 0.65f, 18.2f), new Vector3(17f, 1.3f, 0.4f), boundaryMaterial);
-            CreateBoundary("Boundary_CombatEast", new Vector3(8.2f, 0.65f, 13.2f), new Vector3(0.4f, 1.3f, 10f), boundaryMaterial);
+            CreateBoundary("Boundary_CombatEast_South", new Vector3(8.2f, 0.65f, 9.9f), new Vector3(0.4f, 1.3f, 3.4f), boundaryMaterial);
+            CreateBoundary("Boundary_CombatEast_North", new Vector3(8.2f, 0.65f, 16.6f), new Vector3(0.4f, 1.3f, 3.2f), boundaryMaterial);
             CreateBoundary("Boundary_CombatWest", new Vector3(-8.2f, 0.65f, 13.2f), new Vector3(0.4f, 1.3f, 10f), boundaryMaterial);
 
             CreateBuilding("CombatArea_Rock_West", new Vector3(-4.6f, 0.6f, 13.8f), new Vector3(1.4f, 1.2f, 1.1f), propMaterial);
@@ -1079,6 +1326,79 @@ namespace ProjectGenesis.Tools.Editor
             return territory;
         }
 
+        private static void ConfigureNorthCombatEastOpening(Material boundaryMaterial)
+        {
+            string[] oldBoundaryNames =
+            {
+                "Boundary_CombatEast",
+                "Boundary_CombatEast_South",
+                "Boundary_CombatEast_North"
+            };
+
+            foreach (string boundaryName in oldBoundaryNames)
+            {
+                GameObject existing = GameObject.Find(boundaryName);
+                if (existing != null)
+                {
+                    Object.DestroyImmediate(existing);
+                }
+            }
+
+            CreateBoundary(
+                "Boundary_CombatEast_South",
+                new Vector3(8.2f, 0.65f, 9.9f),
+                new Vector3(0.4f, 1.3f, 3.4f),
+                boundaryMaterial);
+            CreateBoundary(
+                "Boundary_CombatEast_North",
+                new Vector3(8.2f, 0.65f, 16.6f),
+                new Vector3(0.4f, 1.3f, 3.2f),
+                boundaryMaterial);
+        }
+
+        private static GameObject CreateEliteClearing(
+            Material groundMaterial,
+            Material boundaryMaterial,
+            Material propMaterial,
+            WorldZoneDefinition zoneDefinition,
+            out EnemyTerritory territory,
+            out WorldZoneVolume zoneVolume)
+        {
+            GameObject root = new("EliteClearing");
+            CreateRoad(
+                "Ground_EliteClearing",
+                new Vector3(13.2f, 0.009f, 13.8f),
+                new Vector3(10f, 0.015f, 7.2f),
+                groundMaterial,
+                root.transform);
+
+            CreateBoundary("Boundary_EliteEast", new Vector3(18.2f, 0.65f, 13.8f), new Vector3(0.4f, 1.3f, 7.6f), boundaryMaterial, root.transform);
+            CreateBoundary("Boundary_EliteNorth", new Vector3(13.2f, 0.65f, 17.6f), new Vector3(10.4f, 1.3f, 0.4f), boundaryMaterial, root.transform);
+            CreateBoundary("Boundary_EliteSouth", new Vector3(13.2f, 0.65f, 10f), new Vector3(10.4f, 1.3f, 0.4f), boundaryMaterial, root.transform);
+
+            CreateBuilding(
+                "EliteClearing_Rock_NorthEast",
+                new Vector3(16.9f, 0.55f, 16.1f),
+                new Vector3(1.2f, 1.1f, 1.4f),
+                propMaterial,
+                root.transform);
+            CreateBuilding(
+                "EliteClearing_Rock_SouthEast",
+                new Vector3(16.5f, 0.4f, 11.6f),
+                new Vector3(1.5f, 0.8f, 1f),
+                propMaterial,
+                root.transform);
+
+            GameObject zoneObject = new("Zone_EliteClearing");
+            zoneObject.transform.SetParent(root.transform, true);
+            zoneObject.transform.position = new Vector3(13.2f, 0.05f, 13.8f);
+            territory = zoneObject.AddComponent<EnemyTerritory>();
+            territory.Configure(new Vector2(9.2f, 6.4f), 0.2f);
+            zoneVolume = zoneObject.AddComponent<WorldZoneVolume>();
+            zoneVolume.Configure(zoneDefinition, new Vector2(10f, 7.2f), 0f, 10);
+            return root;
+        }
+
         private static WorldZoneVolume CreateWorldZoneVolume(
             string objectName,
             Vector3 position,
@@ -1093,18 +1413,33 @@ namespace ProjectGenesis.Tools.Editor
             return volume;
         }
 
-        private static void CreateBuilding(string name, Vector3 position, Vector3 scale, Material material)
+        private static void CreateBuilding(
+            string name,
+            Vector3 position,
+            Vector3 scale,
+            Material material,
+            Transform parent = null)
         {
             GameObject block = GameObject.CreatePrimitive(PrimitiveType.Cube);
             block.name = name;
+            if (parent != null)
+            {
+                block.transform.SetParent(parent, true);
+            }
+
             block.transform.SetPositionAndRotation(position, Quaternion.identity);
             block.transform.localScale = scale;
             block.GetComponent<Renderer>().sharedMaterial = material;
         }
 
-        private static void CreateBoundary(string name, Vector3 position, Vector3 scale, Material material)
+        private static void CreateBoundary(
+            string name,
+            Vector3 position,
+            Vector3 scale,
+            Material material,
+            Transform parent = null)
         {
-            CreateBuilding(name, position, scale, material);
+            CreateBuilding(name, position, scale, material, parent);
         }
 
         private static GameObject CreateSpawnPoint()
@@ -1198,8 +1533,11 @@ namespace ProjectGenesis.Tools.Editor
         private static void CreateEnemySpawners(
             GameObject wolfPrefab,
             GameObject boarPrefab,
+            GameObject alphaPrefab,
             Transform player,
-            EnemyTerritory territory)
+            EnemyTerritory territory,
+            EnemyTerritory eliteTerritory,
+            Transform clearingRoot)
         {
             CreateEnemySpawner(
                 "WolfSpawn_West",
@@ -1219,19 +1557,35 @@ namespace ProjectGenesis.Tools.Editor
                 wolfPrefab,
                 player,
                 territory);
+            CreateEnemySpawner(
+                "WolfAlphaSpawn_Clearing",
+                new Vector3(14.2f, 0.05f, 14.2f),
+                alphaPrefab,
+                player,
+                eliteTerritory,
+                45f,
+                clearingRoot);
         }
 
-        private static void CreateEnemySpawner(
+        private static EnemySpawner CreateEnemySpawner(
             string name,
             Vector3 position,
             GameObject enemyPrefab,
             Transform player,
-            EnemyTerritory territory)
+            EnemyTerritory territory,
+            float respawnDelay = 12f,
+            Transform parent = null)
         {
             GameObject spawn = new(name);
+            if (parent != null)
+            {
+                spawn.transform.SetParent(parent, true);
+            }
+
             spawn.transform.SetPositionAndRotation(position, Quaternion.Euler(0f, 180f, 0f));
             EnemySpawner spawner = spawn.AddComponent<EnemySpawner>();
-            spawner.Configure(enemyPrefab, player, 12f, territory);
+            spawner.Configure(enemyPrefab, player, respawnDelay, territory);
+            return spawner;
         }
 
         private static FirstContactUi CreateFirstContactUi(

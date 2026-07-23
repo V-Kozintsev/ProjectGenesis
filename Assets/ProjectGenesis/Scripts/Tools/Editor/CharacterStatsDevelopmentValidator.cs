@@ -188,8 +188,8 @@ namespace ProjectGenesis.Tools.Editor
             Require(tooltips[0].SlotIndex == 0,
                 "Heavy Strike tooltip must describe quick slot 1.");
             Require(UnityEngine.Object.FindObjectsByType<EnemySpawner>(
-                    FindObjectsSortMode.None).Length == 3,
-                "Starter scene must preserve all three enemy spawners.");
+                    FindObjectsSortMode.None).Length >= 3,
+                "Starter scene must preserve its three regular enemy spawners.");
         }
 
         private static Transform FindChild(Transform parent, string childName)

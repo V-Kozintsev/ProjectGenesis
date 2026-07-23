@@ -217,7 +217,9 @@ namespace ProjectGenesis.UI
             if (targetNameText != null)
             {
                 targetNameText.text = hasEnemyTarget
-                    ? $"{observedTarget.DisplayName} [Ур. {observedTarget.EnemyLevel}]"
+                    ? observedTarget.Rank == EnemyRank.Common
+                        ? $"{observedTarget.DisplayName} [Ур. {observedTarget.EnemyLevel}]"
+                        : $"{observedTarget.DisplayName} [{GetRankLabel(observedTarget.Rank)} · Ур. {observedTarget.EnemyLevel}]"
                     : observedNpc.DisplayName;
             }
 
@@ -246,6 +248,16 @@ namespace ProjectGenesis.UI
                         (float)targetHealth.CurrentHealth / targetHealth.MaximumHealth);
                 }
             }
+        }
+
+        private static string GetRankLabel(EnemyRank rank)
+        {
+            return rank switch
+            {
+                EnemyRank.Elite => "Элита",
+                EnemyRank.Boss => "Босс",
+                _ => string.Empty
+            };
         }
 
         private static void SetHealthFill(Image fill, float normalizedHealth)
