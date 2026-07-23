@@ -76,6 +76,7 @@ namespace ProjectGenesis.Gameplay
         public Health Health => health;
         public CombatStats CombatStats => stats;
         public Collider TargetCollider => targetCollider;
+        public TelegraphedEnemyAttack SpecialAttack => specialAttack;
         public float DetectionRadius => detectionRadius;
         public float LeashRadius => leashRadius;
         public float CorpseLifetime => corpseLifetime;

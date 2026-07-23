@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 028 First Elite Encounter is in implementation after the accepted Sprint 027 Zone Rules Foundation. The connected north wilderness is gaining a separate side clearing, a level-3 Wolf Alpha, one readable avoidable attack, and a guaranteed useful reward.
+Sprint 029 Combat Readability Layer is in implementation after the accepted Sprint 028 First Elite Encounter. The selected-target panel stays clean for normal targets and only shows a temporary warning line when an elite attack is actively being prepared.
 
 The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
 
@@ -25,6 +25,7 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - Click `Heavy Strike` on the temporary hotbar to use the first warrior skill on the selected enemy. If the enemy is out of skill range, the character approaches automatically; after the skill, basic autoattacks continue against the same living target. The button shows cooldown seconds while unavailable.
 - The east side of the north combat area leads into the Wolf Alpha clearing. The larger, darker level-3 `Вожак стаи` is marked `Элита` in the target panel and returns to its own territory instead of following the player toward the village.
 - When the Wolf Alpha turns orange and prepares `Мощный укус`, move outside its short hit range before the warning ends to avoid the special damage. The local combat feed reports the warning, hit, or successful avoidance.
+- During `Мощный укус`, the selected-target panel temporarily shows an `Опасно` countdown and a short retreat hint so the warning is not only color-based.
 - Press `C` or click `Характеристики [C]` to inspect health, attack, defense, experience, attack timing, and Heavy Strike power. Equipping the Rusty Sword raises level-1 attack from 14 to 18 and Heavy Strike damage against the current wolf from 22 to 29. Hover Heavy Strike for its description, damage, range, and cooldown.
 - Drag the title area of the character-stats, inventory, or quest-journal window to move it; the window is kept within reachable screen bounds.
 - Clicking the ground or using WASD stops the current approach or attack but keeps the selected target.

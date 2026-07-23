@@ -11,6 +11,7 @@ namespace ProjectGenesis.UI
         [SerializeField] private Text targetNameText;
         [SerializeField] private Text targetHealthText;
         [SerializeField] private Image targetHealthFill;
+        [SerializeField] private Text targetStatusText;
         [SerializeField] private Text experienceText;
         [SerializeField] private GameObject targetPanel;
         [SerializeField] private Button clearTargetButton;
@@ -28,6 +29,7 @@ namespace ProjectGenesis.UI
             Text targetLabel,
             Text targetHealthLabel,
             Image selectedTargetHealthFill,
+            Text selectedTargetStatusLabel,
             Text experienceLabel,
             GameObject selectedTargetPanel,
             Button selectedTargetClearButton,
@@ -41,6 +43,7 @@ namespace ProjectGenesis.UI
             targetNameText = targetLabel;
             targetHealthText = targetHealthLabel;
             targetHealthFill = selectedTargetHealthFill;
+            targetStatusText = selectedTargetStatusLabel;
             experienceText = experienceLabel;
             targetPanel = selectedTargetPanel;
             clearTargetButton = selectedTargetClearButton;
@@ -48,6 +51,12 @@ namespace ProjectGenesis.UI
             progression = playerProgression;
             combatController = combat;
             interactionController = interaction;
+        }
+
+        public void SetTargetStatusLabel(Text statusLabel)
+        {
+            targetStatusText = statusLabel;
+            RefreshTarget();
         }
 
         private void Awake()
@@ -92,6 +101,14 @@ namespace ProjectGenesis.UI
             }
 
             StopObservingTarget();
+        }
+
+        private void Update()
+        {
+            if (observedTarget != null && !observedTarget.IsDead)
+            {
+                RefreshTargetStatus();
+            }
         }
 
         private void Subscribe()
@@ -248,6 +265,8 @@ namespace ProjectGenesis.UI
                         (float)targetHealth.CurrentHealth / targetHealth.MaximumHealth);
                 }
             }
+
+            RefreshTargetStatus();
         }
 
         private static string GetRankLabel(EnemyRank rank)
@@ -256,8 +275,48 @@ namespace ProjectGenesis.UI
             {
                 EnemyRank.Elite => "Элита",
                 EnemyRank.Boss => "Босс",
-                _ => string.Empty
+                _ => "Противник"
             };
+        }
+
+        private void RefreshTargetStatus()
+        {
+            if (targetStatusText == null)
+            {
+                return;
+            }
+
+            if (observedTarget != null && !observedTarget.IsDead)
+            {
+                string warning = BuildEnemyWarning(observedTarget);
+                bool hasWarning = !string.IsNullOrWhiteSpace(warning);
+                targetStatusText.gameObject.SetActive(hasWarning);
+                targetStatusText.text = warning;
+                targetStatusText.color = new Color(1f, 0.48f, 0.2f);
+                return;
+            }
+
+            if (observedNpc != null)
+            {
+                targetStatusText.gameObject.SetActive(false);
+                return;
+            }
+
+            targetStatusText.gameObject.SetActive(false);
+        }
+
+        private static string BuildEnemyWarning(EnemyBrain enemy)
+        {
+            TelegraphedEnemyAttack special = enemy.SpecialAttack != null
+                ? enemy.SpecialAttack
+                : enemy.GetComponent<TelegraphedEnemyAttack>();
+            if (special != null && special.IsWindingUp)
+            {
+                float remaining = special.GetRemainingWindup(Time.time);
+                return $"Опасно: {special.AttackName} {remaining:0.0} с. Отойдите.";
+            }
+
+            return string.Empty;
         }
 
         private static void SetHealthFill(Image fill, float normalizedHealth)

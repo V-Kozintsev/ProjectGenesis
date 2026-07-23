@@ -2,6 +2,8 @@
 
 ## 2026-07-23
 
+- Started Sprint 029 Combat Readability Layer with documented scope and acceptance criteria.
+- Added a temporary selected-target warning line for active elite attack countdowns while keeping regular enemy target panels clean.
 - Started Sprint 028 First Elite Encounter with documented scope and acceptance criteria.
 - Added explicit common, elite, and boss enemy ranks without coupling rank to authored balance values.
 - Added a reusable telegraphed enemy attack with warning feedback, defense-aware damage, and movement-based avoidance.

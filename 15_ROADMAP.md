@@ -2,7 +2,7 @@
 
 ## Current Direction
 
-**Sprint 027: Zone Rules Foundation** is complete and accepted. **Sprint 028: First Elite Encounter** is in implementation with a connected side clearing, explicit elite rank, readable avoidable attack, and existing-item reward.
+**Sprint 028: First Elite Encounter** is complete and accepted. **Sprint 029: Combat Readability Layer** is in implementation with a clean selected-target panel and a temporary warning countdown only while elite attacks are being prepared.
 
 This file preserves completed milestone history and the broad delivery order. The user-facing Russian plan and current dependency decisions live in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md). A future feature listed here is not permission to implement it before its dependencies or current priority.
 

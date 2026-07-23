@@ -104,6 +104,8 @@ Enemy prefabs compose the shared `EnemyBrain`, `Health`, `HealthRegeneration`, `
 
 `EnemyRank` is explicit identity metadata and does not infer balance values. `TelegraphedEnemyAttack` is an optional enemy-prefab component that owns one readable windup/cooldown/damage cycle; `EnemyBrain` only yields movement and normal attacks while that cycle is active. This keeps common enemies unchanged and allows future elites to author special attacks without subclassing the shared AI.
 
+`CombatHudView` observes the selected enemy or NPC and presents only current runtime state: name, rank, health, and temporary danger warnings. Warning text reads optional enemy abilities such as `TelegraphedEnemyAttack` from the selected target instead of hardcoding Wolf Alpha rules into the UI, and regular targets do not show permanent explanatory text.
+
 ## Saving
 
 Save only stable runtime state:

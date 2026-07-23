@@ -399,6 +399,49 @@ namespace ProjectGenesis.Tools.Editor
             AssetDatabase.SaveAssets();
         }
 
+        [MenuItem("Project Genesis/Sprint 029/Rebuild Starter Village Combat Readability")]
+        public static void RebuildStarterVillageCombatReadability()
+        {
+            RebuildStarterVillage();
+        }
+
+        [MenuItem("Project Genesis/Sprint 029/Apply Combat Readability To Existing Scene")]
+        public static void ApplyCombatReadabilityToExistingScene()
+        {
+            Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            CombatHudView hud = Object.FindFirstObjectByType<CombatHudView>(
+                FindObjectsInactive.Include);
+            GameObject targetPanel = FindGameObject("CombatHud_Target");
+            if (hud == null || targetPanel == null)
+            {
+                throw new System.InvalidOperationException(
+                    "Starter village combat HUD target panel was not found.");
+            }
+
+            SetRect(
+                targetPanel.GetComponent<RectTransform>(),
+                new Vector2(0f, -24f),
+                new Vector2(430f, 132f),
+                new Vector2(0.5f, 1f));
+
+            Text targetStatusText = FindText("Text_TargetStatus");
+            if (targetStatusText == null)
+            {
+                targetStatusText = CreateText(
+                    "Text_TargetStatus",
+                    targetPanel.transform,
+                    "Обычный враг",
+                    17,
+                    TextAnchor.UpperLeft);
+            }
+
+            ConfigureTargetStatusText(targetStatusText);
+            hud.SetTargetStatusLabel(targetStatusText);
+            EditorUtility.SetDirty(hud);
+            EditorSceneManager.SaveScene(scene, ScenePath);
+            AssetDatabase.SaveAssets();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -2889,7 +2932,7 @@ namespace ProjectGenesis.Tools.Editor
             SetRect(
                 targetPanel.GetComponent<RectTransform>(),
                 new Vector2(0f, -24f),
-                new Vector2(430f, 104f),
+                new Vector2(430f, 132f),
                 new Vector2(0.5f, 1f));
 
             Text targetNameText = CreateText(
@@ -2934,6 +2977,14 @@ namespace ProjectGenesis.Tools.Editor
                 new Vector2(398f, 18f),
                 new Color(0.82f, 0.18f, 0.14f));
 
+            Text targetStatusText = CreateText(
+                "Text_TargetStatus",
+                targetPanel.transform,
+                "Обычный враг",
+                17,
+                TextAnchor.UpperLeft);
+            ConfigureTargetStatusText(targetStatusText);
+
             CombatHudView hud = canvasObject.AddComponent<CombatHudView>();
             hud.Initialize(
                 playerHealthText,
@@ -2941,6 +2992,7 @@ namespace ProjectGenesis.Tools.Editor
                 targetNameText,
                 targetHealthText,
                 targetHealthFill,
+                targetStatusText,
                 experienceText,
                 targetPanel,
                 clearTargetButton,
@@ -3083,6 +3135,19 @@ namespace ProjectGenesis.Tools.Editor
             EditorUtility.SetDirty(label.GetComponent<RectTransform>());
         }
 
+        private static void ConfigureTargetStatusText(Text targetStatusText)
+        {
+            targetStatusText.color = new Color(0.82f, 0.88f, 0.92f);
+            targetStatusText.fontSize = 17;
+            SetRect(
+                targetStatusText.GetComponent<RectTransform>(),
+                new Vector2(16f, -96f),
+                new Vector2(398f, 24f),
+                new Vector2(0f, 1f));
+            EditorUtility.SetDirty(targetStatusText);
+            EditorUtility.SetDirty(targetStatusText.GetComponent<RectTransform>());
+        }
+
         private static Button FindButton(string objectName)
         {
             Button[] buttons = Object.FindObjectsByType<Button>(
@@ -3093,6 +3158,38 @@ namespace ProjectGenesis.Tools.Editor
                 if (button.name == objectName)
                 {
                     return button;
+                }
+            }
+
+            return null;
+        }
+
+        private static Text FindText(string objectName)
+        {
+            Text[] texts = Object.FindObjectsByType<Text>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            foreach (Text text in texts)
+            {
+                if (text.name == objectName)
+                {
+                    return text;
+                }
+            }
+
+            return null;
+        }
+
+        private static GameObject FindGameObject(string objectName)
+        {
+            Transform[] transforms = Object.FindObjectsByType<Transform>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            foreach (Transform transform in transforms)
+            {
+                if (transform.name == objectName)
+                {
+                    return transform.gameObject;
                 }
             }
 

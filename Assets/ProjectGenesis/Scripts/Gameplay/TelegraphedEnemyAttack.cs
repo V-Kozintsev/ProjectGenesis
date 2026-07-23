@@ -35,6 +35,10 @@ namespace ProjectGenesis.Gameplay
         public float AttackPowerMultiplier => attackPowerMultiplier;
         public bool IsWindingUp => isWindingUp;
         public bool IsValid => TryValidate(out _);
+        public float GetRemainingWindup(float currentTime)
+        {
+            return isWindingUp ? Mathf.Max(0f, resolveTime - currentTime) : 0f;
+        }
 
         private void Awake()
         {
