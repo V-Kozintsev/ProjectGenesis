@@ -15,6 +15,7 @@ New ideas are recorded here even when they are not ready for implementation. Eac
 - First dungeon-like cave.
 - Reputation with village factions.
 - Simple crafting.
+- Merchant economy: currency, buy and sell prices, vendor stock, item sinks, repair or service costs, and save/server authority rules.
 - Gathering nodes.
 - Mounts much later.
 

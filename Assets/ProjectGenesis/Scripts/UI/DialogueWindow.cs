@@ -117,11 +117,16 @@ namespace ProjectGenesis.UI
                 return;
             }
 
+            if (speakerText != null)
+            {
+                speakerText.text = currentNpc.DisplayName;
+            }
+
             if (currentQuestDefinition == null)
             {
                 if (bodyText != null)
                 {
-                    bodyText.text = string.Empty;
+                    bodyText.text = "Торговля и услуги появятся позже.";
                 }
 
                 if (questText != null)
@@ -143,11 +148,6 @@ namespace ProjectGenesis.UI
             QuestProgressData progress = currentQuestLog != null
                 ? currentQuestLog.GetQuestProgress(currentQuestDefinition.QuestId)
                 : null;
-
-            if (speakerText != null)
-            {
-                speakerText.text = currentNpc.DisplayName;
-            }
 
             if (bodyText != null)
             {

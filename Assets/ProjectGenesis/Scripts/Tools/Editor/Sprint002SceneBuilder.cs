@@ -31,6 +31,7 @@ namespace ProjectGenesis.Tools.Editor
         private const string PropMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Village_Prop.mat";
         private const string NpcMaterialPath = "Assets/ProjectGenesis/Materials/MAT_NPC_Village_Elder.mat";
         private const string GuardMaterialPath = "Assets/ProjectGenesis/Materials/MAT_NPC_GuardCaptain.mat";
+        private const string MerchantMaterialPath = "Assets/ProjectGenesis/Materials/MAT_NPC_VillageMerchant.mat";
         private const string WolfMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Enemy_Wolf.mat";
         private const string BoarMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Enemy_Boar.mat";
         private const string WolfAlphaMaterialPath = "Assets/ProjectGenesis/Materials/MAT_Enemy_WolfAlpha.mat";
@@ -44,6 +45,7 @@ namespace ProjectGenesis.Tools.Editor
         private const string WolfLootTablePath = "Assets/ProjectGenesis/Data/LootTables/LT_Wolf.asset";
         private const string WolfTrophiesQuestPath = "Assets/ProjectGenesis/Data/Quests/SO_Quest_WolfTrophies.asset";
         private const string BoarHuntQuestPath = "Assets/ProjectGenesis/Data/Quests/SO_Quest_BoarHunt.asset";
+        private const string WolfAlphaHuntQuestPath = "Assets/ProjectGenesis/Data/Quests/SO_Quest_WolfAlphaHunt.asset";
         private const string BoarLootTablePath = "Assets/ProjectGenesis/Data/LootTables/LT_Boar.asset";
         private const string WolfAlphaLootTablePath = "Assets/ProjectGenesis/Data/LootTables/LT_WolfAlpha.asset";
         private const string HeavyStrikePath = "Assets/ProjectGenesis/Data/Skills/SO_Skill_HeavyStrike.asset";
@@ -442,6 +444,55 @@ namespace ProjectGenesis.Tools.Editor
             AssetDatabase.SaveAssets();
         }
 
+        [MenuItem("Project Genesis/Sprint 030/Rebuild Starter Village Elite Quest And Merchant")]
+        public static void RebuildStarterVillageEliteQuestAndMerchant()
+        {
+            RebuildStarterVillage();
+        }
+
+        [MenuItem("Project Genesis/Sprint 030/Apply Elite Quest And Merchant To Existing Scene")]
+        public static void ApplyEliteQuestAndMerchantToExistingScene()
+        {
+            EnsureFolders();
+            QuestDefinition boarHuntQuest = CreateBoarHuntQuest();
+            QuestDefinition wolfAlphaHuntQuest = CreateWolfAlphaHuntQuest();
+            Material guardMaterial = CreateMaterial(GuardMaterialPath, new Color(0.28f, 0.38f, 0.52f));
+            Material merchantMaterial = CreateMaterial(MerchantMaterialPath, new Color(0.42f, 0.33f, 0.2f));
+            Material targetRingMaterial = CreateMaterial(TargetRingMaterialPath, new Color(0.85f, 0.16f, 0.12f));
+
+            Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            InteractableNpc guard = FindNpc("NPC_GuardCaptain");
+            if (guard == null)
+            {
+                guard = CreateGuardCaptain(
+                    guardMaterial,
+                    targetRingMaterial,
+                    boarHuntQuest,
+                    wolfAlphaHuntQuest);
+            }
+            else
+            {
+                guard.ConfigureDisplayName("Капитан стражи");
+                guard.ConfigureQuests(boarHuntQuest, wolfAlphaHuntQuest);
+                EditorUtility.SetDirty(guard);
+            }
+
+            InteractableNpc merchant = FindNpc("NPC_VillageMerchant");
+            if (merchant == null)
+            {
+                merchant = CreateVillageMerchant(merchantMaterial, targetRingMaterial);
+            }
+            else
+            {
+                merchant.ConfigureDisplayName("Деревенский торговец");
+                merchant.ConfigureQuests(null);
+                EditorUtility.SetDirty(merchant);
+            }
+
+            EditorSceneManager.SaveScene(scene, ScenePath);
+            AssetDatabase.SaveAssets();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -454,6 +505,7 @@ namespace ProjectGenesis.Tools.Editor
             Material boundaryMaterial = CreateMaterial(BoundaryMaterialPath, new Color(0.36f, 0.28f, 0.18f));
             Material propMaterial = CreateMaterial(PropMaterialPath, new Color(0.48f, 0.32f, 0.18f));
             Material npcMaterial = CreateMaterial(NpcMaterialPath, new Color(0.72f, 0.64f, 0.42f));
+            Material merchantMaterial = CreateMaterial(MerchantMaterialPath, new Color(0.42f, 0.33f, 0.2f));
             Material wolfMaterial = CreateMaterial(WolfMaterialPath, new Color(0.28f, 0.3f, 0.34f));
             Material boarMaterial = CreateMaterial(BoarMaterialPath, new Color(0.4f, 0.22f, 0.12f));
             Material alphaMaterial = CreateMaterial(WolfAlphaMaterialPath, new Color(0.18f, 0.12f, 0.16f));
@@ -474,6 +526,8 @@ namespace ProjectGenesis.Tools.Editor
             CharacterRaceDefinition humanRace = CreateHumanRace();
             CharacterClassDefinition warriorClass = CreateWarriorClass();
             QuestDefinition wolfTrophiesQuest = CreateWolfTrophiesQuest();
+            QuestDefinition boarHuntQuest = CreateBoarHuntQuest();
+            QuestDefinition wolfAlphaHuntQuest = CreateWolfAlphaHuntQuest();
             WorldZoneDefinition villageZone = CreateStarterVillageZone();
             WorldZoneDefinition northWildsZone = CreateNorthWildsZone();
 
@@ -556,7 +610,9 @@ namespace ProjectGenesis.Tools.Editor
             CreateGuardCaptain(
                 CreateMaterial(GuardMaterialPath, new Color(0.28f, 0.38f, 0.52f)),
                 targetRingMaterial,
-                CreateBoarHuntQuest());
+                boarHuntQuest,
+                wolfAlphaHuntQuest);
+            CreateVillageMerchant(merchantMaterial, targetRingMaterial);
             CreateEnemySpawners(
                 wolfPrefab,
                 boarPrefab,
@@ -813,6 +869,35 @@ namespace ProjectGenesis.Tools.Editor
                 "Вернитесь к капитану стражи",
                 2,
                 100);
+            EditorUtility.SetDirty(quest);
+            return quest;
+        }
+
+        private static QuestDefinition CreateWolfAlphaHuntQuest()
+        {
+            QuestDefinition quest =
+                AssetDatabase.LoadAssetAtPath<QuestDefinition>(WolfAlphaHuntQuestPath);
+            if (quest == null)
+            {
+                quest = ScriptableObject.CreateInstance<QuestDefinition>();
+                AssetDatabase.CreateAsset(quest, WolfAlphaHuntQuestPath);
+            }
+
+            quest.Configure(
+                "wolf-alpha-hunt",
+                "Вожак стаи",
+                "В восточной поляне держится вожак волков. Победите его, чтобы ослабить стаю у северной дороги.",
+                "Кабанов отогнали, но теперь ясно, почему звери так наглели. На восточной поляне появился вожак стаи. Одолей его.",
+                "Вожак всё ещё держит восточную поляну. Следи за его мощным укусом и не стой рядом во время подготовки.",
+                "Вой затих. Вернись ко мне, пока стая не пришла в себя.",
+                "Хорошая охота. Теперь северный проход станет спокойнее.",
+                QuestObjectiveType.DefeatTarget,
+                "wolf_alpha",
+                "Побеждён вожак стаи",
+                "Вернитесь к капитану стражи",
+                1,
+                160,
+                "boars-near-the-road");
             EditorUtility.SetDirty(quest);
             return quest;
         }
@@ -1549,7 +1634,8 @@ namespace ProjectGenesis.Tools.Editor
         private static InteractableNpc CreateGuardCaptain(
             Material npcMaterial,
             Material targetRingMaterial,
-            QuestDefinition questDefinition)
+            QuestDefinition questDefinition,
+            params QuestDefinition[] followUpQuestDefinitions)
         {
             GameObject guard = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             guard.name = "NPC_GuardCaptain";
@@ -1560,13 +1646,39 @@ namespace ProjectGenesis.Tools.Editor
             guard.GetComponent<Renderer>().sharedMaterial = npcMaterial;
             InteractableNpc npc = guard.AddComponent<InteractableNpc>();
             npc.ConfigureDisplayName("Капитан стражи");
-            npc.ConfigureQuest(questDefinition);
+            npc.ConfigureQuests(questDefinition, followUpQuestDefinitions);
 
             GameObject selectionRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             selectionRing.name = "SelectionRing";
             selectionRing.transform.SetParent(guard.transform, false);
             selectionRing.transform.localPosition = new Vector3(0f, -0.98f, 0f);
             selectionRing.transform.localScale = new Vector3(0.78f, 0.025f, 0.78f);
+            Object.DestroyImmediate(selectionRing.GetComponent<Collider>());
+            selectionRing.GetComponent<Renderer>().sharedMaterial = targetRingMaterial;
+            npc.SetSelectionRing(selectionRing);
+            return npc;
+        }
+
+        private static InteractableNpc CreateVillageMerchant(
+            Material npcMaterial,
+            Material targetRingMaterial)
+        {
+            GameObject merchant = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            merchant.name = "NPC_VillageMerchant";
+            merchant.transform.SetPositionAndRotation(
+                new Vector3(4.9f, 1f, -1.4f),
+                Quaternion.Euler(0f, 235f, 0f));
+            merchant.transform.localScale = new Vector3(0.85f, 1f, 0.85f);
+            merchant.GetComponent<Renderer>().sharedMaterial = npcMaterial;
+            InteractableNpc npc = merchant.AddComponent<InteractableNpc>();
+            npc.ConfigureDisplayName("Деревенский торговец");
+            npc.ConfigureQuests(null);
+
+            GameObject selectionRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            selectionRing.name = "SelectionRing";
+            selectionRing.transform.SetParent(merchant.transform, false);
+            selectionRing.transform.localPosition = new Vector3(0f, -0.98f, 0f);
+            selectionRing.transform.localScale = new Vector3(0.74f, 0.025f, 0.74f);
             Object.DestroyImmediate(selectionRing.GetComponent<Collider>());
             selectionRing.GetComponent<Renderer>().sharedMaterial = targetRingMaterial;
             npc.SetSelectionRing(selectionRing);

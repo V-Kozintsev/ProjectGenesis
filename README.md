@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 029 Combat Readability Layer is in implementation after the accepted Sprint 028 First Elite Encounter. The selected-target panel stays clean for normal targets and only shows a temporary warning line when an elite attack is actively being prepared.
+Sprint 030 Elite Quest And Merchant Placeholder is in implementation after the accepted Sprint 029 Combat Readability Layer. The Wolf Alpha encounter is being connected to a Guard Captain follow-up quest, and a village merchant placeholder is being added without starting the economy system yet.
 
 The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
 
@@ -67,6 +67,8 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - `E` is still available as a temporary fallback while standing near an NPC.
 - Accept the Village Elder's quest, collect five wolf tails beyond the north gate, then return to the elder and choose `Завершить поручение`.
 - Talk to the Guard Captain near the north approach and accept `Кабанья угроза`. It can remain active together with the wolf quest; defeating two boars completes only its own objective.
+- After turning in `Кабанья угроза`, talk to the Guard Captain again to accept `Вожак стаи`. Ordinary wolves do not progress this quest; defeat the level-3 `Вожак стаи` in the eastern clearing, then return to the captain.
+- The `Деревенский торговец` in the village can be selected and talked to, but buy/sell economy, currency, prices, and vendor stock are intentionally later systems.
 - When two quests are active, the compact tracker lists both and the `J` journal keeps their full independent details.
 - The authored content for that quest lives in `Assets/ProjectGenesis/Data/Quests/SO_Quest_WolfTrophies.asset`; the Village Elder references the asset instead of storing a private copy of its texts and numbers.
 - The compact tracker in the upper-right corner shows current tail progress and tells the player when it is time to return to the elder.
@@ -78,7 +80,7 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - Player position, level, experience, quest state, exact inventory positions, equipped weapon, equipped body armor, and remaining potions are saved automatically. There is intentionally no save button.
 - For the current offline prototype, persistence uses a local JSON file behind a replaceable interface. In the future online version, the authoritative server will store this state and return the character near the last valid position after login.
 - To start a fresh development playthrough, use `Project Genesis > Development > Clear Local Prototype Profile` while outside Play mode.
-- Corpse resurrection, resurrection items or skills, item or quest loss on death, server-authoritative combat, and a real multiplayer backend remain outside the current prototype.
+- Corpse resurrection, resurrection items or skills, item or quest loss on death, merchant economy, server-authoritative combat, and a real multiplayer backend remain outside the current prototype.
 
 ## Documentation Map
 
@@ -129,6 +131,8 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - [44_SPRINT_026.md](44_SPRINT_026.md) - second quest giver, parallel active quests, shared tracking, and validation sprint.
 - [45_SPRINT_027.md](45_SPRINT_027.md) - reusable peaceful and combat zone rules, transition feedback, safe resurrection, and validation sprint.
 - [46_SPRINT_028.md](46_SPRINT_028.md) - first elite rank, Wolf Alpha encounter, readable special attack, side clearing, reward, and validation sprint.
+- [46_SPRINT_029.md](46_SPRINT_029.md) - combat readability layer for temporary elite attack warnings without permanent explanatory clutter.
+- [47_SPRINT_030.md](47_SPRINT_030.md) - elite follow-up quest and merchant placeholder without starting the economy system.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

@@ -5,8 +5,8 @@
 Initial NPCs:
 
 - Village Elder - first quest giver.
-- Guard Captain - current boar-hunt quest giver and future combat-oriented quests.
-- Trader - buy/sell later.
+- Guard Captain - boar-hunt quest giver and follow-up combat-oriented quests such as the Wolf Alpha hunt.
+- Village Merchant - selectable and talkable placeholder; buy/sell comes later with economy rules.
 - Healer - future respawn and consumable hook.
 
 ## Quest Types
@@ -67,6 +67,8 @@ Authored quest content lives in reusable `QuestDefinition` assets. A definition 
 Accepted progress remains a self-contained `QuestProgressData` snapshot. This keeps existing saves readable and prevents later wording or balance edits to an asset from corrupting the state already stored for a character.
 
 `QuestLog` supports multiple active quests at the same time. Objective events advance every matching active quest independently, turning in one quest does not change another, and the shared tracker summarizes multiple active entries while the journal remains the detailed view.
+
+An `InteractableNpc` may also hold follow-up quest definitions. Follow-ups use prerequisite quest ids, so a combat NPC can offer the next task only after the earlier task is completed.
 
 ## Quest Rule
 
