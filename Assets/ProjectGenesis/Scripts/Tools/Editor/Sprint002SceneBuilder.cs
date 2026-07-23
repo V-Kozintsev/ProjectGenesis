@@ -493,6 +493,41 @@ namespace ProjectGenesis.Tools.Editor
             AssetDatabase.SaveAssets();
         }
 
+        [MenuItem("Project Genesis/Sprint 031/Rebuild Starter Village Map Foundation")]
+        public static void RebuildStarterVillageMapFoundation()
+        {
+            RebuildStarterVillage();
+        }
+
+        [MenuItem("Project Genesis/Sprint 031/Apply Map Foundation To Existing Scene")]
+        public static void ApplyMapFoundationToExistingScene()
+        {
+            Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            GameObject canvasObject = FindGameObject("UI_FirstContact");
+            GameObject player = FindGameObject("Player");
+            if (canvasObject == null || player == null)
+            {
+                throw new System.InvalidOperationException(
+                    "Starter village UI canvas or player was not found.");
+            }
+
+            GameObject existingMap = FindGameObject("WorldMapRoot");
+            if (existingMap != null)
+            {
+                Object.DestroyImmediate(existingMap);
+            }
+
+            CreateWorldMap(canvasObject, player);
+            GameObject characterEntryRoot = FindGameObject("CharacterEntryOverlay");
+            if (characterEntryRoot != null)
+            {
+                characterEntryRoot.transform.SetAsLastSibling();
+                EditorUtility.SetDirty(characterEntryRoot.transform);
+            }
+
+            EditorSceneManager.SaveScene(scene, ScenePath);
+            AssetDatabase.SaveAssets();
+        }
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -1783,11 +1818,261 @@ namespace ProjectGenesis.Tools.Editor
             CreateSkillHotbar(canvasObject, player.GetComponent<PlayerSkillController>());
             CreateDeathRespawnUi(canvasObject, player.GetComponent<PlayerDeathController>());
             CreateLocalMessageFeed(canvasObject, player.GetComponent<LocalMessageStream>());
+            CreateWorldMap(canvasObject, player);
             CreateCharacterEntryUi(canvasObject, player);
 
             return new FirstContactUi(dialogueWindow, promptView);
         }
 
+        private static void CreateWorldMap(GameObject canvasObject, GameObject player)
+        {
+            GameObject root = new("WorldMapRoot", typeof(RectTransform));
+            root.transform.SetParent(canvasObject.transform, false);
+            Stretch(root.GetComponent<RectTransform>(), 0f, 0f, 0f, 0f);
+
+            Vector2 worldMinimum = new(-8.5f, -8.5f);
+            Vector2 worldMaximum = new(18.5f, 18.5f);
+            Vector2 miniMapSize = new(184f, 184f);
+            Vector2 largeMapSize = new(620f, 420f);
+
+            GameObject miniPanel = CreatePanel(
+                "MiniMapPanel",
+                root.transform,
+                new Color(0.035f, 0.05f, 0.055f, 0.88f));
+            miniPanel.GetComponent<Image>().raycastTarget = false;
+            SetRect(
+                miniPanel.GetComponent<RectTransform>(),
+                new Vector2(0f, -24f),
+                new Vector2(240f, 276f),
+                new Vector2(1f, 1f));
+
+            Text miniTitle = CreateText(
+                "Text_MiniMapTitle",
+                miniPanel.transform,
+                "Карта [M]",
+                20,
+                TextAnchor.UpperLeft);
+            miniTitle.color = new Color(1f, 0.86f, 0.48f);
+            SetRect(miniTitle.GetComponent<RectTransform>(), new Vector2(16f, -12f), new Vector2(228f, 28f), new Vector2(0f, 1f));
+
+            Text miniZone = CreateText(
+                "Text_MiniMapZone",
+                miniPanel.transform,
+                "Стартовая деревня",
+                17,
+                TextAnchor.UpperLeft);
+            miniZone.color = new Color(0.78f, 0.9f, 1f);
+            SetRect(miniZone.GetComponent<RectTransform>(), new Vector2(16f, -38f), new Vector2(228f, 24f), new Vector2(0f, 1f));
+
+            GameObject miniMap = CreatePanel(
+                "MiniMapSurface",
+                miniPanel.transform,
+                new Color(0.07f, 0.085f, 0.075f, 0.96f));
+            miniMap.GetComponent<Image>().raycastTarget = false;
+            SetRect(miniMap.GetComponent<RectTransform>(), new Vector2(20f, 20f), miniMapSize, new Vector2(0f, 0f));
+            CreateMapAreas(miniMap.transform, miniMapSize, worldMinimum, worldMaximum, false);
+            RectTransform miniMarker = CreateMapMarker("MiniMap_PlayerMarker", miniMap.transform, 20, new Color(1f, 0.86f, 0.28f));
+
+            GameObject largeWindow = CreatePanel(
+                "WorldMapWindow",
+                root.transform,
+                new Color(0.035f, 0.045f, 0.05f, 0.96f));
+            SetRect(
+                largeWindow.GetComponent<RectTransform>(),
+                Vector2.zero,
+                new Vector2(760f, 560f),
+                new Vector2(0.5f, 0.5f));
+            CreateWindowDragHandle(largeWindow, 650f);
+
+            Text largeTitle = CreateText(
+                "Text_WorldMapTitle",
+                largeWindow.transform,
+                "Карта мира",
+                30,
+                TextAnchor.UpperLeft);
+            largeTitle.color = new Color(1f, 0.86f, 0.48f);
+            SetRect(largeTitle.GetComponent<RectTransform>(), new Vector2(28f, -24f), new Vector2(560f, 42f), new Vector2(0f, 1f));
+
+            Button closeButton = CreateButton("Button_CloseWorldMap", largeWindow.transform, "X");
+            SetRect(closeButton.GetComponent<RectTransform>(), new Vector2(-24f, -24f), new Vector2(42f, 38f), new Vector2(1f, 1f));
+
+            Text largeZone = CreateText(
+                "Text_WorldMapZone",
+                largeWindow.transform,
+                "Текущая область: Стартовая деревня",
+                20,
+                TextAnchor.UpperLeft);
+            largeZone.color = new Color(0.78f, 0.9f, 1f);
+            SetRect(largeZone.GetComponent<RectTransform>(), new Vector2(28f, -66f), new Vector2(600f, 30f), new Vector2(0f, 1f));
+
+            GameObject largeMap = CreatePanel(
+                "WorldMapSurface",
+                largeWindow.transform,
+                new Color(0.07f, 0.085f, 0.075f, 1f));
+            largeMap.GetComponent<Image>().raycastTarget = false;
+            SetRect(largeMap.GetComponent<RectTransform>(), new Vector2(0f, -16f), largeMapSize, new Vector2(0.5f, 0.5f));
+            CreateMapAreas(largeMap.transform, largeMapSize, worldMinimum, worldMaximum, true);
+            RectTransform largeMarker = CreateMapMarker("WorldMap_PlayerMarker", largeMap.transform, 28, new Color(1f, 0.86f, 0.28f));
+
+            Text hint = CreateText(
+                "Text_WorldMapHint",
+                largeWindow.transform,
+                "M - закрыть карту",
+                18,
+                TextAnchor.LowerRight);
+            hint.color = new Color(0.72f, 0.78f, 0.82f);
+            SetRect(hint.GetComponent<RectTransform>(), new Vector2(-28f, 24f), new Vector2(240f, 28f), new Vector2(1f, 0f));
+
+            WorldMapView mapView = root.AddComponent<WorldMapView>();
+            mapView.Initialize(
+                miniMap.GetComponent<RectTransform>(),
+                largeWindow.GetComponent<RectTransform>(),
+                miniMarker,
+                largeMarker,
+                miniZone,
+                largeZone,
+                closeButton,
+                player.transform,
+                player.GetComponent<PlayerZoneController>(),
+                worldMinimum,
+                worldMaximum);
+            largeWindow.SetActive(false);
+        }
+
+        private static void CreateMapAreas(
+            Transform mapRoot,
+            Vector2 mapSize,
+            Vector2 worldMinimum,
+            Vector2 worldMaximum,
+            bool includeLabels)
+        {
+            CreateMapArea(
+                mapRoot,
+                "MapArea_StarterVillage",
+                "Стартовая деревня",
+                new Vector2(0f, 0f),
+                new Vector2(16.4f, 16.4f),
+                mapSize,
+                worldMinimum,
+                worldMaximum,
+                new Color(0.23f, 0.42f, 0.28f, 0.82f),
+                includeLabels);
+            CreateMapArea(
+                mapRoot,
+                "MapArea_NorthWilds",
+                "Северные окрестности",
+                new Vector2(0f, 13.2f),
+                new Vector2(16.4f, 10f),
+                mapSize,
+                worldMinimum,
+                worldMaximum,
+                new Color(0.24f, 0.34f, 0.23f, 0.82f),
+                includeLabels);
+            CreateMapArea(
+                mapRoot,
+                "MapArea_EliteClearing",
+                "Поляна вожака",
+                new Vector2(13.2f, 13.8f),
+                new Vector2(10f, 7.2f),
+                mapSize,
+                worldMinimum,
+                worldMaximum,
+                new Color(0.34f, 0.18f, 0.19f, 0.86f),
+                includeLabels);
+            CreateMapArea(
+                mapRoot,
+                "MapRoad_NorthSouth",
+                string.Empty,
+                new Vector2(0f, 4.8f),
+                new Vector2(1.6f, 25f),
+                mapSize,
+                worldMinimum,
+                worldMaximum,
+                new Color(0.58f, 0.48f, 0.34f, 0.85f),
+                false);
+            CreateMapArea(
+                mapRoot,
+                "MapRoad_EastWest",
+                string.Empty,
+                new Vector2(0f, 0f),
+                new Vector2(14f, 1.6f),
+                mapSize,
+                worldMinimum,
+                worldMaximum,
+                new Color(0.58f, 0.48f, 0.34f, 0.85f),
+                false);
+        }
+
+        private static void CreateMapArea(
+            Transform mapRoot,
+            string name,
+            string label,
+            Vector2 worldCenter,
+            Vector2 worldSize,
+            Vector2 mapSize,
+            Vector2 worldMinimum,
+            Vector2 worldMaximum,
+            Color color,
+            bool includeLabel)
+        {
+            GameObject area = CreatePanel(name, mapRoot, color);
+            area.GetComponent<Image>().raycastTarget = false;
+            RectTransform rect = area.GetComponent<RectTransform>();
+            Vector2 mapCenter = WorldToMapPosition(worldCenter, mapSize, worldMinimum, worldMaximum);
+            Vector2 mapAreaSize = WorldSizeToMapSize(worldSize, mapSize, worldMinimum, worldMaximum);
+            SetRect(rect, mapCenter, mapAreaSize, new Vector2(0.5f, 0.5f));
+
+            if (!includeLabel || string.IsNullOrWhiteSpace(label))
+            {
+                return;
+            }
+
+            Text labelText = CreateText($"Text_{name}", area.transform, label, 16, TextAnchor.MiddleCenter);
+            labelText.color = new Color(0.93f, 0.96f, 0.9f);
+            Stretch(labelText.GetComponent<RectTransform>(), 4f, 2f, 4f, 2f);
+        }
+
+        private static RectTransform CreateMapMarker(
+            string name,
+            Transform parent,
+            int fontSize,
+            Color color)
+        {
+            Text marker = CreateText(name, parent, "▲", fontSize, TextAnchor.MiddleCenter);
+            marker.color = color;
+            RectTransform rect = marker.GetComponent<RectTransform>();
+            SetRect(rect, Vector2.zero, new Vector2(fontSize + 8f, fontSize + 8f), new Vector2(0.5f, 0.5f));
+            marker.transform.SetAsLastSibling();
+            return rect;
+        }
+
+        private static Vector2 WorldToMapPosition(
+            Vector2 worldPosition,
+            Vector2 mapSize,
+            Vector2 worldMinimum,
+            Vector2 worldMaximum)
+        {
+            float width = Mathf.Max(0.01f, worldMaximum.x - worldMinimum.x);
+            float height = Mathf.Max(0.01f, worldMaximum.y - worldMinimum.y);
+            float normalizedX = Mathf.Clamp01((worldPosition.x - worldMinimum.x) / width);
+            float normalizedY = Mathf.Clamp01((worldPosition.y - worldMinimum.y) / height);
+            return new Vector2(
+                (normalizedX - 0.5f) * mapSize.x,
+                (normalizedY - 0.5f) * mapSize.y);
+        }
+
+        private static Vector2 WorldSizeToMapSize(
+            Vector2 worldSize,
+            Vector2 mapSize,
+            Vector2 worldMinimum,
+            Vector2 worldMaximum)
+        {
+            float width = Mathf.Max(0.01f, worldMaximum.x - worldMinimum.x);
+            float height = Mathf.Max(0.01f, worldMaximum.y - worldMinimum.y);
+            return new Vector2(
+                Mathf.Max(1f, worldSize.x / width * mapSize.x),
+                Mathf.Max(1f, worldSize.y / height * mapSize.y));
+        }
         private static void CreateDeathRespawnUi(GameObject canvasObject, PlayerDeathController deathController)
         {
             GameObject window = CreatePanel(

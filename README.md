@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 030 Elite Quest And Merchant Placeholder is in implementation after the accepted Sprint 029 Combat Readability Layer. The Wolf Alpha encounter is being connected to a Guard Captain follow-up quest, and a village merchant placeholder is being added without starting the economy system yet.
+Sprint 031 Map Foundation is in implementation after the accepted Sprint 030 Elite Quest And Merchant Placeholder. A readable prototype mini-map and larger `M` map are being added before the heavier merchant economy work.
 
 The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
 
@@ -69,6 +69,7 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - Talk to the Guard Captain near the north approach and accept `Кабанья угроза`. It can remain active together with the wolf quest; defeating two boars completes only its own objective.
 - After turning in `Кабанья угроза`, talk to the Guard Captain again to accept `Вожак стаи`. Ordinary wolves do not progress this quest; defeat the level-3 `Вожак стаи` in the eastern clearing, then return to the captain.
 - The `Деревенский торговец` in the village can be selected and talked to, but buy/sell economy, currency, prices, and vendor stock are intentionally later systems.
+- The mini-map in the upper-right corner shows the current prototype region, the player marker, and the current authored area name. Press `M` to open or close the larger map window; text input focus blocks this shortcut while typing in chat.
 - When two quests are active, the compact tracker lists both and the `J` journal keeps their full independent details.
 - The authored content for that quest lives in `Assets/ProjectGenesis/Data/Quests/SO_Quest_WolfTrophies.asset`; the Village Elder references the asset instead of storing a private copy of its texts and numbers.
 - The compact tracker in the upper-right corner shows current tail progress and tells the player when it is time to return to the elder.
@@ -133,6 +134,7 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - [46_SPRINT_028.md](46_SPRINT_028.md) - first elite rank, Wolf Alpha encounter, readable special attack, side clearing, reward, and validation sprint.
 - [46_SPRINT_029.md](46_SPRINT_029.md) - combat readability layer for temporary elite attack warnings without permanent explanatory clutter.
 - [47_SPRINT_030.md](47_SPRINT_030.md) - elite follow-up quest and merchant placeholder without starting the economy system.
+- [48_SPRINT_031.md](48_SPRINT_031.md) - mini-map and larger M map foundation for starter-region orientation.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

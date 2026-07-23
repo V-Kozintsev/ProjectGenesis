@@ -2,6 +2,9 @@
 
 ## 2026-07-23
 
+- Started Sprint 031 Map Foundation with documented scope and acceptance criteria.
+- Added a prototype mini-map and larger M map before starting merchant economy work.
+
 - Started Sprint 030 Elite Quest And Merchant Placeholder with documented scope and acceptance criteria.
 - Added the data-driven `Вожак стаи` follow-up quest after `Кабанья угроза`, tied to the Wolf Alpha objective id rather than ordinary wolves.
 - Added a selectable village merchant placeholder with readable no-shop dialogue while leaving economy, currency, prices, and vendor stock for a later sprint.

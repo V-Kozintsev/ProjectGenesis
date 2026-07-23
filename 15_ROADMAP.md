@@ -2,7 +2,7 @@
 
 ## Current Direction
 
-**Sprint 029: Combat Readability Layer** is complete and accepted. **Sprint 030: Elite Quest And Merchant Placeholder** is in implementation with a Guard Captain follow-up quest for the Wolf Alpha and a village merchant placeholder that intentionally does not start the economy system.
+**Sprint 030: Elite Quest And Merchant Placeholder** is complete and accepted. **Sprint 031: Map Foundation** is in implementation with a prototype mini-map, larger `M` map, player marker, and readable starter-region areas before merchant economy work.
 
 This file preserves completed milestone history and the broad delivery order. The user-facing Russian plan and current dependency decisions live in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md). A future feature listed here is not permission to implement it before its dependencies or current priority.
 
