@@ -20,6 +20,7 @@ namespace ProjectGenesis.Gameplay
         private PlayerCombatController combatController;
         private Collider playerCollider;
         private LocalMessageStream messageStream;
+        private PlayerZoneController zoneController;
         private int pendingSlotIndex = -1;
 
         public event Action<int, SkillDefinition> SlotChanged;
@@ -36,6 +37,7 @@ namespace ProjectGenesis.Gameplay
             combatController = GetComponent<PlayerCombatController>();
             playerCollider = GetComponent<Collider>();
             messageStream = GetComponent<LocalMessageStream>();
+            zoneController = GetComponent<PlayerZoneController>();
             EnsureCooldownStorage();
         }
 
@@ -124,6 +126,12 @@ namespace ProjectGenesis.Gameplay
                 return;
             }
 
+            if (zoneController != null && !zoneController.TryAuthorizeCombat())
+            {
+                pendingSlotIndex = -1;
+                return;
+            }
+
             float remainingCooldown = GetRemainingCooldown(slotIndex);
             if (remainingCooldown > 0f)
             {
@@ -196,6 +204,11 @@ namespace ProjectGenesis.Gameplay
                 return false;
             }
 
+            if (zoneController != null && !zoneController.IsCombatAllowed)
+            {
+                return false;
+            }
+
             if (GetRemainingCooldown(pendingSlotIndex) > 0f)
             {
                 return false;
@@ -209,6 +222,11 @@ namespace ProjectGenesis.Gameplay
             if (target == null || target.IsDead)
             {
                 PublishFeedback("Цель недоступна.");
+                return;
+            }
+
+            if (zoneController != null && !zoneController.TryAuthorizeCombat())
+            {
                 return;
             }
 

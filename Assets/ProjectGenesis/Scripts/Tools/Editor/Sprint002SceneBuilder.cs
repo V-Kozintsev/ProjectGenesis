@@ -46,6 +46,8 @@ namespace ProjectGenesis.Tools.Editor
         private const string HeavyStrikePath = "Assets/ProjectGenesis/Data/Skills/SO_Skill_HeavyStrike.asset";
         private const string HumanRacePath = "Assets/ProjectGenesis/Data/Races/SO_Race_Human.asset";
         private const string WarriorClassPath = "Assets/ProjectGenesis/Data/Classes/SO_Class_Warrior.asset";
+        private const string StarterVillageZonePath = "Assets/ProjectGenesis/Data/Zones/SO_Zone_StarterVillage.asset";
+        private const string NorthWildsZonePath = "Assets/ProjectGenesis/Data/Zones/SO_Zone_NorthWilds.asset";
 
         [MenuItem("Project Genesis/Sprint 002/Rebuild Starter Village Blockout")]
         public static void RebuildStarterVillageBlockout()
@@ -245,6 +247,74 @@ namespace ProjectGenesis.Tools.Editor
             AssetDatabase.SaveAssets();
         }
 
+        [MenuItem("Project Genesis/Sprint 027/Rebuild Starter Village Zone Rules")]
+        public static void RebuildStarterVillageZoneRules()
+        {
+            RebuildStarterVillage();
+        }
+
+        [MenuItem("Project Genesis/Sprint 027/Apply Zone Rules To Existing Scene")]
+        public static void ApplyZoneRulesToExistingScene()
+        {
+            EnsureFolders();
+            WorldZoneDefinition villageZone = CreateStarterVillageZone();
+            WorldZoneDefinition northWildsZone = CreateNorthWildsZone();
+            UpdatePlayerPrefabZoneController(northWildsZone);
+
+            Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            GameObject safeZoneObject = GameObject.Find("Zone_StarterVillageSafe");
+            if (safeZoneObject == null)
+            {
+                safeZoneObject = new GameObject("Zone_StarterVillageSafe");
+                safeZoneObject.transform.position = new Vector3(0f, 0.05f, 0f);
+            }
+
+            WorldZoneVolume safeVolume = safeZoneObject.GetComponent<WorldZoneVolume>();
+            if (safeVolume == null)
+            {
+                safeVolume = safeZoneObject.AddComponent<WorldZoneVolume>();
+            }
+
+            safeVolume.Configure(villageZone, new Vector2(16.4f, 16.4f), 0f, 100);
+            EditorUtility.SetDirty(safeVolume);
+
+            GameObject combatZoneObject = GameObject.Find("Zone_NorthCombat");
+            if (combatZoneObject == null)
+            {
+                throw new System.InvalidOperationException(
+                    "Starter village north combat zone was not found.");
+            }
+
+            WorldZoneVolume combatVolume = combatZoneObject.GetComponent<WorldZoneVolume>();
+            if (combatVolume == null)
+            {
+                combatVolume = combatZoneObject.AddComponent<WorldZoneVolume>();
+            }
+
+            combatVolume.Configure(northWildsZone, new Vector2(16.4f, 10f), 0f, 10);
+            EditorUtility.SetDirty(combatVolume);
+
+            GameObject player = GameObject.Find("Player");
+            if (player == null)
+            {
+                throw new System.InvalidOperationException("Starter village player was not found.");
+            }
+
+            PlayerZoneController zoneController = player.GetComponent<PlayerZoneController>();
+            if (zoneController == null)
+            {
+                zoneController = player.AddComponent<PlayerZoneController>();
+            }
+
+            zoneController.Configure(
+                northWildsZone,
+                new[] { safeVolume, combatVolume });
+            IncludeGameplayBehaviour(zoneController);
+            EditorUtility.SetDirty(zoneController);
+            EditorSceneManager.SaveScene(scene, ScenePath);
+            AssetDatabase.SaveAssets();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -274,6 +344,8 @@ namespace ProjectGenesis.Tools.Editor
             CharacterRaceDefinition humanRace = CreateHumanRace();
             CharacterClassDefinition warriorClass = CreateWarriorClass();
             QuestDefinition wolfTrophiesQuest = CreateWolfTrophiesQuest();
+            WorldZoneDefinition villageZone = CreateStarterVillageZone();
+            WorldZoneDefinition northWildsZone = CreateNorthWildsZone();
 
             GameObject playerPrefab = CreatePlayerPrefab(
                 playerMaterial,
@@ -284,7 +356,8 @@ namespace ProjectGenesis.Tools.Editor
                 minorHealingPotion,
                 heavyStrike,
                 humanRace,
-                warriorClass);
+                warriorClass,
+                northWildsZone);
             GameObject wolfPrefab = CreateWolfPrefab(
                 wolfMaterial,
                 targetRingMaterial,
@@ -305,8 +378,14 @@ namespace ProjectGenesis.Tools.Editor
             CreateRoad("Road_Main_EastWest", new Vector3(0f, 0.02f, 0f), new Vector3(14f, 0.03f, 1.4f), roadMaterial);
 
             CreateVillageBlockout(buildingMaterial, boundaryMaterial, propMaterial);
+            WorldZoneVolume villageZoneVolume = CreateWorldZoneVolume(
+                "Zone_StarterVillageSafe",
+                new Vector3(0f, 0.05f, 0f),
+                villageZone,
+                new Vector2(16.4f, 16.4f),
+                100);
             EnemyTerritory combatTerritory =
-                CreateNorthCombatArea(combatAreaMaterial, boundaryMaterial, propMaterial);
+                CreateNorthCombatArea(combatAreaMaterial, boundaryMaterial, propMaterial, northWildsZone, out WorldZoneVolume combatZoneVolume);
 
             GameObject spawnPoint = CreateSpawnPoint();
             GameObject player = (GameObject)PrefabUtility.InstantiatePrefab(playerPrefab);
@@ -317,6 +396,10 @@ namespace ProjectGenesis.Tools.Editor
             PlayerCombatController combatController = player.GetComponent<PlayerCombatController>();
             PlayerDeathController deathController = player.GetComponent<PlayerDeathController>();
             deathController.SetRespawnPoint(spawnPoint.transform);
+            PlayerZoneController zoneController = player.GetComponent<PlayerZoneController>();
+            zoneController.Configure(
+                northWildsZone,
+                new[] { villageZoneVolume, combatZoneVolume });
 
             GameObject destinationMarker = CreateDestinationMarker(markerMaterial);
             PlayerController playerController = player.GetComponent<PlayerController>();
@@ -364,7 +447,8 @@ namespace ProjectGenesis.Tools.Editor
                 "Assets/ProjectGenesis/Data/Skills",
                 "Assets/ProjectGenesis/Data/Quests",
                 "Assets/ProjectGenesis/Data/Races",
-                "Assets/ProjectGenesis/Data/Classes"
+                "Assets/ProjectGenesis/Data/Classes",
+                "Assets/ProjectGenesis/Data/Zones"
             };
 
             foreach (string folder in folders)
@@ -563,6 +647,45 @@ namespace ProjectGenesis.Tools.Editor
             return quest;
         }
 
+        private static WorldZoneDefinition CreateStarterVillageZone()
+        {
+            WorldZoneDefinition zone =
+                AssetDatabase.LoadAssetAtPath<WorldZoneDefinition>(StarterVillageZonePath);
+            if (zone == null)
+            {
+                zone = ScriptableObject.CreateInstance<WorldZoneDefinition>();
+                AssetDatabase.CreateAsset(zone, StarterVillageZonePath);
+            }
+
+            zone.Configure(
+                "starter-village",
+                "Стартовая деревня",
+                WorldZoneType.Peaceful,
+                "Мирная зона: Стартовая деревня.",
+                "В мирной зоне боевые действия запрещены.");
+            EditorUtility.SetDirty(zone);
+            return zone;
+        }
+
+        private static WorldZoneDefinition CreateNorthWildsZone()
+        {
+            WorldZoneDefinition zone =
+                AssetDatabase.LoadAssetAtPath<WorldZoneDefinition>(NorthWildsZonePath);
+            if (zone == null)
+            {
+                zone = ScriptableObject.CreateInstance<WorldZoneDefinition>();
+                AssetDatabase.CreateAsset(zone, NorthWildsZonePath);
+            }
+
+            zone.Configure(
+                "north-wilds",
+                "Северные окрестности",
+                WorldZoneType.Combat,
+                "Боевая зона: Северные окрестности.");
+            EditorUtility.SetDirty(zone);
+            return zone;
+        }
+
         private static SkillDefinition CreateHeavyStrike()
         {
             SkillDefinition skill = AssetDatabase.LoadAssetAtPath<SkillDefinition>(HeavyStrikePath);
@@ -624,7 +747,8 @@ namespace ProjectGenesis.Tools.Editor
             ItemDefinition minorHealingPotion,
             SkillDefinition heavyStrike,
             CharacterRaceDefinition humanRace,
-            CharacterClassDefinition warriorClass)
+            CharacterClassDefinition warriorClass,
+            WorldZoneDefinition defaultZone)
         {
             GameObject player = new("PF_Player_Prototype");
             player.transform.position = Vector3.zero;
@@ -669,6 +793,8 @@ namespace ProjectGenesis.Tools.Editor
             PlayerSkillController skillController = player.AddComponent<PlayerSkillController>();
             skillController.ConfigureQuickSlots(new[] { heavyStrike });
             player.AddComponent<PlayerDeathController>();
+            PlayerZoneController zoneController = player.AddComponent<PlayerZoneController>();
+            zoneController.Configure(defaultZone, System.Array.Empty<WorldZoneVolume>());
 
             GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             visual.name = "Visual";
@@ -923,7 +1049,9 @@ namespace ProjectGenesis.Tools.Editor
         private static EnemyTerritory CreateNorthCombatArea(
             Material combatAreaMaterial,
             Material boundaryMaterial,
-            Material propMaterial)
+            Material propMaterial,
+            WorldZoneDefinition zoneDefinition,
+            out WorldZoneVolume zoneVolume)
         {
             CreateRoad(
                 "Ground_NorthCombatArea",
@@ -942,7 +1070,27 @@ namespace ProjectGenesis.Tools.Editor
             territoryObject.transform.position = new Vector3(0f, 0.05f, 13.2f);
             EnemyTerritory territory = territoryObject.AddComponent<EnemyTerritory>();
             territory.Configure(new Vector2(15.6f, 9.2f), 0.2f);
+            zoneVolume = territoryObject.AddComponent<WorldZoneVolume>();
+            zoneVolume.Configure(
+                zoneDefinition,
+                new Vector2(16.4f, 10f),
+                0f,
+                10);
             return territory;
+        }
+
+        private static WorldZoneVolume CreateWorldZoneVolume(
+            string objectName,
+            Vector3 position,
+            WorldZoneDefinition definition,
+            Vector2 size,
+            int priority)
+        {
+            GameObject zoneObject = new(objectName);
+            zoneObject.transform.position = position;
+            WorldZoneVolume volume = zoneObject.AddComponent<WorldZoneVolume>();
+            volume.Configure(definition, size, 0f, priority);
+            return volume;
         }
 
         private static void CreateBuilding(string name, Vector3 position, Vector3 scale, Material material)
@@ -2302,6 +2450,7 @@ namespace ProjectGenesis.Tools.Editor
                 player.GetComponent<PlayerSkillController>(),
                 player.GetComponent<PlayerLootController>(),
                 player.GetComponent<PlayerDeathController>(),
+                player.GetComponent<PlayerZoneController>(),
                 canvasObject.GetComponent<InventoryView>(),
                 canvasObject.GetComponent<QuestJournalView>(),
                 canvasObject.GetComponent<SkillHotbarView>(),
@@ -2610,6 +2759,59 @@ namespace ProjectGenesis.Tools.Editor
             }
 
             return null;
+        }
+
+        private static void UpdatePlayerPrefabZoneController(
+            WorldZoneDefinition defaultZone)
+        {
+            GameObject prefabRoot = PrefabUtility.LoadPrefabContents(PlayerPrefabPath);
+            try
+            {
+                PlayerZoneController zoneController =
+                    prefabRoot.GetComponent<PlayerZoneController>();
+                if (zoneController == null)
+                {
+                    zoneController = prefabRoot.AddComponent<PlayerZoneController>();
+                }
+
+                zoneController.Configure(
+                    defaultZone,
+                    System.Array.Empty<WorldZoneVolume>());
+                EditorUtility.SetDirty(zoneController);
+                PrefabUtility.SaveAsPrefabAsset(prefabRoot, PlayerPrefabPath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(prefabRoot);
+            }
+        }
+
+        private static void IncludeGameplayBehaviour(MonoBehaviour behaviour)
+        {
+            CharacterEntryView[] entryViews = Object.FindObjectsByType<CharacterEntryView>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            if (entryViews.Length != 1 || behaviour == null)
+            {
+                throw new System.InvalidOperationException(
+                    "Starter village character entry gate was not found.");
+            }
+
+            SerializedObject serializedEntry = new(entryViews[0]);
+            SerializedProperty behaviours = serializedEntry.FindProperty("gameplayBehaviours");
+            for (int index = 0; index < behaviours.arraySize; index++)
+            {
+                if (behaviours.GetArrayElementAtIndex(index).objectReferenceValue == behaviour)
+                {
+                    return;
+                }
+            }
+
+            int newIndex = behaviours.arraySize;
+            behaviours.InsertArrayElementAtIndex(newIndex);
+            behaviours.GetArrayElementAtIndex(newIndex).objectReferenceValue = behaviour;
+            serializedEntry.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(entryViews[0]);
         }
 
         private static InputField CreateInputField(string name, Transform parent, string placeholderValue)

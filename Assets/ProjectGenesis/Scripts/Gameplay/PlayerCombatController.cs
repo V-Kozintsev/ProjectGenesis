@@ -20,6 +20,7 @@ namespace ProjectGenesis.Gameplay
         private QuestLog questLog;
         private Collider playerCollider;
         private LocalMessageStream messageStream;
+        private PlayerZoneController zoneController;
         private EnemyBrain target;
         private float nextAttackTime;
         private bool isCombatActive;
@@ -27,6 +28,7 @@ namespace ProjectGenesis.Gameplay
         public event Action<EnemyBrain> TargetChanged;
 
         public EnemyBrain Target => target;
+        public bool IsCombatAllowed => zoneController == null || zoneController.IsCombatAllowed;
         public bool IsInputLocked => health == null || health.IsDead;
 
         private void Awake()
@@ -40,6 +42,9 @@ namespace ProjectGenesis.Gameplay
             playerCollider = GetComponent<Collider>();
             messageStream = GetComponent<LocalMessageStream>();
             health.Died += HandlePlayerDied;
+            zoneController = GetComponent<PlayerZoneController>();
+            if (zoneController != null)
+                zoneController.ZoneChanged += HandleZoneChanged;
         }
 
         private void OnDestroy()
@@ -47,6 +52,11 @@ namespace ProjectGenesis.Gameplay
             if (health != null)
             {
                 health.Died -= HandlePlayerDied;
+            }
+
+            if (zoneController != null)
+            {
+                zoneController.ZoneChanged -= HandleZoneChanged;
             }
 
             UnsubscribeFromTarget();
@@ -120,6 +130,12 @@ namespace ProjectGenesis.Gameplay
                 return;
             }
 
+            if (zoneController != null && !zoneController.TryAuthorizeCombat())
+            {
+                StopCombatAction();
+                return;
+            }
+
             isCombatActive = true;
             regeneration.SetRegenerationAllowed(false);
             MoveTowardTarget();
@@ -137,6 +153,11 @@ namespace ProjectGenesis.Gameplay
         public void ResumeCombatAfterSkill()
         {
             if (target == null || target.IsDead || IsInputLocked)
+            {
+                return;
+            }
+
+            if (zoneController != null && !zoneController.TryAuthorizeCombat())
             {
                 return;
             }
@@ -257,6 +278,14 @@ namespace ProjectGenesis.Gameplay
                     transform.rotation,
                     Quaternion.LookRotation(direction.normalized, Vector3.up),
                     14f * Time.deltaTime);
+            }
+        }
+
+        private void HandleZoneChanged(ProjectGenesis.Data.WorldZoneDefinition zone)
+        {
+            if (zone != null && !zone.AllowsCombat)
+            {
+                StopCombatAction();
             }
         }
 

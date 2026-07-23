@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 025 Reusable Quest Content Definitions and Sprint 026 Parallel Quests And Second Quest are complete and accepted after the deterministic Sprint 008-026 regression suite and the user's Play Mode check. The Village Elder keeps Wolf Trophies, while a new Guard Captain offers a data-driven two-boar hunt that can be active at the same time.
+Sprint 025, Sprint 026, and Sprint 027 Zone Rules Foundation are complete and accepted after the deterministic Sprint 008-027 regression suite and the user's Play Mode check. The village is now an authored peaceful zone, while the northern wilderness explicitly allows combat.
 
 The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
 
@@ -17,6 +17,8 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - Hold the right mouse button and move the mouse to rotate the camera horizontally and vertically. A short right-click returns it behind the character.
 - Use the mouse wheel to zoom the camera in and out. Click the wheel to switch between the rear and front views.
 - WASD or arrow keys are optional fallback controls and cancel the current click destination.
+- The starter village is a peaceful zone. Enemies can still be selected there, but normal attacks and Heavy Strike are refused with a system message and do not start cooldowns.
+- Crossing the north gate enters `Северные окрестности`, where combat works normally. Returning to the village stops active combat, makes pursuing enemies return, and announces the peaceful zone in the local feed.
 - Leave the village through the north gate to reach the first combat area. Its three wolves are spread across the zone and return home before they can chase the player back into the village.
 - Idle wolves alternate between short pauses and small NavMesh walks around their spawn points. Their roaming radius and pause range are editable on the wolf prefab.
 - Click a grey wolf once to select it. Click the selected wolf again at any time to run into range and attack automatically; a quick double-click performs both steps.
@@ -122,6 +124,7 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - [42_SPRINT_024.md](42_SPRINT_024.md) - typed local message stream, filterable feed, local chat input, and validation sprint.
 - [43_SPRINT_025.md](43_SPRINT_025.md) - reusable quest content definitions, NPC decoupling, save compatibility, and validation sprint.
 - [44_SPRINT_026.md](44_SPRINT_026.md) - second quest giver, parallel active quests, shared tracking, and validation sprint.
+- [45_SPRINT_027.md](45_SPRINT_027.md) - reusable peaceful and combat zone rules, transition feedback, safe resurrection, and validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

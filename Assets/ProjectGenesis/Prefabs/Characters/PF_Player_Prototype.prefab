@@ -112,6 +112,7 @@ GameObject:
   - component: {fileID: 4857155830772707276}
   - component: {fileID: 8499092032952935784}
   - component: {fileID: 4561324553330474515}
+  - component: {fileID: 6301640335070616406}
   m_Layer: 0
   m_Name: PF_Player_Prototype
   m_TagString: Untagged
@@ -434,3 +435,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   respawnPoint: {fileID: 0}
   deathView: {fileID: 0}
+--- !u!114 &6301640335070616406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5875306266831850917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bca2de97284f409ead26f56f65d8f6f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultZone: {fileID: 11400000, guid: 6afed9322536758468581645f3556281, type: 2}
+  zoneVolumes: []

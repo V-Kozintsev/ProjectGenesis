@@ -80,6 +80,17 @@ Enemies should telegraph danger through:
 - attack speed;
 - size or visual category.
 
+## Zone Rules
+
+Combat permission belongs to the player's resolved world zone rather than to UI buttons or enemy placement.
+
+- peaceful zones allow selection but refuse basic attacks and active combat skills before movement, damage, or cooldown begins;
+- entering a peaceful zone stops an active player attack and causes hostile AI to return instead of damaging the protected player;
+- combat zones preserve the normal selection, approach, skill, damage, and autoattack loop;
+- overlapping world-zone volumes use explicit priority so a village, sanctuary, or interior can override a broader region;
+- unmapped starter-region space uses an authored combat fallback so gaps cannot accidentally become protected;
+- future PvP, faction, duel, guard, and crime rules must extend this authority instead of bypassing it.
+
 ## Death
 
 Player death in prototype:

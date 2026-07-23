@@ -13616,6 +13616,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1411810987}
   - component: {fileID: 1411810986}
+  - component: {fileID: 1411810988}
   m_Layer: 0
   m_Name: Zone_NorthCombat
   m_TagString: Untagged
@@ -13652,6 +13653,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1411810988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1411810985}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9beb32d2ff94832a38d9589e308c106, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  definition: {fileID: 11400000, guid: 6afed9322536758468581645f3556281, type: 2}
+  size: {x: 16.4, y: 10}
+  edgePadding: 0
+  priority: 10
 --- !u!1 &1413935142
 GameObject:
   m_ObjectHideFlags: 0
@@ -15470,6 +15487,54 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &1549565538
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1549565540}
+  - component: {fileID: 1549565539}
+  m_Layer: 0
+  m_Name: Zone_StarterVillageSafe
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1549565539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1549565538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9beb32d2ff94832a38d9589e308c106, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  definition: {fileID: 11400000, guid: cb12467efad40974eb0983d5505b0212, type: 2}
+  size: {x: 16.4, y: 16.4}
+  edgePadding: 0
+  priority: 100
+--- !u!4 &1549565540
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1549565538}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.05, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1552891635
 GameObject:
   m_ObjectHideFlags: 0
@@ -16949,6 +17014,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1781590605}
   m_CullTransparentMesh: 1
+--- !u!114 &1786778733 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6301640335070616406, guid: 18719c27b43cc5447826037ae93cda88, type: 3}
+  m_PrefabInstance: {fileID: 1945297642}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1945297659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bca2de97284f409ead26f56f65d8f6f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1790031685
 GameObject:
   m_ObjectHideFlags: 0
@@ -18780,6 +18856,7 @@ MonoBehaviour:
   - {fileID: 1933557017}
   - {fileID: 1933557018}
   - {fileID: 1933557013}
+  - {fileID: 1786778733}
 --- !u!114 &1933557013
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19485,6 +19562,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 6301640335070616406, guid: 18719c27b43cc5447826037ae93cda88, type: 3}
+      propertyPath: zoneVolumes.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6301640335070616406, guid: 18719c27b43cc5447826037ae93cda88, type: 3}
+      propertyPath: 'zoneVolumes.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1549565539}
+    - target: {fileID: 6301640335070616406, guid: 18719c27b43cc5447826037ae93cda88, type: 3}
+      propertyPath: 'zoneVolumes.Array.data[1]'
+      value: 
+      objectReference: {fileID: 1411810988}
     - target: {fileID: 6891834445730343274, guid: 18719c27b43cc5447826037ae93cda88, type: 3}
       propertyPath: cameraTransform
       value: 
@@ -21372,3 +21461,4 @@ SceneRoots:
   - {fileID: 879328536}
   - {fileID: 1281391825}
   - {fileID: 1902884557}
+  - {fileID: 1549565540}

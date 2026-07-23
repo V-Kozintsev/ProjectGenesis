@@ -12,6 +12,11 @@
 - Kept the wolf and boar quests simultaneously active, independently progressed, persisted, and turnable in either order; the compact tracker now summarizes multiple active quests.
 - Restored a bold visible close symbol on the selected-target panel and added deterministic scene coverage for it.
 - Passed the Sprint 008-026 relevant regression suite and accepted Sprint 026 after the user's Play Mode check of simultaneous quests, independent progress, persistence, turn-in, and target-panel close control.
+- Started Sprint 027 Zone Rules Foundation with documented scope and acceptance criteria.
+- Added reusable `WorldZoneDefinition` assets and prioritized `WorldZoneVolume` scene bounds for the peaceful starter village and combat-enabled north wilds.
+- Centralized combat authorization in `PlayerZoneController`; normal attacks, Heavy Strike, and hostile AI now respect peaceful protection while enemy selection remains available.
+- Published authored zone-transition and combat-refusal messages through the existing local feed and refreshed the resolved zone immediately after village resurrection.
+- Passed the deterministic Sprint 008-027 relevant regression suite and accepted Sprint 027 after the user's Play Mode check of peaceful combat refusal, zone transitions, wilderness combat, enemy return, and safe resurrection.
 - Started Sprint 023 Character Equipment View with documented scope and acceptance criteria.
 - Started Sprint 024 Local Message Feed Foundation with documented scope and acceptance criteria.
 - Added a bounded typed session-local stream for system, loot, combat, local-chat, and announcement events without adding message history to character saves.

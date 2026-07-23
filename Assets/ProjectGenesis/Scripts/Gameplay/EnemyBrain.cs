@@ -44,6 +44,7 @@ namespace ProjectGenesis.Gameplay
         private Health playerHealth;
         private CombatStats playerStats;
         private LocalMessageStream playerMessageStream;
+        private PlayerZoneController playerZoneController;
         private Collider targetCollider;
         private Collider playerCollider;
         private EnemyTerritory territory;
@@ -145,6 +146,24 @@ namespace ProjectGenesis.Gameplay
                 else
                 {
                     hasAggro = false;
+                    UpdateRoaming();
+                }
+
+                return;
+            }
+
+            if (playerZoneController != null && !playerZoneController.IsCombatAllowed)
+            {
+                if (State == EnemyState.Return)
+                {
+                    UpdateReturn();
+                }
+                else if (hasAggro || distanceFromHome > GetReturnArrivalDistance())
+                {
+                    BeginReturn();
+                }
+                else
+                {
                     UpdateRoaming();
                 }
 
@@ -275,6 +294,12 @@ namespace ProjectGenesis.Gameplay
 
             if (attacker != null)
             {
+                PlayerZoneController attackerZone = attacker.GetComponent<PlayerZoneController>();
+                if (attackerZone != null && !attackerZone.IsCombatAllowed)
+                {
+                    return 0;
+                }
+
                 SetPlayer(attacker.transform);
             }
 
@@ -292,6 +317,7 @@ namespace ProjectGenesis.Gameplay
             playerHealth = player != null ? player.GetComponent<Health>() : null;
             playerStats = player != null ? player.GetComponent<CombatStats>() : null;
             playerMessageStream = player != null ? player.GetComponent<LocalMessageStream>() : null;
+            playerZoneController = player != null ? player.GetComponent<PlayerZoneController>() : null;
             playerCollider = player != null ? player.GetComponent<Collider>() : null;
         }
 

@@ -23,6 +23,7 @@ namespace ProjectGenesis.Gameplay
         private PlayerLootController lootController;
         private PlayerInteractionController interactionController;
         private LocalMessageStream messageStream;
+        private PlayerZoneController zoneController;
         private bool isDeathStateActive;
         private int lastExperienceLoss;
         private bool isSubscribed;
@@ -78,6 +79,7 @@ namespace ProjectGenesis.Gameplay
             }
 
             health.RestoreFull();
+            zoneController?.RefreshNow();
             regeneration.SetRegenerationAllowed(true, true);
             isDeathStateActive = false;
             deathView?.Hide();
@@ -129,6 +131,7 @@ namespace ProjectGenesis.Gameplay
             lootController ??= GetComponent<PlayerLootController>();
             interactionController ??= GetComponent<PlayerInteractionController>();
             messageStream ??= GetComponent<LocalMessageStream>();
+            zoneController ??= GetComponent<PlayerZoneController>();
 
             if (!isSubscribed && health != null)
             {
