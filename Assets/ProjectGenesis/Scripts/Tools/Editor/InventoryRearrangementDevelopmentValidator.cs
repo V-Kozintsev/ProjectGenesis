@@ -147,9 +147,9 @@ namespace ProjectGenesis.Tools.Editor
             ItemDefinition sword,
             ItemDefinition axe)
         {
-            Require(PlayerProfileData.CurrentVersion == 7,
-                "Current profile version must be 7.");
-            for (int version = 1; version <= 7; version++)
+            Require(PlayerProfileData.CurrentVersion >= 7,
+                "Current profile version must keep inventory positions.");
+            for (int version = 1; version <= PlayerProfileData.CurrentVersion; version++)
             {
                 Require(LocalJsonPlayerPersistence.IsSupportedVersion(version),
                     $"Profile version {version} must remain supported.");

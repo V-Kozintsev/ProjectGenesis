@@ -10,6 +10,7 @@ namespace ProjectGenesis.Saving
     [DefaultExecutionOrder(250)]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(PlayerProgression), typeof(PlayerInventory), typeof(PlayerEquipment))]
+    [RequireComponent(typeof(PlayerWallet))]
     [RequireComponent(typeof(PlayerIdentity))]
     public sealed class PlayerPersistenceController : MonoBehaviour
     {
@@ -22,6 +23,7 @@ namespace ProjectGenesis.Saving
         private PlayerProgression progression;
         private PlayerInventory inventory;
         private PlayerEquipment equipment;
+        private PlayerWallet wallet;
         private QuestLog questLog;
         private NavMeshAgent agent;
         private IPlayerPersistence persistence;
@@ -53,6 +55,7 @@ namespace ProjectGenesis.Saving
             progression = GetComponent<PlayerProgression>();
             inventory = GetComponent<PlayerInventory>();
             equipment = GetComponent<PlayerEquipment>();
+            wallet = GetComponent<PlayerWallet>();
             questLog = GetComponent<QuestLog>();
             agent = GetComponent<NavMeshAgent>();
             persistence = new LocalJsonPlayerPersistence();
@@ -114,6 +117,7 @@ namespace ProjectGenesis.Saving
                     : string.Empty,
                 Level = progression.Level,
                 CurrentExperience = progression.CurrentExperience,
+                Gold = wallet != null ? wallet.Gold : 0,
                 MainHandInstanceId = equipment.MainHand != null
                     ? equipment.MainHand.InstanceId
                     : string.Empty,
@@ -190,6 +194,7 @@ namespace ProjectGenesis.Saving
 
             inventory.RestoreSlots(restoredItems);
             progression.RestoreState(profile.Level, profile.CurrentExperience);
+            wallet?.RestoreGold(profile.Version >= 8 ? profile.Gold : wallet.StartingGold);
             questLog?.RestoreState(profile.Quests);
             if (profile.Version >= 7)
             {

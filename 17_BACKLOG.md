@@ -15,13 +15,17 @@ New ideas are recorded here even when they are not ready for implementation. Eac
 - First dungeon-like cave.
 - Reputation with village factions.
 - Simple crafting.
-- Merchant economy: currency, buy and sell prices, vendor stock, item sinks, repair or service costs, and save/server authority rules.
+- Merchant economy expansion: final pricing, item sinks, repair or service costs, limited stock, buyback, player trading, and save/server authority rules.
+- NPC interaction hub: first show a greeting and clear choices such as quest, trade, talk/lore, achievements or services where relevant, and close instead of making every NPC action open immediately.
+- Item information UX: show item descriptions and stats through hover, selection, right-click details, or a later tooltip system before final inventory art.
+- Player-to-player trade: two-sided exchange window where both players place items and gold, then both confirm before the exchange is committed by the server.
 - Gathering nodes.
 - Mounts much later.
 
 ## Combat Ideas
 
 - Skill cooldowns.
+- Replace the temporary centered Heavy Strike button with a compact skill hotbar made of slots/icons once the skill system has more than one action.
 - Class resource systems.
 - Blocking and dodging.
 - Enemy telegraph attacks.

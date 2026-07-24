@@ -24,6 +24,8 @@ namespace ProjectGenesis.Gameplay
         public int AttackBonus => definition != null ? definition.AttackBonus : 0;
         public int DefenseBonus => definition != null ? definition.DefenseBonus : 0;
         public int HealingAmount => definition != null ? definition.HealingAmount : 0;
+        public int BuyPrice => definition != null ? definition.BuyPrice : 0;
+        public int SellPrice => definition != null ? definition.SellPrice : 0;
         public bool IsValid => definition != null && !string.IsNullOrWhiteSpace(instanceId);
 
         public static ItemInstance Create(ItemDefinition definition, string stableInstanceId = null)

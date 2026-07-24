@@ -18,6 +18,7 @@ namespace ProjectGenesis.Gameplay
 
         [Header("References")]
         [SerializeField] private DialogueWindow dialogueWindow;
+        [SerializeField] private MerchantShopView merchantShopView;
         [SerializeField] private InteractionPromptView promptView;
         [SerializeField] private Camera gameplayCamera;
 
@@ -59,6 +60,7 @@ namespace ProjectGenesis.Gameplay
             if (health != null && health.IsDead)
             {
                 CancelPendingInteraction(true);
+                merchantShopView?.Close();
                 promptView?.Hide();
                 return;
             }
@@ -67,6 +69,7 @@ namespace ProjectGenesis.Gameplay
             nearestNpc = FindNearestNpc();
             ClearSelectionWhenTooFar();
             CloseDialogueWhenTooFar();
+            CloseShopWhenTooFar();
             TryOpenPendingInteraction();
 
             if (nearestNpc != null)
@@ -82,7 +85,7 @@ namespace ProjectGenesis.Gameplay
             if (!GameplayInputGate.IsTextEntryFocused && nearestNpc != null &&
                 keyboard != null && keyboard.eKey.wasPressedThisFrame)
             {
-                nearestNpc.Interact(questLog, dialogueWindow, CanInteractWith);
+                InteractWithNpc(nearestNpc);
             }
 
         }
@@ -90,6 +93,11 @@ namespace ProjectGenesis.Gameplay
         public void SetDialogueWindow(DialogueWindow window)
         {
             dialogueWindow = window;
+        }
+
+        public void SetMerchantShopView(MerchantShopView view)
+        {
+            merchantShopView = view;
         }
 
         public void SetPromptView(InteractionPromptView view)
@@ -112,6 +120,7 @@ namespace ProjectGenesis.Gameplay
             CancelPendingInteraction(true);
             ClearNpcSelection();
             dialogueWindow?.Hide();
+            merchantShopView?.Close();
         }
 
         public void ClearSelection()
@@ -119,6 +128,7 @@ namespace ProjectGenesis.Gameplay
             CancelPendingInteraction(true);
             ClearNpcSelection();
             dialogueWindow?.Hide();
+            merchantShopView?.Close();
         }
 
         public void HandleNpcClick(InteractableNpc clickedNpc)
@@ -133,6 +143,7 @@ namespace ProjectGenesis.Gameplay
                 CancelPendingInteraction(true);
                 SetSelectedNpc(clickedNpc);
                 dialogueWindow?.Hide();
+                merchantShopView?.Close();
                 promptView?.ShowMessage($"Выбран NPC: {clickedNpc.DisplayName}");
                 return;
             }
@@ -141,7 +152,7 @@ namespace ProjectGenesis.Gameplay
             if (distance <= interactionRadius)
             {
                 CancelPendingInteraction(true);
-                clickedNpc.Interact(questLog, dialogueWindow, CanInteractWith);
+                InteractWithNpc(clickedNpc);
             }
             else if (distance <= clickApproachMaxDistance)
             {
@@ -199,8 +210,21 @@ namespace ProjectGenesis.Gameplay
             {
                 InteractableNpc npc = pendingInteractionNpc;
                 CancelPendingInteraction(true);
-                npc.Interact(questLog, dialogueWindow, CanInteractWith);
+                InteractWithNpc(npc);
             }
+        }
+
+        private void InteractWithNpc(InteractableNpc npc)
+        {
+            MerchantShop shop = npc != null ? npc.GetComponent<MerchantShop>() : null;
+            if (shop != null)
+            {
+                dialogueWindow?.Hide();
+                shop.OpenFor(gameObject, merchantShopView);
+                return;
+            }
+
+            npc?.Interact(questLog, dialogueWindow, CanInteractWith);
         }
 
         private void CancelPendingInteraction(bool resetAgentPath)
@@ -285,6 +309,20 @@ namespace ProjectGenesis.Gameplay
             }
         }
 
+        private void CloseShopWhenTooFar()
+        {
+            if (merchantShopView == null || !merchantShopView.IsOpen ||
+                selectedNpc == null || selectedNpc.GetComponent<MerchantShop>() == null)
+            {
+                return;
+            }
+
+            if (!CanInteractWith(selectedNpc))
+            {
+                merchantShopView.Close();
+            }
+        }
+
         private void ClearSelectionWhenTooFar()
         {
             if (selectedNpc == null || GetPlanarDistance(selectedNpc) <= clickApproachMaxDistance)
@@ -295,6 +333,7 @@ namespace ProjectGenesis.Gameplay
             CancelPendingInteraction(true);
             ClearNpcSelection();
             dialogueWindow?.Hide();
+            merchantShopView?.Close();
         }
 
         private bool CanInteractWith(InteractableNpc npc)

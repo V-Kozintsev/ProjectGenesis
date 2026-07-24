@@ -19,3 +19,5 @@ MonoBehaviour:
   attackBonus: 0
   defenseBonus: 3
   healingAmount: 0
+  buyPrice: 32
+  sellPrice: 8

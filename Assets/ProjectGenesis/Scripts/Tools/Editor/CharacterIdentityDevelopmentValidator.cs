@@ -76,8 +76,8 @@ namespace ProjectGenesis.Tools.Editor
 
         private static void ValidateProfileCompatibility()
         {
-            Require(PlayerProfileData.CurrentVersion == 7,
-                "Current local profile version must be 7.");
+            Require(PlayerProfileData.CurrentVersion >= 7,
+                "Current profile version must keep identity and separated equipment data.");
             Require(LocalJsonPlayerPersistence.IsSupportedVersion(1),
                 "Existing version-1 profiles must remain supported.");
             Require(LocalJsonPlayerPersistence.IsSupportedVersion(2),
@@ -94,7 +94,7 @@ namespace ProjectGenesis.Tools.Editor
                 "Current version-7 separated-equipment profiles must be supported.");
             Require(!LocalJsonPlayerPersistence.IsSupportedVersion(0),
                 "Invalid version 0 must be rejected.");
-            Require(!LocalJsonPlayerPersistence.IsSupportedVersion(8),
+            Require(!LocalJsonPlayerPersistence.IsSupportedVersion(PlayerProfileData.CurrentVersion + 1),
                 "Unknown future profile versions must be rejected.");
 
             PlayerProfileData legacyProfile = JsonUtility.FromJson<PlayerProfileData>(

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ProjectGenesis.Core;
 using ProjectGenesis.Data;
 using ProjectGenesis.Gameplay;
@@ -528,6 +529,79 @@ namespace ProjectGenesis.Tools.Editor
             EditorSceneManager.SaveScene(scene, ScenePath);
             AssetDatabase.SaveAssets();
         }
+
+        [MenuItem("Project Genesis/Sprint 032/Rebuild Starter Village Merchant Shop")]
+        public static void RebuildStarterVillageMerchantShop()
+        {
+            RebuildStarterVillage();
+        }
+
+        [MenuItem("Project Genesis/Sprint 032/Apply Merchant Shop To Existing Scene")]
+        public static void ApplyMerchantShopToExistingScene()
+        {
+            EnsureFolders();
+            ItemDefinition rustySword = CreateRustySword();
+            ItemDefinition wornAxe = CreateWornAxe();
+            ItemDefinition wornLeatherArmor = CreateWornLeatherArmor();
+            ItemDefinition minorHealingPotion = CreateMinorHealingPotion();
+
+            Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            GameObject player = FindGameObject("Player");
+            GameObject canvasObject = FindGameObject("UI_FirstContact");
+            if (player == null || canvasObject == null)
+            {
+                throw new System.InvalidOperationException(
+                    "Starter village player or UI canvas was not found.");
+            }
+
+            EnsurePlayerWalletAndCatalog(
+                player,
+                new[] { rustySword, wornAxe, wornLeatherArmor, minorHealingPotion });
+            RecreateInventoryUi(canvasObject, player);
+
+            GameObject existingShopWindow = FindGameObject("MerchantShopWindow");
+            if (existingShopWindow != null)
+            {
+                Object.DestroyImmediate(existingShopWindow);
+            }
+
+            MerchantShopView shopView = CreateMerchantShopUi(canvasObject);
+            InteractableNpc merchant = FindNpc("NPC_VillageMerchant");
+            if (merchant == null)
+            {
+                merchant = CreateVillageMerchant(
+                    CreateMaterial(MerchantMaterialPath, new Color(0.42f, 0.33f, 0.2f)),
+                    CreateMaterial(TargetRingMaterialPath, new Color(0.85f, 0.16f, 0.12f)),
+                    minorHealingPotion,
+                    rustySword);
+            }
+            else
+            {
+                ConfigureMerchantShop(merchant, minorHealingPotion, rustySword);
+                EditorUtility.SetDirty(merchant);
+            }
+
+            PlayerInteractionController interactionController =
+                player.GetComponent<PlayerInteractionController>();
+            if (interactionController == null)
+            {
+                interactionController = player.AddComponent<PlayerInteractionController>();
+            }
+
+            interactionController.SetMerchantShopView(shopView);
+            IncludeGameplayBehaviour(player.GetComponent<PlayerWallet>());
+            GameObject characterEntryRoot = FindGameObject("CharacterEntryOverlay");
+            if (characterEntryRoot != null)
+            {
+                characterEntryRoot.transform.SetAsLastSibling();
+                EditorUtility.SetDirty(characterEntryRoot.transform);
+            }
+
+            EditorUtility.SetDirty(interactionController);
+            EditorSceneManager.SaveScene(scene, ScenePath);
+            AssetDatabase.SaveAssets();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -647,7 +721,11 @@ namespace ProjectGenesis.Tools.Editor
                 targetRingMaterial,
                 boarHuntQuest,
                 wolfAlphaHuntQuest);
-            CreateVillageMerchant(merchantMaterial, targetRingMaterial);
+            CreateVillageMerchant(
+                merchantMaterial,
+                targetRingMaterial,
+                minorHealingPotion,
+                rustySword);
             CreateEnemySpawners(
                 wolfPrefab,
                 boarPrefab,
@@ -658,6 +736,7 @@ namespace ProjectGenesis.Tools.Editor
                 clearingRoot.transform);
             FirstContactUi ui = CreateFirstContactUi(player, combatController, villageElder);
             interactionController.SetDialogueWindow(ui.DialogueWindow);
+            interactionController.SetMerchantShopView(ui.MerchantShopView);
             interactionController.SetPromptView(ui.PromptView);
 
             CreateEventSystem();
@@ -737,7 +816,13 @@ namespace ProjectGenesis.Tools.Editor
                 AssetDatabase.CreateAsset(item, RustySwordPath);
             }
 
-            item.Configure("weapon.rusty_sword", "Ржавый меч", ItemType.Weapon, 4);
+            item.Configure(
+                "weapon.rusty_sword",
+                "Ржавый меч",
+                ItemType.Weapon,
+                attack: 4,
+                buy: 24,
+                sell: 6);
             EditorUtility.SetDirty(item);
             return item;
         }
@@ -751,7 +836,13 @@ namespace ProjectGenesis.Tools.Editor
                 AssetDatabase.CreateAsset(item, WornAxePath);
             }
 
-            item.Configure("weapon.worn_axe", "Потёртый топор", ItemType.Weapon, 7);
+            item.Configure(
+                "weapon.worn_axe",
+                "Потёртый топор",
+                ItemType.Weapon,
+                attack: 7,
+                buy: 38,
+                sell: 10);
             EditorUtility.SetDirty(item);
             return item;
         }
@@ -770,7 +861,9 @@ namespace ProjectGenesis.Tools.Editor
                 "armor.worn_leather",
                 "Потёртая кожаная броня",
                 ItemType.Armor,
-                defense: 3);
+                defense: 3,
+                buy: 32,
+                sell: 8);
             EditorUtility.SetDirty(item);
             return item;
         }
@@ -789,7 +882,9 @@ namespace ProjectGenesis.Tools.Editor
                 "consumable.minor_healing_potion",
                 "Малое лечебное зелье",
                 ItemType.Consumable,
-                healing: 30);
+                healing: 30,
+                buy: 12,
+                sell: 3);
             EditorUtility.SetDirty(item);
             return item;
         }
@@ -1067,6 +1162,8 @@ namespace ProjectGenesis.Tools.Editor
             progression.ConfigureDeathPenalty(0.1f, 10);
             progression.ConfigureEnemyExperienceScaling(0.25f, 0.1f, 0.1f, 1.5f);
             player.AddComponent<LocalMessageStream>();
+            PlayerWallet wallet = player.AddComponent<PlayerWallet>();
+            wallet.ConfigureStartingGold(35);
             player.AddComponent<PlayerInventory>();
             player.AddComponent<PlayerEquipment>();
             player.AddComponent<PlayerItemUseController>();
@@ -1696,7 +1793,8 @@ namespace ProjectGenesis.Tools.Editor
 
         private static InteractableNpc CreateVillageMerchant(
             Material npcMaterial,
-            Material targetRingMaterial)
+            Material targetRingMaterial,
+            params ItemDefinition[] stockItems)
         {
             GameObject merchant = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             merchant.name = "NPC_VillageMerchant";
@@ -1708,6 +1806,7 @@ namespace ProjectGenesis.Tools.Editor
             InteractableNpc npc = merchant.AddComponent<InteractableNpc>();
             npc.ConfigureDisplayName("Деревенский торговец");
             npc.ConfigureQuests(null);
+            ConfigureMerchantShop(npc, stockItems);
 
             GameObject selectionRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             selectionRing.name = "SelectionRing";
@@ -1718,6 +1817,20 @@ namespace ProjectGenesis.Tools.Editor
             selectionRing.GetComponent<Renderer>().sharedMaterial = targetRingMaterial;
             npc.SetSelectionRing(selectionRing);
             return npc;
+        }
+
+        private static void ConfigureMerchantShop(
+            InteractableNpc merchant,
+            params ItemDefinition[] stockItems)
+        {
+            MerchantShop shop = merchant.GetComponent<MerchantShop>();
+            if (shop == null)
+            {
+                shop = merchant.gameObject.AddComponent<MerchantShop>();
+            }
+
+            shop.Configure("Деревенский торговец", stockItems);
+            EditorUtility.SetDirty(shop);
         }
 
         private static void CreateEnemySpawners(
@@ -1814,6 +1927,7 @@ namespace ProjectGenesis.Tools.Editor
             CreateQuestProgressToast(canvasObject, player.GetComponent<QuestLog>());
             CreateQuestJournalUi(canvasObject, player.GetComponent<QuestLog>(), dialogueWindow);
             CreateInventoryUi(canvasObject, player);
+            MerchantShopView merchantShopView = CreateMerchantShopUi(canvasObject);
             CreateCharacterStatsUi(canvasObject, player);
             CreateSkillHotbar(canvasObject, player.GetComponent<PlayerSkillController>());
             CreateDeathRespawnUi(canvasObject, player.GetComponent<PlayerDeathController>());
@@ -1821,7 +1935,146 @@ namespace ProjectGenesis.Tools.Editor
             CreateWorldMap(canvasObject, player);
             CreateCharacterEntryUi(canvasObject, player);
 
-            return new FirstContactUi(dialogueWindow, promptView);
+            return new FirstContactUi(dialogueWindow, merchantShopView, promptView);
+        }
+
+        private static MerchantShopView CreateMerchantShopUi(GameObject canvasObject)
+        {
+            GameObject window = CreatePanel(
+                "MerchantShopWindow",
+                canvasObject.transform,
+                new Color(0.045f, 0.055f, 0.06f, 0.97f));
+            SetRect(
+                window.GetComponent<RectTransform>(),
+                new Vector2(-30f, -30f),
+                new Vector2(760f, 470f),
+                new Vector2(1f, 1f));
+            CreateWindowDragHandle(window, 700f);
+
+            Text title = CreateText(
+                "Text_MerchantShopTitle",
+                window.transform,
+                "Деревенский торговец",
+                28,
+                TextAnchor.UpperLeft);
+            title.color = new Color(1f, 0.84f, 0.48f);
+            SetRect(title.GetComponent<RectTransform>(), new Vector2(24f, -20f), new Vector2(420f, 38f), new Vector2(0f, 1f));
+
+            Text gold = CreateText(
+                "Text_MerchantShopGold",
+                window.transform,
+                "Золото: 0",
+                22,
+                TextAnchor.UpperRight);
+            gold.color = new Color(1f, 0.74f, 0.34f);
+            SetRect(gold.GetComponent<RectTransform>(), new Vector2(-72f, -24f), new Vector2(180f, 34f), new Vector2(1f, 1f));
+
+            Button closeButton = CreateButton("Button_CloseMerchantShop", window.transform, "X");
+            closeButton.GetComponent<Image>().color = new Color(0.28f, 0.1f, 0.09f, 1f);
+            SetRect(closeButton.GetComponent<RectTransform>(), new Vector2(-18f, -18f), new Vector2(38f, 36f), new Vector2(1f, 1f));
+
+            GameObject divider = CreatePanel("Divider_MerchantShop", window.transform, new Color(0.28f, 0.32f, 0.34f, 1f));
+            divider.GetComponent<Image>().raycastTarget = false;
+            SetRect(divider.GetComponent<RectTransform>(), new Vector2(24f, -76f), new Vector2(710f, 2f), new Vector2(0f, 1f));
+
+            Text buyTitle = CreateText("Text_MerchantBuyTitle", window.transform, "Покупка", 22, TextAnchor.UpperLeft);
+            buyTitle.color = new Color(0.9f, 0.92f, 0.94f);
+            SetRect(buyTitle.GetComponent<RectTransform>(), new Vector2(390f, -96f), new Vector2(330f, 32f), new Vector2(0f, 1f));
+
+            Text sellTitle = CreateText("Text_MerchantSellTitle", window.transform, "Продажа из рюкзака", 22, TextAnchor.UpperLeft);
+            sellTitle.color = new Color(0.9f, 0.92f, 0.94f);
+            SetRect(sellTitle.GetComponent<RectTransform>(), new Vector2(24f, -96f), new Vector2(330f, 32f), new Vector2(0f, 1f));
+
+            Button[] buyButtons = new Button[2];
+            Text[] buyTexts = new Text[2];
+            for (int index = 0; index < buyButtons.Length; index++)
+            {
+                Button buyButton = CreateButton(
+                    $"Button_MerchantBuy_{index + 1}",
+                    window.transform,
+                    "Товар");
+                SetRect(
+                    buyButton.GetComponent<RectTransform>(),
+                    new Vector2(390f, -138f - index * 74f),
+                    new Vector2(310f, 62f),
+                    new Vector2(0f, 1f));
+                Text buyText = buyButton.GetComponentInChildren<Text>();
+                buyText.fontSize = 17;
+                buyText.alignment = TextAnchor.MiddleLeft;
+                buyButtons[index] = buyButton;
+                buyTexts[index] = buyText;
+            }
+
+            Button[] sellButtons = new Button[8];
+            Text[] sellTexts = new Text[8];
+            for (int index = 0; index < sellButtons.Length; index++)
+            {
+                int column = index % 2;
+                int row = index / 2;
+                Button sellButton = CreateButton(
+                    $"Button_MerchantSellSlot_{index + 1}",
+                    window.transform,
+                    $"{index + 1}. Пусто");
+                SetRect(
+                    sellButton.GetComponent<RectTransform>(),
+                    new Vector2(24f + column * 164f, -138f - row * 66f),
+                    new Vector2(154f, 54f),
+                    new Vector2(0f, 1f));
+                Text sellText = sellButton.GetComponentInChildren<Text>();
+                sellText.fontSize = 14;
+                sellText.alignment = TextAnchor.MiddleLeft;
+                sellButtons[index] = sellButton;
+                sellTexts[index] = sellText;
+            }
+
+            Text feedback = CreateText(
+                "Text_MerchantShopFeedback",
+                window.transform,
+                "Выберите предмет для покупки или продажи.",
+                18,
+                TextAnchor.UpperLeft);
+            feedback.color = new Color(0.78f, 0.86f, 0.72f);
+            SetRect(feedback.GetComponent<RectTransform>(), new Vector2(24f, 28f), new Vector2(700f, 36f), new Vector2(0f, 0f));
+
+            MerchantShopView shopView = canvasObject.AddComponent<MerchantShopView>();
+            shopView.Initialize(
+                window,
+                closeButton,
+                title,
+                gold,
+                feedback,
+                buyButtons,
+                buyTexts,
+                sellButtons,
+                sellTexts);
+
+            window.SetActive(false);
+            return shopView;
+        }
+
+        private static void RecreateInventoryUi(GameObject canvasObject, GameObject player)
+        {
+            DestroyIfExists("InventoryWindow");
+            DestroyIfExists("Button_OpenInventory");
+            DestroyIfExists("InventoryDestroyConfirmation");
+
+            InventoryView[] inventoryViews = Object.FindObjectsByType<InventoryView>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            foreach (InventoryView inventoryView in inventoryViews)
+            {
+                Object.DestroyImmediate(inventoryView);
+            }
+
+            CharacterEquipmentView[] equipmentViews = Object.FindObjectsByType<CharacterEquipmentView>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            foreach (CharacterEquipmentView equipmentView in equipmentViews)
+            {
+                Object.DestroyImmediate(equipmentView);
+            }
+
+            CreateInventoryUi(canvasObject, player);
         }
 
         private static void CreateWorldMap(GameObject canvasObject, GameObject player)
@@ -2532,7 +2785,11 @@ namespace ProjectGenesis.Tools.Editor
 
             Text capacityText = CreateText("Text_InventoryCapacity", window.transform, "Ячейки: 0 / 8", 21, TextAnchor.UpperLeft);
             capacityText.color = new Color(0.82f, 0.88f, 0.92f);
-            SetRect(capacityText.GetComponent<RectTransform>(), new Vector2(24f, -78f), new Vector2(468f, 30f), new Vector2(0f, 1f));
+            SetRect(capacityText.GetComponent<RectTransform>(), new Vector2(24f, -78f), new Vector2(210f, 30f), new Vector2(0f, 1f));
+
+            Text goldText = CreateText("Text_InventoryGold", window.transform, "Золото: 0", 21, TextAnchor.UpperRight);
+            goldText.color = new Color(1f, 0.74f, 0.34f);
+            SetRect(goldText.GetComponent<RectTransform>(), new Vector2(248f, -78f), new Vector2(220f, 30f), new Vector2(0f, 1f));
 
             GameObject divider = CreatePanel("Divider", window.transform, new Color(0.28f, 0.32f, 0.34f, 1f));
             divider.GetComponent<Image>().raycastTarget = false;
@@ -2659,6 +2916,7 @@ namespace ProjectGenesis.Tools.Editor
                 slotButtons,
                 slotTexts,
                 capacityText,
+                goldText,
                 itemNameText,
                 itemDetailsText,
                 actionText,
@@ -2670,6 +2928,7 @@ namespace ProjectGenesis.Tools.Editor
                 cancelDestroyButton,
                 player.GetComponent<PlayerInventory>(),
                 player.GetComponent<PlayerEquipment>(),
+                player.GetComponent<PlayerWallet>(),
                 player.GetComponent<PlayerItemUseController>(),
                 player.GetComponent<PlayerItemDropController>());
 
@@ -3593,6 +3852,15 @@ namespace ProjectGenesis.Tools.Editor
             return null;
         }
 
+        private static void DestroyIfExists(string objectName)
+        {
+            GameObject target = FindGameObject(objectName);
+            if (target != null)
+            {
+                Object.DestroyImmediate(target);
+            }
+        }
+
         private static InteractableNpc FindNpc(string objectName)
         {
             InteractableNpc[] npcs = Object.FindObjectsByType<InteractableNpc>(
@@ -3660,6 +3928,50 @@ namespace ProjectGenesis.Tools.Editor
             behaviours.GetArrayElementAtIndex(newIndex).objectReferenceValue = behaviour;
             serializedEntry.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(entryViews[0]);
+        }
+
+        private static void EnsurePlayerWalletAndCatalog(
+            GameObject player,
+            ItemDefinition[] itemCatalog)
+        {
+            PlayerWallet wallet = player.GetComponent<PlayerWallet>();
+            if (wallet == null)
+            {
+                wallet = player.AddComponent<PlayerWallet>();
+                wallet.ConfigureStartingGold(35);
+            }
+
+            PlayerPersistenceController persistence =
+                player.GetComponent<PlayerPersistenceController>();
+            if (persistence != null)
+            {
+                CharacterRaceDefinition[] races = persistence.RaceCatalog != null
+                    ? ToArray(persistence.RaceCatalog)
+                    : System.Array.Empty<CharacterRaceDefinition>();
+                CharacterClassDefinition[] classes = persistence.ClassCatalog != null
+                    ? ToArray(persistence.ClassCatalog)
+                    : System.Array.Empty<CharacterClassDefinition>();
+                persistence.Configure(itemCatalog, races, classes);
+                EditorUtility.SetDirty(persistence);
+            }
+
+            EditorUtility.SetDirty(wallet);
+        }
+
+        private static T[] ToArray<T>(IReadOnlyList<T> values)
+        {
+            if (values == null)
+            {
+                return System.Array.Empty<T>();
+            }
+
+            T[] result = new T[values.Count];
+            for (int index = 0; index < values.Count; index++)
+            {
+                result[index] = values[index];
+            }
+
+            return result;
         }
 
         private static InputField CreateInputField(string name, Transform parent, string placeholderValue)
@@ -3763,13 +4075,18 @@ namespace ProjectGenesis.Tools.Editor
 
         private readonly struct FirstContactUi
         {
-            public FirstContactUi(DialogueWindow dialogueWindow, InteractionPromptView promptView)
+            public FirstContactUi(
+                DialogueWindow dialogueWindow,
+                MerchantShopView merchantShopView,
+                InteractionPromptView promptView)
             {
                 DialogueWindow = dialogueWindow;
+                MerchantShopView = merchantShopView;
                 PromptView = promptView;
             }
 
             public DialogueWindow DialogueWindow { get; }
+            public MerchantShopView MerchantShopView { get; }
             public InteractionPromptView PromptView { get; }
         }
     }

@@ -77,3 +77,9 @@ Needed operations:
 The current prototype stores every collected copy as a stable `ItemInstance` in one of eight persistent positions. The player can select, move, or swap exact copies. Main-hand equipment accepts only weapons; body equipment accepts only armor. The Worn Leather Armor contributes `+3` equipment defense without changing base defense.
 
 The Minor Healing Potion restores `30` health and is removed only after successful use. Full health, death, an invalid instance, or a non-consumable category rejects the action without deleting anything. Potions remain separate instances in this sprint; stacking and quickbar use are later systems.
+
+## Prototype Prices
+
+Items now carry temporary `Buy Price` and `Sell Price` values on `ItemDefinition`.
+
+These prices exist so the first merchant shop can buy and sell exact item instances. They are not final economy balance and should be tuned later together with drop rates, kill time, vendor availability, quest rewards, and currency sinks.

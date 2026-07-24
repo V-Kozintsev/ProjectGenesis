@@ -106,15 +106,15 @@ namespace ProjectGenesis.Tools.Editor
 
         private static void ValidateProfileMigration(ItemDefinition sword)
         {
-            Require(PlayerProfileData.CurrentVersion == 7,
-                "Current local profile version must be 7.");
-            for (int version = 1; version <= 7; version++)
+            Require(PlayerProfileData.CurrentVersion >= 7,
+                "Current profile version must keep stable item instances.");
+            for (int version = 1; version <= PlayerProfileData.CurrentVersion; version++)
             {
                 Require(LocalJsonPlayerPersistence.IsSupportedVersion(version),
                     $"Profile version {version} must remain supported.");
             }
 
-            Require(!LocalJsonPlayerPersistence.IsSupportedVersion(8),
+            Require(!LocalJsonPlayerPersistence.IsSupportedVersion(PlayerProfileData.CurrentVersion + 1),
                 "Unknown future profile versions must be rejected.");
 
             PlayerProfileData legacy = new()

@@ -4,7 +4,7 @@ Project Genesis is a small-scope online RPG prototype built in Unity. The goal i
 
 ## Current Stage
 
-Sprint 031 Map Foundation is in implementation after the accepted Sprint 030 Elite Quest And Merchant Placeholder. A readable prototype mini-map and larger `M` map are being added before the heavier merchant economy work.
+Sprint 032 Merchant Shop Foundation is in implementation after the accepted Sprint 031 Map Foundation. The next step is the first minimal buy/sell loop through the existing village merchant, with persistent gold but without full economy balancing.
 
 The Russian development sequence, seamless-world direction, lore and visual-production gates, and Codex task-handoff rules are summarized in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md).
 
@@ -46,6 +46,7 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - Rebuilding the starter village preserves edits to an existing loot-table asset. Use `Project Genesis > Sprint 009 > Validate Wolf Loot Table` to check the table and run a fixed-seed 100,000-roll simulation.
 - While the Village Elder's quest is active and incomplete, each wolf also has a 70% chance to add a `Wolf Tail` directly to objective progress. Quest trophies do not appear on the ground or occupy normal inventory slots, and progress stops at `5 / 5`.
 - Press `I` or click `Инвентарь [I]` to open one movable window containing the eight-slot bag plus separate `Правая рука` and `Тело` equipment slots.
+- The inventory window shows the character's current prototype gold near the bag capacity.
 - Click an occupied inventory slot to select that exact item. `Надеть` transfers a weapon or armor from the bag into its character slot; the equipped item no longer occupies one of the eight bag positions.
 - Drag an occupied slot onto an empty slot to move it, or onto another occupied slot to swap the two exact item instances. Reordered positions persist after restarting Play Mode.
 - Boars have a 20% chance to drop a `Потёртый топор` with `+7` attack; the Rusty Sword remains `+4` attack.
@@ -68,7 +69,10 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - Accept the Village Elder's quest, collect five wolf tails beyond the north gate, then return to the elder and choose `Завершить поручение`.
 - Talk to the Guard Captain near the north approach and accept `Кабанья угроза`. It can remain active together with the wolf quest; defeating two boars completes only its own objective.
 - After turning in `Кабанья угроза`, talk to the Guard Captain again to accept `Вожак стаи`. Ordinary wolves do not progress this quest; defeat the level-3 `Вожак стаи` in the eastern clearing, then return to the captain.
-- The `Деревенский торговец` in the village can be selected and talked to, but buy/sell economy, currency, prices, and vendor stock are intentionally later systems.
+- The `Деревенский торговец` in the village can be selected with one click. Re-click him nearby, or let the character auto-approach, to open a temporary shop window.
+- The shop shows persistent gold, two starter goods, and bag items that can be sold. Click a buy or sell entry once to choose it, then click it again to confirm the transaction.
+- Buying checks bag space and gold first; selling removes the exact item instance from the bag and adds its sell price.
+- Starter shop prices are temporary Inspector-tunable item data, not final economy balance.
 - The mini-map in the upper-right corner shows the current prototype region, the player marker, and the current authored area name. Press `M` to open or close the larger map window; text input focus blocks this shortcut while typing in chat.
 - When two quests are active, the compact tracker lists both and the `J` journal keeps their full independent details.
 - The authored content for that quest lives in `Assets/ProjectGenesis/Data/Quests/SO_Quest_WolfTrophies.asset`; the Village Elder references the asset instead of storing a private copy of its texts and numbers.
@@ -135,6 +139,7 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - [46_SPRINT_029.md](46_SPRINT_029.md) - combat readability layer for temporary elite attack warnings without permanent explanatory clutter.
 - [47_SPRINT_030.md](47_SPRINT_030.md) - elite follow-up quest and merchant placeholder without starting the economy system.
 - [48_SPRINT_031.md](48_SPRINT_031.md) - mini-map and larger M map foundation for starter-region orientation.
+- [49_SPRINT_032.md](49_SPRINT_032.md) - first merchant shop, persistent gold, starter prices, buy/sell, and validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

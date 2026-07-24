@@ -19,6 +19,7 @@ namespace ProjectGenesis.UI
         [SerializeField] private Button[] slotButtons;
         [SerializeField] private Text[] slotTexts;
         [SerializeField] private Text capacityText;
+        [SerializeField] private Text goldText;
         [SerializeField] private Text itemNameText;
         [SerializeField] private Text itemDetailsText;
         [SerializeField] private Text itemActionText;
@@ -30,6 +31,7 @@ namespace ProjectGenesis.UI
         [SerializeField] private Button cancelDestroyButton;
         [SerializeField] private PlayerInventory inventory;
         [SerializeField] private PlayerEquipment equipment;
+        [SerializeField] private PlayerWallet wallet;
         [SerializeField] private PlayerItemUseController itemUseController;
         [SerializeField] private PlayerItemDropController itemDropController;
         [SerializeField] private string selectedInstanceId;
@@ -67,6 +69,7 @@ namespace ProjectGenesis.UI
             Button[] inventorySlotButtons,
             Text[] inventorySlotTexts,
             Text capacityLabel,
+            Text goldLabel,
             Text itemNameLabel,
             Text itemDetailsLabel,
             Text actionLabel,
@@ -78,6 +81,7 @@ namespace ProjectGenesis.UI
             Button cancellationButton,
             PlayerInventory playerInventory,
             PlayerEquipment playerEquipment,
+            PlayerWallet playerWallet,
             PlayerItemUseController playerItemUseController,
             PlayerItemDropController playerItemDropController)
         {
@@ -90,6 +94,7 @@ namespace ProjectGenesis.UI
             slotButtons = inventorySlotButtons ?? Array.Empty<Button>();
             slotTexts = inventorySlotTexts ?? Array.Empty<Text>();
             capacityText = capacityLabel;
+            goldText = goldLabel;
             itemNameText = itemNameLabel;
             itemDetailsText = itemDetailsLabel;
             itemActionText = actionLabel;
@@ -101,6 +106,7 @@ namespace ProjectGenesis.UI
             cancelDestroyButton = cancellationButton;
             inventory = playerInventory;
             equipment = playerEquipment;
+            wallet = playerWallet;
             itemUseController = playerItemUseController;
             itemDropController = playerItemDropController;
         }
@@ -141,6 +147,11 @@ namespace ProjectGenesis.UI
             if (equipment != null)
             {
                 equipment.Changed += HandleEquipmentChanged;
+            }
+
+            if (wallet != null)
+            {
+                wallet.Changed += HandleWalletChanged;
             }
 
             CloseWindow();
@@ -185,6 +196,11 @@ namespace ProjectGenesis.UI
             if (equipment != null)
             {
                 equipment.Changed -= HandleEquipmentChanged;
+            }
+
+            if (wallet != null)
+            {
+                wallet.Changed -= HandleWalletChanged;
             }
 
         }
@@ -287,6 +303,11 @@ namespace ProjectGenesis.UI
             Refresh();
         }
 
+        private void HandleWalletChanged(PlayerWallet _)
+        {
+            Refresh();
+        }
+
         private void Refresh()
         {
             if (inventory == null || equipment == null)
@@ -297,6 +318,11 @@ namespace ProjectGenesis.UI
             if (capacityText != null)
             {
                 capacityText.text = $"Ячейки: {inventory.Count} / {inventory.Capacity}";
+            }
+
+            if (goldText != null)
+            {
+                goldText.text = wallet != null ? $"Золото: {wallet.Gold}" : "Золото: -";
             }
 
             ItemInstance item = ResolveSelectedItem();

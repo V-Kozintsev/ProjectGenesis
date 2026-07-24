@@ -2,6 +2,9 @@
 
 ## 2026-07-23
 
+- Started Sprint 032 Merchant Shop Foundation with documented scope and acceptance criteria.
+- Added persistent player gold, temporary item buy/sell prices, merchant stock, a movable shop window, and deterministic buy/sell validation.
+
 - Started Sprint 031 Map Foundation with documented scope and acceptance criteria.
 - Added a prototype mini-map and larger M map before starting merchant economy work.
 

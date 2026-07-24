@@ -6,7 +6,7 @@ Initial NPCs:
 
 - Village Elder - first quest giver.
 - Guard Captain - boar-hunt quest giver and follow-up combat-oriented quests such as the Wolf Alpha hunt.
-- Village Merchant - selectable and talkable placeholder; buy/sell comes later with economy rules.
+- Village Merchant - selectable shop NPC with a small starter stock; full economy rules come later.
 - Healer - future respawn and consumable hook.
 
 ## Quest Types
@@ -73,3 +73,7 @@ An `InteractableNpc` may also hold follow-up quest definitions. Follow-ups use p
 ## Quest Rule
 
 Quest logic should be objective-based. Do not write one custom class for every quest unless a quest truly has unique behavior.
+
+## Merchant Rule
+
+Merchant stock should be data-driven. The prototype merchant references item definitions and the shop window performs generic buy/sell actions against the player's wallet and bag rather than hardcoding one-off item behavior.
