@@ -218,7 +218,7 @@ namespace ProjectGenesis.UI
         private void RefreshTarget()
         {
             bool hasEnemyTarget = observedTarget != null && !observedTarget.IsDead;
-            bool hasNpcTarget = observedNpc != null;
+            bool hasNpcTarget = observedNpc != null && !IsNpcInteractionHubShowing(observedNpc);
             bool hasTarget = hasEnemyTarget || hasNpcTarget;
 
             if (targetPanel != null)
@@ -303,6 +303,14 @@ namespace ProjectGenesis.UI
             }
 
             targetStatusText.gameObject.SetActive(false);
+        }
+
+        private bool IsNpcInteractionHubShowing(InteractableNpc npc)
+        {
+            NpcInteractionView hub = interactionController != null
+                ? interactionController.NpcInteractionView
+                : null;
+            return hub != null && hub.IsVisible && hub.CurrentNpc == npc;
         }
 
         private static string BuildEnemyWarning(EnemyBrain enemy)

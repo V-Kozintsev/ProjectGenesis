@@ -602,6 +602,46 @@ namespace ProjectGenesis.Tools.Editor
             AssetDatabase.SaveAssets();
         }
 
+        [MenuItem("Project Genesis/Sprint 033/Rebuild Starter Village NPC Interaction Hub")]
+        public static void RebuildStarterVillageNpcInteractionHub()
+        {
+            RebuildStarterVillage();
+        }
+
+        [MenuItem("Project Genesis/Sprint 033/Apply NPC Interaction Hub To Existing Scene")]
+        public static void ApplyNpcInteractionHubToExistingScene()
+        {
+            Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            GameObject canvasObject = FindGameObject("UI_FirstContact");
+            GameObject player = FindGameObject("Player");
+            if (canvasObject == null || player == null)
+            {
+                throw new System.InvalidOperationException(
+                    "Starter village UI canvas or player was not found.");
+            }
+
+            NpcInteractionView interactionView = RecreateNpcInteractionUi(canvasObject);
+            PlayerInteractionController interactionController =
+                player.GetComponent<PlayerInteractionController>();
+            if (interactionController == null)
+            {
+                interactionController = player.AddComponent<PlayerInteractionController>();
+            }
+
+            interactionController.SetNpcInteractionView(interactionView);
+            EditorUtility.SetDirty(interactionController);
+
+            GameObject characterEntryRoot = FindGameObject("CharacterEntryOverlay");
+            if (characterEntryRoot != null)
+            {
+                characterEntryRoot.transform.SetAsLastSibling();
+                EditorUtility.SetDirty(characterEntryRoot.transform);
+            }
+
+            EditorSceneManager.SaveScene(scene, ScenePath);
+            AssetDatabase.SaveAssets();
+        }
+
         public static void RebuildStarterVillage()
         {
             EnsureFolders();
@@ -735,6 +775,7 @@ namespace ProjectGenesis.Tools.Editor
                 eliteTerritory,
                 clearingRoot.transform);
             FirstContactUi ui = CreateFirstContactUi(player, combatController, villageElder);
+            interactionController.SetNpcInteractionView(ui.NpcInteractionView);
             interactionController.SetDialogueWindow(ui.DialogueWindow);
             interactionController.SetMerchantShopView(ui.MerchantShopView);
             interactionController.SetPromptView(ui.PromptView);
@@ -1921,6 +1962,7 @@ namespace ProjectGenesis.Tools.Editor
             rect.sizeDelta = new Vector2(420f, 48f);
 
             InteractionPromptView promptView = CreateInteractionPrompt(canvasObject.transform);
+            NpcInteractionView npcInteractionView = CreateNpcInteractionUi(canvasObject.transform);
             DialogueWindow dialogueWindow = CreateDialogueWindow(canvasObject.transform);
             CreateCombatHud(canvasObject, player, combatController);
             CreateQuestTracker(canvasObject, player.GetComponent<QuestLog>(), villageElder);
@@ -1935,7 +1977,87 @@ namespace ProjectGenesis.Tools.Editor
             CreateWorldMap(canvasObject, player);
             CreateCharacterEntryUi(canvasObject, player);
 
-            return new FirstContactUi(dialogueWindow, merchantShopView, promptView);
+            return new FirstContactUi(
+                npcInteractionView,
+                dialogueWindow,
+                merchantShopView,
+                promptView);
+        }
+
+        private static NpcInteractionView RecreateNpcInteractionUi(GameObject canvasObject)
+        {
+            DestroyIfExists("NpcInteractionWindow");
+            NpcInteractionView[] interactionViews = Object.FindObjectsByType<NpcInteractionView>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            foreach (NpcInteractionView interactionView in interactionViews)
+            {
+                Object.DestroyImmediate(interactionView);
+            }
+
+            return CreateNpcInteractionUi(canvasObject.transform);
+        }
+
+        private static NpcInteractionView CreateNpcInteractionUi(Transform canvasTransform)
+        {
+            GameObject root = CreatePanel(
+                "NpcInteractionWindow",
+                canvasTransform,
+                new Color(0.045f, 0.055f, 0.06f, 0.97f));
+            SetRect(
+                root.GetComponent<RectTransform>(),
+                new Vector2(-360f, 38f),
+                new Vector2(560f, 300f),
+                new Vector2(0.5f, 0.5f));
+            CreateWindowDragHandle(root, 500f);
+
+            Text title = CreateText(
+                "Text_NpcInteractionTitle",
+                root.transform,
+                "NPC",
+                28,
+                TextAnchor.UpperLeft);
+            title.color = new Color(1f, 0.84f, 0.48f);
+            SetRect(title.GetComponent<RectTransform>(), new Vector2(24f, -20f), new Vector2(380f, 38f), new Vector2(0f, 1f));
+
+            Text body = CreateText(
+                "Text_NpcInteractionBody",
+                root.transform,
+                "Что вы хотели?",
+                20,
+                TextAnchor.UpperLeft);
+            body.color = new Color(0.9f, 0.92f, 0.9f);
+            body.lineSpacing = 1.08f;
+            SetRect(body.GetComponent<RectTransform>(), new Vector2(24f, -72f), new Vector2(512f, 92f), new Vector2(0f, 1f));
+
+            Button closeButton = CreateButton("Button_CloseNpcInteraction", root.transform, "X");
+            closeButton.GetComponent<Image>().color = new Color(0.28f, 0.1f, 0.09f, 1f);
+            SetRect(closeButton.GetComponent<RectTransform>(), new Vector2(-18f, -18f), new Vector2(38f, 36f), new Vector2(1f, 1f));
+
+            Button questButton = CreateButton("Button_NpcQuest", root.transform, "Задание");
+            SetRect(questButton.GetComponent<RectTransform>(), new Vector2(24f, -184f), new Vector2(240f, 46f), new Vector2(0f, 1f));
+
+            Button tradeButton = CreateButton("Button_NpcTrade", root.transform, "Торговля");
+            SetRect(tradeButton.GetComponent<RectTransform>(), new Vector2(296f, -184f), new Vector2(240f, 46f), new Vector2(0f, 1f));
+
+            Button talkButton = CreateButton("Button_NpcTalk", root.transform, "Поговорить");
+            SetRect(talkButton.GetComponent<RectTransform>(), new Vector2(24f, -240f), new Vector2(240f, 46f), new Vector2(0f, 1f));
+
+            Button exitButton = CreateButton("Button_NpcClose", root.transform, "Закрыть");
+            SetRect(exitButton.GetComponent<RectTransform>(), new Vector2(296f, -240f), new Vector2(240f, 46f), new Vector2(0f, 1f));
+
+            NpcInteractionView view = root.AddComponent<NpcInteractionView>();
+            view.Initialize(
+                root,
+                title,
+                body,
+                questButton,
+                tradeButton,
+                talkButton,
+                exitButton,
+                closeButton);
+            root.SetActive(false);
+            return view;
         }
 
         private static MerchantShopView CreateMerchantShopUi(GameObject canvasObject)
@@ -3690,10 +3812,10 @@ namespace ProjectGenesis.Tools.Editor
             rootRect.anchorMin = new Vector2(0.5f, 0f);
             rootRect.anchorMax = new Vector2(0.5f, 0f);
             rootRect.pivot = new Vector2(0.5f, 0f);
-            rootRect.anchoredPosition = new Vector2(0f, 42f);
-            rootRect.sizeDelta = new Vector2(420f, 56f);
+            rootRect.anchoredPosition = new Vector2(0f, 112f);
+            rootRect.sizeDelta = new Vector2(560f, 48f);
 
-            Text promptText = CreateText("Text_Prompt", root.transform, "Press E - Talk", 24, TextAnchor.MiddleCenter);
+            Text promptText = CreateText("Text_Prompt", root.transform, "Press E - Talk", 20, TextAnchor.MiddleCenter);
             promptText.color = new Color(1f, 0.95f, 0.82f);
             Stretch(promptText.GetComponent<RectTransform>(), 18f, 8f, 18f, 8f);
 
@@ -4076,15 +4198,18 @@ namespace ProjectGenesis.Tools.Editor
         private readonly struct FirstContactUi
         {
             public FirstContactUi(
+                NpcInteractionView npcInteractionView,
                 DialogueWindow dialogueWindow,
                 MerchantShopView merchantShopView,
                 InteractionPromptView promptView)
             {
+                NpcInteractionView = npcInteractionView;
                 DialogueWindow = dialogueWindow;
                 MerchantShopView = merchantShopView;
                 PromptView = promptView;
             }
 
+            public NpcInteractionView NpcInteractionView { get; }
             public DialogueWindow DialogueWindow { get; }
             public MerchantShopView MerchantShopView { get; }
             public InteractionPromptView PromptView { get; }

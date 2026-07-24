@@ -2,6 +2,9 @@
 
 ## 2026-07-23
 
+- Started Sprint 033 NPC Interaction Hub with documented scope and acceptance criteria.
+- Added a temporary NPC action window so quests and merchant trade open from explicit choices rather than immediate repeated-click actions.
+
 - Started Sprint 032 Merchant Shop Foundation with documented scope and acceptance criteria.
 - Added persistent player gold, temporary item buy/sell prices, merchant stock, a movable shop window, and deterministic buy/sell validation.
 

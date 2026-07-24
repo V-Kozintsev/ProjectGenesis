@@ -69,7 +69,8 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - Accept the Village Elder's quest, collect five wolf tails beyond the north gate, then return to the elder and choose `Завершить поручение`.
 - Talk to the Guard Captain near the north approach and accept `Кабанья угроза`. It can remain active together with the wolf quest; defeating two boars completes only its own objective.
 - After turning in `Кабанья угроза`, talk to the Guard Captain again to accept `Вожак стаи`. Ordinary wolves do not progress this quest; defeat the level-3 `Вожак стаи` in the eastern clearing, then return to the captain.
-- The `Деревенский торговец` in the village can be selected with one click. Re-click him nearby, or let the character auto-approach, to open a temporary shop window.
+- NPCs now open a temporary action window before their specific feature. Quest NPCs offer `Задание`; the merchant offers `Торговля`; `Поговорить` is a placeholder for later lore and services.
+- The `Деревенский торговец` in the village can be selected with one click. Re-click him nearby, or let the character auto-approach, then choose `Торговля` to open the temporary shop window.
 - The shop shows persistent gold, two starter goods, and bag items that can be sold. Click a buy or sell entry once to choose it, then click it again to confirm the transaction.
 - Buying checks bag space and gold first; selling removes the exact item instance from the bag and adds its sell price.
 - Starter shop prices are temporary Inspector-tunable item data, not final economy balance.
@@ -140,6 +141,7 @@ The Russian development sequence, seamless-world direction, lore and visual-prod
 - [47_SPRINT_030.md](47_SPRINT_030.md) - elite follow-up quest and merchant placeholder without starting the economy system.
 - [48_SPRINT_031.md](48_SPRINT_031.md) - mini-map and larger M map foundation for starter-region orientation.
 - [49_SPRINT_032.md](49_SPRINT_032.md) - first merchant shop, persistent gold, starter prices, buy/sell, and validation sprint.
+- [50_SPRINT_033.md](50_SPRINT_033.md) - reusable NPC action window for quests, trading, talk placeholders, and validation sprint.
 - [CHANGELOG.md](CHANGELOG.md) - change history.
 
 ## Development Principle

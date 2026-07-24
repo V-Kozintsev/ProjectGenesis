@@ -2,7 +2,7 @@
 
 ## Current Direction
 
-**Sprint 031: Map Foundation** is complete and accepted. **Sprint 032: Merchant Shop Foundation** is in implementation with persistent gold, temporary prices, and the first buy/sell loop through the existing village merchant.
+**Sprint 032: Merchant Shop Foundation** is complete and accepted. **Sprint 033: NPC Interaction Hub** is in implementation so quest and trade features open from explicit NPC action choices.
 
 This file preserves completed milestone history and the broad delivery order. The user-facing Russian plan and current dependency decisions live in [32_DEVELOPMENT_PLAN_RU.md](32_DEVELOPMENT_PLAN_RU.md). A future feature listed here is not permission to implement it before its dependencies or current priority.
 

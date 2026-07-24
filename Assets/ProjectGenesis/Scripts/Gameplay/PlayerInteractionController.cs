@@ -17,6 +17,7 @@ namespace ProjectGenesis.Gameplay
         [SerializeField, Min(1f)] private float clickApproachMaxDistance = 20f;
 
         [Header("References")]
+        [SerializeField] private NpcInteractionView npcInteractionView;
         [SerializeField] private DialogueWindow dialogueWindow;
         [SerializeField] private MerchantShopView merchantShopView;
         [SerializeField] private InteractionPromptView promptView;
@@ -35,6 +36,7 @@ namespace ProjectGenesis.Gameplay
         public event Action<InteractableNpc> SelectionChanged;
 
         public InteractableNpc SelectedNpc => selectedNpc;
+        public NpcInteractionView NpcInteractionView => npcInteractionView;
 
         private void Awake()
         {
@@ -60,6 +62,7 @@ namespace ProjectGenesis.Gameplay
             if (health != null && health.IsDead)
             {
                 CancelPendingInteraction(true);
+                npcInteractionView?.Hide();
                 merchantShopView?.Close();
                 promptView?.Hide();
                 return;
@@ -69,6 +72,7 @@ namespace ProjectGenesis.Gameplay
             nearestNpc = FindNearestNpc();
             ClearSelectionWhenTooFar();
             CloseDialogueWhenTooFar();
+            CloseNpcInteractionWhenTooFar();
             CloseShopWhenTooFar();
             TryOpenPendingInteraction();
 
@@ -95,6 +99,11 @@ namespace ProjectGenesis.Gameplay
             dialogueWindow = window;
         }
 
+        public void SetNpcInteractionView(NpcInteractionView view)
+        {
+            npcInteractionView = view;
+        }
+
         public void SetMerchantShopView(MerchantShopView view)
         {
             merchantShopView = view;
@@ -119,6 +128,7 @@ namespace ProjectGenesis.Gameplay
         {
             CancelPendingInteraction(true);
             ClearNpcSelection();
+            npcInteractionView?.Hide();
             dialogueWindow?.Hide();
             merchantShopView?.Close();
         }
@@ -127,6 +137,7 @@ namespace ProjectGenesis.Gameplay
         {
             CancelPendingInteraction(true);
             ClearNpcSelection();
+            npcInteractionView?.Hide();
             dialogueWindow?.Hide();
             merchantShopView?.Close();
         }
@@ -142,6 +153,7 @@ namespace ProjectGenesis.Gameplay
             {
                 CancelPendingInteraction(true);
                 SetSelectedNpc(clickedNpc);
+                npcInteractionView?.Hide();
                 dialogueWindow?.Hide();
                 merchantShopView?.Close();
                 promptView?.ShowMessage($"Выбран NPC: {clickedNpc.DisplayName}");
@@ -216,11 +228,17 @@ namespace ProjectGenesis.Gameplay
 
         private void InteractWithNpc(InteractableNpc npc)
         {
-            MerchantShop shop = npc != null ? npc.GetComponent<MerchantShop>() : null;
-            if (shop != null)
+            if (npcInteractionView != null)
             {
                 dialogueWindow?.Hide();
-                shop.OpenFor(gameObject, merchantShopView);
+                merchantShopView?.Close();
+                npcInteractionView.Show(
+                    npc,
+                    gameObject,
+                    questLog,
+                    dialogueWindow,
+                    merchantShopView,
+                    CanInteractWith);
                 return;
             }
 
@@ -309,6 +327,20 @@ namespace ProjectGenesis.Gameplay
             }
         }
 
+        private void CloseNpcInteractionWhenTooFar()
+        {
+            if (npcInteractionView == null || !npcInteractionView.IsVisible ||
+                npcInteractionView.CurrentNpc == null)
+            {
+                return;
+            }
+
+            if (!CanInteractWith(npcInteractionView.CurrentNpc))
+            {
+                npcInteractionView.Hide();
+            }
+        }
+
         private void CloseShopWhenTooFar()
         {
             if (merchantShopView == null || !merchantShopView.IsOpen ||
@@ -332,6 +364,7 @@ namespace ProjectGenesis.Gameplay
 
             CancelPendingInteraction(true);
             ClearNpcSelection();
+            npcInteractionView?.Hide();
             dialogueWindow?.Hide();
             merchantShopView?.Close();
         }
